@@ -1,0 +1,12 @@
+/*
+  Content-Security-Policy:
+    default-src 'self';
+    script-src 'self' https://pheu.roled.io https://*.posthog.com;
+    style-src 'self' 'unsafe-inline';
+    img-src * data:;
+    connect-src 'self' https://auth.roled.io https://pheu.roled.io https://*.posthog.com;
+    font-src 'self';
+    object-src 'none';
+    base-uri 'self';
+    frame-ancestors 'none';
+    form-action 'self';

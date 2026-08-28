@@ -1,0 +1,38 @@
+all: false
+dir: "{{.InterfaceDir}}"
+force-file-write: true
+formatter: goimports
+generate: true
+include-auto-generated: false
+log-level: info
+structname: "{{.Mock}}{{.InterfaceName}}"
+pkgname: "mocks"
+recursive: false
+require-template-schema-exists: true
+template: testify
+template-schema: "{{.Template}}.schema.json"
+packages:
+  github.com/roledio/roled/internal/repositories:
+    config:
+      all: true
+      dir: "internal/mocks/repositories"
+      filename: "Mock{{.InterfaceName}}.go"
+      recursive: true
+  github.com/roledio/roled/internal/services:
+    config:
+      all: true
+      dir: "internal/mocks/services"
+      filename: "Mock{{.InterfaceName}}.go"
+      recursive: true
+  github.com/roledio/roled/pkg/utils/cacheutil:
+    config:
+      all: true
+      dir: "pkg/mocks/utils/cacheutil"
+      filename: "Mock{{.InterfaceName}}.go"
+      recursive: true
+  github.com/roledio/roled/internal/queues:
+    config:
+      all: true
+      dir: "internal/mocks/queues"
+      filename: "Mock{{.InterfaceName}}.go"
+      recursive: true

@@ -1,0 +1,85 @@
+name: Release Roled
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  release:
+    name: Release Auth version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+
+      - name: Install minification tools
+        run: |
+          npm install -g csso-cli terser html-minifier-terser
+
+      - name: Run minification script
+        run: |
+          ./.scripts/minify-templates.sh --all --version ${{ github.sha }}
+
+      - name: Determine release version
+        id: version
+        run: |
+          set -euo pipefail
+          VERSION="v$(cd auth && make version)"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Releasing version: $VERSION"
+
+      - name: Make build script executable
+        run: chmod +x .scripts/build-image.sh
+
+      - name: Publish Docker image
+        run: .scripts/build-image.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          IMAGE_TAG_OVERRIDE: ${{ steps.version.outputs.version }}
+          GITHUB_REF_NAME: main
+          CI_GITHUB_SHA: ${{ github.sha }}
+          PUSH_LATEST: true
+
+      - name: Create git tag
+        if: success()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git rev-parse "${VERSION}" >/dev/null 2>&1; then
+            echo "Tag ${VERSION} already exists."
+          else
+            git tag "${VERSION}"
+            git push origin "${VERSION}"
+          fi
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+
+      - name: Bump auth version for the next release
+        if: success()
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          cd auth
+          make bump-version
+          NEXT_VERSION="$(make version)"
+          git add Makefile
+
+          if git diff --cached --quiet; then
+            echo "No version bump commit needed."
+          else
+            git commit -m "chore: :pushpin: bump auth version to ${NEXT_VERSION}"
+            git push origin HEAD:main
+          fi

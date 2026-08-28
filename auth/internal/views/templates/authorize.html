@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    {{template "partials/head" .}}
+    {{if not .IsError}}
+    <title>{{if or .Flash.IsSignup .Map.IsSignup}}Sign up for{{else}}Sign in to{{end}} {{.Data.Project.Name}}</title>
+    {{else}}
+    <title>Authorization Error</title>
+    {{end}}
+</head>
+
+<body>
+    <main class="roled-auth-page" role="main">
+        <div class="roled-auth-container">
+            {{if not .IsError}}
+            <div class="roled-auth-card roled-animate-slide-up">
+                <!-- Header with Logo and Project Name -->
+                <header class="roled-auth-header">
+                    {{if .Data.Project.LogoURL}}
+                    <img class="roled-auth-logo" src="{{.Data.Project.LogoURL}}" alt="{{.Data.Project.Name}} logo">
+                    {{end}}
+                    <h1 class="roled-auth-title" data-form-title>{{if or .Flash.IsSignup .Map.IsSignup}}Create
+                        account{{else}}Sign in{{end}}</h1>
+                    <p class="roled-auth-subtitle" data-form-subtitle data-project-name="{{.Data.Project.Name}}">
+                        {{if or .Flash.IsSignup .Map.IsSignup}}Sign up for{{else}}Sign in to{{end}}
+                        <strong>{{.Data.Project.Name}}</strong>
+                    </p>
+                </header>
+
+                <!-- Auth Form -->
+                <div class="roled-auth-body">
+                    <form method="POST" id="auth-form" data-auth-form data-validate>
+                        <input type="hidden" name="csrf_token" value="{{ .Map.CSRFToken }}">
+                        <input type="hidden" name="is_signup" id="is_signup" data-is-signup
+                            value="{{if or .Flash.IsSignup .Map.IsSignup}}true{{else}}false{{end}}">
+
+                        <!-- Email Field -->
+                        <div class="roled-form-group">
+                            <label class="roled-label" for="email">Email</label>
+                            <input type="email" name="email" id="email" class="roled-input"
+                                placeholder="Enter your email" required autocomplete="email" value="{{.Flash.Email}}">
+                        </div>
+
+                        <!-- Password Field -->
+                        <div class="roled-form-group">
+                            <label class="roled-label" for="password">Password</label>
+                            <div class="roled-password-wrapper">
+                                <input type="password" name="password" id="password" class="roled-input"
+                                    placeholder="Enter your password" required minlength="8"
+                                    data-minlength-message="Password must be at least 8 characters"
+                                    autocomplete="current-password">
+                                <button type="button" class="roled-password-toggle" aria-label="Show password">
+                                    <!-- Eye Open Icon -->
+                                    <svg class="icon-eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" style="display: none;">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                        <circle cx="12" cy="12" r="3" />
+                                    </svg>
+                                    <!-- Eye Closed Icon -->
+                                    <svg class="icon-eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path
+                                            d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                                        <line x1="1" y1="1" x2="23" y2="23" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Forgot Password Link -->
+                        {{if .Data.ProjectSetting.IsForgotPasswordEnabled}}
+                        <div class="roled-auth-forgot" data-forgot-password>
+                            <a href="/password/forgot?client_id={{.Map.ClientID}}&redirect_uri={{.Map.RedirectURI}}">
+                                Forgot password?
+                            </a>
+                        </div>
+                        {{end}}
+
+                        <!-- Confirm Password Field (Sign Up Only) -->
+                        <div class="roled-form-group" data-confirm-password data-signup-field style="display: none;">
+                            <label class="roled-label" for="password_confirmation">Confirm Password</label>
+                            <div class="roled-password-wrapper">
+                                <input type="password" name="password_confirmation" id="password_confirmation"
+                                    class="roled-input" placeholder="Confirm your password" autocomplete="new-password"
+                                    data-required-message="Password confirmation is required" required
+                                    data-confirm-match="#password" data-confirm-match-message="Passwords do not match">
+                                <button type="button" class="roled-password-toggle" aria-label="Show password">
+                                    <svg class="icon-eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" style="display: none;">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                        <circle cx="12" cy="12" r="3" />
+                                    </svg>
+                                    <svg class="icon-eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path
+                                            d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                                        <line x1="1" y1="1" x2="23" y2="23" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="roled-form-group">
+                            <button type="submit" class="roled-btn roled-btn-primary roled-btn-block" data-submit-btn>
+                                {{if or .Flash.IsSignup .Map.IsSignup}}Sign up{{else}}Sign in{{end}}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Footer with Sign Up/Sign In Toggle -->
+                {{if .Data.ProjectSetting.IsSignupEnabled}}
+                <footer class="roled-auth-footer">
+                    <p class="roled-auth-toggle-text" data-toggle-text>
+                        Don't have an account? <a href="#" data-auth-toggle>Sign up</a>
+                    </p>
+                </footer>
+                {{end}}
+            </div>
+
+            <!-- Powered By Roled Badge -->
+            <div class="roled-powered-by">
+                Powered by
+                <a href="https://roled.io" target="_blank" style="color: var(--roled-muted-foreground);">
+                    <img src="/assets/static/favicon.ico" alt="Roled Logo">
+                    <strong>Roled</strong>
+                </a>
+            </div>
+            {{end}}
+        </div>
+    </main>
+
+    <!-- Template Data -->
+    <div id="tmpl-data" 
+        {{if .Flash}}
+        data-flash-is-signup="{{.Flash.IsSignup}}" 
+        data-flash-error-message="{{.Flash.ErrorMessage}}"
+        {{end}}
+        {{if and (not .IsError) .Data.Project}}
+        data-project-name="{{.Data.Project.Name}}"
+        data-project-logo-url="{{.Data.Project.LogoURL}}"
+        {{end}}
+        data-map-is-signup="{{.Map.IsSignup}}"
+        data-error-message="{{.Error.Msg}}" 
+        {{if not .IsEnvProd}}
+        data-flash-error-debug="{{.Flash.ErrorDebug}}" 
+        data-error-debug="{{.Error.Err}}" 
+        {{end}}
+        data-is-env-prod="{{.IsEnvProd}}"
+        data-is-error="{{.IsError}}">
+    </div>
+
+    <!-- JavaScript Dependencies -->
+    <script src="/assets/static/roled.js?v=1"></script>
+
+    <script>
+        const tmplData = document.getElementById('tmpl-data').dataset;
+        // Initialize auth toggle when Roled is ready
+        document.addEventListener('DOMContentLoaded', function () {
+            // Roled.init() is called automatically in roled.js - no need to reinitialize
+
+            // Set initial form state based on server data
+            var isSignup = tmplData.flashIsSignup === 'true' || tmplData.mapIsSignup === 'true';
+            var confirmPasswordGroup = document.querySelector('[data-confirm-password]');
+            var forgotPasswordLink = document.querySelector('[data-forgot-password]');
+            var formTitle = document.querySelector('[data-form-title]');
+            var submitBtn = document.querySelector('[data-submit-btn]');
+            var formSubtitle = document.querySelector('[data-form-subtitle]');
+            var toggleText = document.querySelector('[data-toggle-text]');
+            var isSignupInput = document.querySelector('[data-is-signup]');
+
+            function updateForm(showSignup) {
+                if (tmplData.isError === 'true') {
+                    // If there's an error, don't change the form state
+                    return;
+                }
+
+                document.title = showSignup 
+                    ? 'Sign up for ' + tmplData.projectName 
+                    : 'Sign in to ' + tmplData.projectName;
+
+                if (formTitle) {
+                    formTitle.textContent = showSignup ? 'Sign up' : 'Sign in';
+                }
+
+                if (submitBtn) {
+                    submitBtn.textContent = showSignup ? 'Sign up' : 'Sign in';
+                }
+
+                if (formSubtitle) {
+                    var projectName = formSubtitle.dataset.projectName || '';
+                    formSubtitle.innerHTML = showSignup
+                        ? 'Sign up for <strong>' + projectName + '</strong>'
+                        : 'Sign in to <strong>' + projectName + '</strong>';
+                }
+
+                if (isSignupInput) {
+                    isSignupInput.value = showSignup ? 'true' : 'false';
+                }
+
+                if (confirmPasswordGroup) {
+                    confirmPasswordGroup.style.display = showSignup ? 'block' : 'none';
+                    var confirmInput = confirmPasswordGroup.querySelector('.roled-input');
+                    if (confirmInput) {
+                        if (showSignup) {
+                            confirmInput.setAttribute('required', '');
+                        } else {
+                            confirmInput.removeAttribute('required');
+                        }
+                    }
+                }
+
+                if (forgotPasswordLink) {
+                    forgotPasswordLink.style.display = showSignup ? 'none' : 'block';
+                }
+
+                if (toggleText) {
+                    toggleText.innerHTML = showSignup
+                        ? 'Already have an account? <a href="#" data-auth-toggle>Sign in</a>'
+                        : 'Don\'t have an account? <a href="#" data-auth-toggle>Sign up</a>';
+                }
+            }
+
+            // Initial state
+            updateForm(isSignup);
+
+            // Handle toggle clicks
+            document.addEventListener('click', function (e) {
+                var target = e.target.closest('[data-auth-toggle]');
+                if (!target) return;
+
+                e.preventDefault();
+                isSignup = !isSignup;
+                updateForm(isSignup);
+            });
+
+            if (typeof Roled !== 'undefined') {
+                var errorMessage = tmplData.errorMessage || tmplData.flashErrorMessage || '';
+                var errorDebug = tmplData.errorDebug || tmplData.flashErrorDebug || '';
+                if (errorMessage) {
+                    Roled.showErrorFromTemplate(errorMessage, errorDebug);
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,161 @@
+package accesstoken
+
+import (
+	"context"
+	"testing"
+	"time"
+
+	"github.com/roledio/roled/internal/configs"
+	"github.com/roledio/roled/internal/constants"
+	"github.com/roledio/roled/internal/entities"
+	"github.com/roledio/roled/internal/errors"
+	repositorymocks "github.com/roledio/roled/internal/mocks/repositories"
+	"github.com/roledio/roled/internal/models"
+	"github.com/roledio/roled/internal/repositories"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"go.openly.dev/pointy"
+)
+
+func TestAccessTokenService_ExchangeToken_RefreshToken_Success(t *testing.T) {
+	ctx := context.Background()
+
+	// Setup mocks
+	mockRegistry := repositorymocks.NewMockRegistry(t)
+	mockClientRepo := repositorymocks.NewMockClientRepository(t)
+	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
+	mockRefreshTokenRepo := repositorymocks.NewMockRefreshTokenRepository(t)
+	mockAccessTokenRepo := repositorymocks.NewMockAccessTokenRepository(t)
+
+	// Mock registry to return repositories
+	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)
+	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
+	mockRegistry.EXPECT().RefreshTokenRepository().Return(mockRefreshTokenRepo)
+	mockRegistry.EXPECT().AccessTokenRepository().Return(mockAccessTokenRepo)
+
+	// Mock Tx
+	mockRegistry.EXPECT().Tx(mock.AnythingOfType("func(repositories.Registry) error")).RunAndReturn(func(fn func(repositories.Registry) error) error {
+		// Simulate transaction
+		return fn(mockRegistry)
+	})
+
+	// Mock client found
+	client := &entities.Client{
+		ID:        "test-client",
+		ProjectID: "test-project",
+		IsActive:  true,
+	}
+	mockClientRepo.EXPECT().FindByID(ctx, "test-client").Return(client, nil)
+
+	// Mock project found
+	project := &entities.Project{
+		ID:       "test-project",
+		IsActive: true,
+	}
+	mockProjectRepo.EXPECT().FindByID(ctx, "test-project").Return(project, nil)
+
+	// Mock refresh token found
+	expiresIn := 3600
+	issuedAt := time.Now().Add(-30 * time.Minute) // 30 minutes ago, so not expired
+	refreshToken := &entities.RefreshToken{
+		ID:               "refresh-token-id",
+		AccountID:        "test-account",
+		ProjectID:        "test-project",
+		ClientID:         "test-client",
+		UserID:           pointy.String("test-user"),
+		RefreshTokenHash: "hash",
+		Status:           constants.RefreshTokenStatusIssued,
+		ExpiresIn:        &expiresIn,
+		IssuedAt:         &issuedAt,
+		UsedAt:           nil,
+	}
+	mockRefreshTokenRepo.EXPECT().FindByClientIDAndRefreshTokenHash(ctx, "test-client", mock.AnythingOfType("string")).Return(refreshToken, nil)
+
+	// Mock update used refresh token
+	mockRefreshTokenRepo.EXPECT().UpdateUsedRefreshToken(ctx, refreshToken).Return(1, nil)
+
+	// Mock create new refresh token
+	mockRefreshTokenRepo.EXPECT().Create(ctx, mock.AnythingOfType("*entities.RefreshToken")).Return(nil)
+
+	// Mock create new access token
+	mockAccessTokenRepo.EXPECT().Create(ctx, mock.AnythingOfType("*entities.AccessToken")).Return(nil)
+
+	// Create service
+	defaultConfig := configs.DefaultConfig{}
+	defaultConfig.JWT.SigningKey = "test-signing-key"
+	defaultConfig.JWT.ExpiryDuration = "1h"
+	defaultConfig.JWT.RefreshTokenExpiryDuration = "7d"
+	defaultConfig.BaseURL = "http://test.com"
+	service := NewAccessTokenService(&defaultConfig, mockRegistry, nil)
+
+	// Test request
+	req := &models.ExchangeTokenRequest{
+		GrantType:    constants.GrantTypeRefreshToken,
+		ClientID:     "test-client",
+		RefreshToken: "test-refresh-token",
+	}
+
+	// Execute
+	result, err := service.ExchangeToken(ctx, req)
+
+	// Assert
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+	assert.NotEmpty(t, result.AccessToken)
+	assert.NotEmpty(t, result.RefreshToken)
+	assert.Equal(t, "bearer", result.TokenType)
+	assert.Greater(t, result.ExpiresIn, 0)
+	assert.Greater(t, result.RefreshTokenExpiresIn, 0)
+}
+
+func TestAccessTokenService_ExchangeToken_RefreshToken_InvalidToken(t *testing.T) {
+	ctx := context.Background()
+
+	// Setup mocks
+	mockRegistry := repositorymocks.NewMockRegistry(t)
+	mockClientRepo := repositorymocks.NewMockClientRepository(t)
+	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
+	mockRefreshTokenRepo := repositorymocks.NewMockRefreshTokenRepository(t)
+
+	// Mock registry to return repositories
+	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)
+	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
+	mockRegistry.EXPECT().RefreshTokenRepository().Return(mockRefreshTokenRepo)
+
+	// Mock client found
+	client := &entities.Client{
+		ID:        "test-client",
+		ProjectID: "test-project",
+		IsActive:  true,
+	}
+	mockClientRepo.EXPECT().FindByID(ctx, "test-client").Return(client, nil)
+
+	// Mock project found
+	project := &entities.Project{
+		ID:       "test-project",
+		IsActive: true,
+	}
+	mockProjectRepo.EXPECT().FindByID(ctx, "test-project").Return(project, nil)
+
+	// Mock refresh token not found
+	mockRefreshTokenRepo.EXPECT().FindByClientIDAndRefreshTokenHash(ctx, "test-client", mock.AnythingOfType("string")).Return(nil, nil)
+
+	// Create service
+	defaultConfig := configs.DefaultConfig{}
+	service := NewAccessTokenService(&defaultConfig, mockRegistry, nil)
+
+	// Test request
+	req := &models.ExchangeTokenRequest{
+		GrantType:    constants.GrantTypeRefreshToken,
+		ClientID:     "test-client",
+		RefreshToken: "invalid-refresh-token",
+	}
+
+	// Execute
+	result, err := service.ExchangeToken(ctx, req)
+
+	// Assert
+	assert.Error(t, err)
+	assert.Equal(t, errors.ErrInvalidRefreshToken, err)
+	assert.Nil(t, result)
+}

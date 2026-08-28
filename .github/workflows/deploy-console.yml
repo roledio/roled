@@ -1,0 +1,74 @@
+name: Deploy Roled Console
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        default: staging
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  deploy:
+    name: Deploy Console
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - name: Validate environment input
+        run: |
+          ENV="${{ github.event.inputs.environment }}"
+          if [ "$ENV" != "staging" ] && [ "$ENV" != "production" ]; then
+            echo "Invalid environment: $ENV. Use 'staging' or 'production'."
+            exit 1
+          fi
+
+      - name: Validate workflow ref matches environment
+        run: |
+          ENV="${{ github.event.inputs.environment }}"
+          echo "GITHUB_REF=${GITHUB_REF}"
+          if [ "$ENV" = "production" ]; then
+            if [[ "${GITHUB_REF}" != refs/tags/* ]]; then
+              echo "For production, run this workflow using a tag in 'Use workflow from'."
+              exit 1
+            fi
+          fi
+
+      - name: Checkout selected ref
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+
+      - name: Use Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: console/package-lock.json
+
+      - name: Install dependencies (console)
+        working-directory: ./console
+        run: npm ci
+
+      - name: Build console (vite)
+        working-directory: ./console
+        env:
+          VITE_AUTH_BASE_URL: ${{ vars.VITE_AUTH_BASE_URL }}
+          VITE_DOCS_BASE_URL: ${{ vars.VITE_DOCS_BASE_URL }}
+          VITE_POSTHOG_PROJECT_TOKEN: ${{ vars.VITE_POSTHOG_PROJECT_TOKEN }}
+          VITE_POSTHOG_HOST: ${{ vars.VITE_POSTHOG_HOST }}
+        run: npm run build
+
+      - name: Deploy
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ vars.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy ./console/dist --project-name=${{ vars.CLOUDFLARE_PAGES_CONSOLE_PROJECT_NAME }} --commit-dirty=true --branch=main

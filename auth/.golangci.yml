@@ -1,0 +1,26 @@
+# golangci-lint configuration for Roled Auth
+# Based on best practices from Kubernetes, Docker, and other large Go projects
+version: "2"
+
+run:
+  timeout: 3m
+  modules-download-mode: readonly
+
+linters:
+  enable:
+    # Core quality checks (fast, reliable)
+    - govet         # Suspicious constructs (shadowing, printf formats)
+    - ineffassign   # Ineffectual assignments (x = y; x = z)
+    - staticcheck   # Comprehensive static analysis
+    # Common Go mistakes
+    - copyloopvar   # Loop variable aliasing (Go 1.22 bug fix)
+    - unconvert     # Unnecessary type conversions
+    - unparam       # Unused function parameters
+    - nakedret      # Naked returns in long functions
+    - nilerr        # Wrong nil/error returns
+    # Additional
+    - gocritic      # Style checks
+
+issues:
+  max-issues-per-linter: 50
+  max-same-issues: 3

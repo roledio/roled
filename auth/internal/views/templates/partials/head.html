@@ -1,0 +1,51 @@
+{{define "partials/head"}}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="Roled Authentication">
+<link rel="icon" href="/assets/static/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"
+    media="print" onload="this.media='all'">
+
+<!-- Roled Design System Styles -->
+<link rel="stylesheet" href="/assets/static/roled.css?v=1">
+
+<style>
+    /* Page-specific styles that extend roled.css */
+
+    /* Additional toast animation for slide-out */
+    @keyframes roled-toast-slide-out {
+        from {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        to {
+            opacity: 0;
+            transform: translateY(-1rem);
+        }
+    }
+
+    /* Confirm password match validation */
+    .roled-input[data-confirm-match] {
+        transition: border-color var(--roled-transition-fast), box-shadow var(--roled-transition-fast);
+    }
+
+    .roled-auth-body form {
+        margin: 0;
+    }
+</style>
+
+{{$gtmContainerId := getenv "GTM_CONTAINER_ID"}}
+{{if and .IsEnvProd $gtmContainerId}}
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','{{$gtmContainerId}}');</script>
+<!-- End Google Tag Manager -->
+{{end}}
+
+{{end}}

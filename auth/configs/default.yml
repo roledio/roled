@@ -1,0 +1,65 @@
+base_url: http://localhost:8080
+
+env: local
+port: 8080
+
+web_use_minified: false
+gtm_container_id: 
+
+db:
+  name: roled
+  username: roled
+  password: your-db-password
+  host: localhost
+  port: 3306
+
+email:
+  from: "%s <admin@example.com>"
+  smtp:
+    host: localhost
+    port: 25
+    username: your-smtp-username
+    password: your-smtp-password
+
+newrelic:
+  license_key: your-newrelic-license-key
+  enabled: false
+
+cors:
+  allowed_domains:
+    - localhost # Use domain-based CORS
+
+redis:
+  host: localhost
+  port: 6379
+  username: default
+  password: your-redis-password
+  prefix: roled
+
+cache_default_ttl: 5m
+
+# Use duration format from https://github.com/karrick/tparse
+verify_email_expiry_duration: 24h
+reset_password_expiry_duration: 1h
+activate_member_expiry_duration: 1w
+
+encryption_master_key: your-secret-encryption-master-key # Must be 32 bytes long for AES-256
+
+jwt:
+  signing_key: your-very-secret-jwt-signing-key # Must be 32-64 bytes long for HS256
+  expiry_duration: 1h
+  refresh_token_expiry_duration: 7d
+  auth_code_expiry_duration: 2m
+
+upload:
+  max_file_size_mb: 5
+  driver: local # or s3
+  local:
+    upload_path: ./uploads
+  s3:
+    access_key: your-s3-access-key
+    secret_key: your-s3-secret-key
+    region: your-s3-region
+    bucket: your-s3-bucket-name
+    base_url: https://your-s3-bucket.s3.your-s3-region.amazonaws.com # To build URL for the uploaded files
+    endpoint: https://your-s3-bucket.s3.your-s3-region.amazonaws.com # Endpoint URL for S3 operations

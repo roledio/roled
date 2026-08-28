@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    {{template "partials/head" .}}
+    {{if not .IsError}}
+    <title>Email Verification Successful</title>
+    {{else}}
+    <title>Email Verification Error</title>
+    {{end}}
+</head>
+
+<body>
+    <main class="roled-auth-page" role="main">
+        <div class="roled-auth-container">
+            {{if not .IsError}}
+            <div class="roled-auth-card roled-animate-slide-up">
+                <!-- Header with Logo and Success Message -->
+                <header class="roled-auth-header">
+                    {{if .Data.Project.LogoURL}}
+                    <img class="roled-auth-logo" src="{{.Data.Project.LogoURL}}" alt="{{.Data.Project.Name}} logo">
+                    {{end}}
+                    <h1 class="roled-auth-title">Email verified</h1>
+                    <p class="roled-auth-subtitle">
+                        The email address <strong>{{.Data.Email}}</strong> has
+                        been successfully verified.
+                    </p>
+                </header>
+
+                <!-- Success Body -->
+                <div class="roled-auth-body">
+                    {{if .Data.LoginURL}}
+                    <p class="roled-auth-text">
+                        You're all set. You can safely close this page or continue to
+                            <a href="{{.Data.LoginURL}}">{{.Data.Project.Name}}</a>.
+                    </p>
+                    {{else}}
+                    <p class="roled-auth-text">
+                        You're all set. You can safely close this page.
+                    </p>
+                    {{end}}
+                </div>
+            </div>
+
+            <!-- Powered By Roled Badge -->
+            <div class="roled-powered-by">
+                Powered by
+                <a href="https://roled.io" target="_blank" style="color: var(--roled-muted-foreground);">
+                    <img src="/assets/static/favicon.ico" alt="Roled Logo">
+                    <strong>Roled</strong>
+                </a>
+            </div>
+            {{end}}
+        </div>
+    </main>
+
+    <!-- Template Data -->
+    <div id="tmpl-data" data-error-message="{{.Error.Msg}}" {{if not .IsEnvProd}} data-error-debug="{{.Error.Err}}"
+        {{end}} data-is-env-prod="{{.IsEnvProd}}" data-is-error="{{.IsError}}">
+    </div>
+
+    <!-- JavaScript Dependencies -->
+    <script src="/assets/static/roled.js?v=1"></script>
+
+    <script>
+        const tmplData = document.getElementById('tmpl-data').dataset;
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof Roled !== 'undefined') {
+                var errorMessage = tmplData.errorMessage || '';
+                var errorDebug = tmplData.errorDebug || '';
+                if (errorMessage) {
+                    Roled.showErrorFromTemplate(errorMessage, errorDebug);
+                }
+            }
+        });
+    </script>
+
+</body>
+
+</html>
