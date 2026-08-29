@@ -1,6 +1,9 @@
 name: Deploy Roled Auth
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       environment:
@@ -16,12 +19,13 @@ jobs:
   deploy:
     name: Deploy Auth
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment }}
+    environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'staging' }}
     permissions:
       contents: read
       packages: write
     steps:
       - name: Validate environment input
+        if: github.event_name == 'workflow_dispatch'
         run: |
           ENV="${{ github.event.inputs.environment }}"
           if [ "$ENV" != "staging" ] && [ "$ENV" != "production" ]; then
@@ -30,8 +34,9 @@ jobs:
           fi
 
       - name: Validate workflow ref matches environment
+        id: validate-ref
         run: |
-          ENV="${{ github.event.inputs.environment }}"
+          ENV="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'staging' }}"
           echo "GITHUB_REF=${GITHUB_REF}"
           if [ "$ENV" = "production" ]; then
             if [[ "${GITHUB_REF}" != refs/tags/* ]]; then
@@ -39,6 +44,7 @@ jobs:
               exit 1
             fi
           fi
+          echo "env=$ENV" >> $GITHUB_OUTPUT
 
       - name: Checkout selected ref
         uses: actions/checkout@v7
@@ -62,7 +68,7 @@ jobs:
       - name: Determine image tag
         id: set-image
         run: |
-          ENV="${{ github.event.inputs.environment }}"
+          ENV="${{ steps.validate-ref.outputs.env }}"
           if [ "$ENV" = "production" ]; then
             echo "image_tag=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
             echo "Using production tag: ${GITHUB_REF_NAME}"
@@ -77,11 +83,11 @@ jobs:
           echo "Calculated staging image tag: $IMAGE_TAG"
 
       - name: Make build script executable
-        if: ${{ github.event.inputs.environment == 'staging' }}
+        if: ${{ steps.validate-ref.outputs.env == 'staging' }}
         run: chmod +x .scripts/build-image.sh
 
       - name: Build and publish Docker image (staging)
-        if: ${{ github.event.inputs.environment == 'staging' }}
+        if: ${{ steps.validate-ref.outputs.env == 'staging' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
@@ -92,6 +98,7 @@ jobs:
 
       - name: Trigger infra deployment
         run: |
+          ENV="${{ steps.validate-ref.outputs.env }}"
           IMAGE_TAG="${{ steps.set-image.outputs.image_tag }}"
           echo "Triggering infra for image: $IMAGE_TAG"
           curl -L \
@@ -102,7 +109,7 @@ jobs:
             -d '{
               "event_type": "roled-auth-image-published",
               "client_payload": {
-                "environment": "${{ github.event.inputs.environment }}",
+                "environment": "${ENV}",
                 "image_tag": "'${IMAGE_TAG}'"
               }
             }'

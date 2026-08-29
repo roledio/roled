@@ -1,6 +1,9 @@
 name: Deploy Roled Console
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       environment:
@@ -16,12 +19,13 @@ jobs:
   deploy:
     name: Deploy Console
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment }}
+    environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'staging' }}
     permissions:
       contents: read
       deployments: write
     steps:
       - name: Validate environment input
+        if: github.event_name == 'workflow_dispatch'
         run: |
           ENV="${{ github.event.inputs.environment }}"
           if [ "$ENV" != "staging" ] && [ "$ENV" != "production" ]; then
@@ -30,8 +34,9 @@ jobs:
           fi
 
       - name: Validate workflow ref matches environment
+        id: validate-ref
         run: |
-          ENV="${{ github.event.inputs.environment }}"
+          ENV="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'staging' }}"
           echo "GITHUB_REF=${GITHUB_REF}"
           if [ "$ENV" = "production" ]; then
             if [[ "${GITHUB_REF}" != refs/tags/* ]]; then
@@ -39,6 +44,7 @@ jobs:
               exit 1
             fi
           fi
+          echo "env=$ENV" >> $GITHUB_OUTPUT
 
       - name: Checkout selected ref
         uses: actions/checkout@v7
