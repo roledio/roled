@@ -106,7 +106,7 @@ jobs:
           IMAGE_TAG="${{ steps.set-image.outputs.image_tag }}"
           echo "Triggering infra for image: $IMAGE_TAG"
           curl -L \
-            -X POST ${{ vars.ROLED_INFRA_DISPATCH_URL }} \
+            -X POST ${{ secrets.ROLED_INFRA_DISPATCH_URL }} \
             -H "Authorization: token ${{ secrets.ROLED_INFRA_DISPATCH_TOKEN }}" \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
