@@ -1,7 +1,10 @@
 name: Deploy Roled Auth
 
 on:
-  push:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
     branches:
       - main
   workflow_dispatch:
@@ -19,6 +22,7 @@ jobs:
   deploy:
     name: Deploy Auth
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'staging' }}
     permissions:
       contents: read
@@ -109,7 +113,7 @@ jobs:
             -d '{
               "event_type": "roled-auth-image-published",
               "client_payload": {
-                "environment": "${ENV}",
+                "environment": "'${ENV}'",
                 "image_tag": "'${IMAGE_TAG}'"
               }
             }'
