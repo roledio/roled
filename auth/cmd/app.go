@@ -105,7 +105,7 @@ func NewApp(config *configs.DefaultConfig) (*App, error) {
 func (a *App) Run() error {
 	printGeneratedCredentials()
 	addr := fmt.Sprintf(":%d", a.config.Port)
-	return a.app.Listen(addr)
+	return a.app.Listen(addr, fiber.ListenConfig{DisableStartupMessage: true})
 }
 
 func (a *App) Shutdown() error {
@@ -137,20 +137,44 @@ func printGeneratedCredentials() {
 	if initialDataGenerated != "true" {
 		return
 	}
+
 	clientID := os.Getenv("GENERATED_CLIENT_ID")
 	clientSecret := os.Getenv("GENERATED_CLIENT_SECRET")
 	adminEmail := os.Getenv("GENERATED_ADMIN_EMAIL")
 	adminPassword := os.Getenv("GENERATED_ADMIN_PASSWORD")
 	userEmail := os.Getenv("GENERATED_USER_EMAIL")
 	userPassword := os.Getenv("GENERATED_USER_PASSWORD")
+	loginURL := os.Getenv("GENERATED_LOGIN_URL")
+	redirectURI := os.Getenv("GENERATED_REDIRECT_URI")
+
+	yellow := "\033[1;33m"
+	bold := "\033[1m"
+	reset := "\033[0m"
+
 	fmt.Println()
-	fmt.Println("Client ID      :", clientID)
-	fmt.Println("Client Secret  :", clientSecret)
+	fmt.Println(yellow + "  Welcome to Roled" + reset)
+	fmt.Println(yellow + "  Centralized User & Role Management Platform" + reset)
 	fmt.Println()
-	fmt.Println("Admin Email    :", adminEmail)
-	fmt.Println("Admin Password :", adminPassword)
+	fmt.Println(bold + "================================================================================" + reset)
+	fmt.Println(bold + "                        INITIAL SEED CREDENTIALS                               " + reset)
+	fmt.Println(bold + "================================================================================" + reset)
 	fmt.Println()
-	fmt.Println("User Email     :", userEmail)
-	fmt.Println("User Password  :", userPassword)
+	fmt.Println(yellow + "  Main Client for Roled Console" + reset)
+	fmt.Printf("  %-16s : %s%s%s\n", "Client ID", bold, clientID, reset)
+	fmt.Printf("  %-16s : %s%s%s\n", "Client Secret", bold, clientSecret, reset)
+	fmt.Printf("  %-16s : %s%s%s\n", "Redirect URI", bold, redirectURI, reset)
+	fmt.Printf("  %-16s : %s%s%s\n", "Login URL", bold, loginURL, reset)
+	fmt.Println()
+	fmt.Println(yellow + "  Admin User" + reset)
+	fmt.Printf("  %-16s : %s%s%s\n", "Email", bold, adminEmail, reset)
+	fmt.Printf("  %-16s : %s%s%s\n", "Password", bold, adminPassword, reset)
+	fmt.Println()
+	fmt.Println(yellow + "  Standard User" + reset)
+	fmt.Printf("  %-16s : %s%s%s\n", "Email", bold, userEmail, reset)
+	fmt.Printf("  %-16s : %s%s%s\n", "Password", bold, userPassword, reset)
+	fmt.Println()
+	fmt.Println(bold + "================================================================================" + reset)
+	fmt.Println(yellow + "  Important: Please store these credentials safely for your records." + reset)
+	fmt.Println(bold + "================================================================================" + reset)
 	fmt.Println()
 }

@@ -26,14 +26,14 @@ import { AuthService } from './services/core/authService';
 import { ConfigService } from './services/core/configService';
 import { HttpClient } from './services/core/httpClient';
 import { TokenService } from './services/core/tokenService';
-import { LocalStorageService } from './storage/storageService';
+import { LocalStorageService, SessionStorageService } from './storage/storageService';
 
 const AUTH_BASE_URL = (import.meta.env.VITE_AUTH_BASE_URL as string);
 
 const queryClient = new QueryClient();
 
 export default function App() {
-  const configService = useMemo(() => new ConfigService(LocalStorageService, AUTH_BASE_URL), []);
+  const configService = useMemo(() => new ConfigService(SessionStorageService, AUTH_BASE_URL), []);
   const tokenService = useMemo(() => new TokenService(LocalStorageService, configService), [configService]);
   const authService = useMemo(() => new AuthService(configService, tokenService, window.location.origin), [configService, tokenService]);
   const httpClient = useMemo(() => new HttpClient(tokenService, configService), [tokenService, configService]);

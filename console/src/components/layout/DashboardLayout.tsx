@@ -11,7 +11,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, User, BookOpen } from "lucide-react";
+import { LogOut, User, Book } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { telemetry } from "@/lib/telemetry";
 import React, { useEffect, useRef } from "react";
@@ -97,7 +97,7 @@ export function DashboardLayout({ children, httpClient, tokenService }: Dashboar
                   className="inline-flex items-center gap-2 px-2 py-1 rounded outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-all duration-200 hover:scale-105 active:scale-95"
                   aria-label="Docs"
                 >
-                  <BookOpen className="h-4 w-4" />
+                  <Book className="h-4 w-4" />
                   <span className="hidden sm:inline text-sm">Docs</span>
                 </a>
               )}

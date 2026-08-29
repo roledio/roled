@@ -3,6 +3,7 @@ package queues
 import (
 	"context"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -115,9 +116,10 @@ func processMessage(
 
 	payload := msg.Values["payload"].(string)
 
-	retry := 0
-	if val, ok := msg.Values["retry_count"].(int64); ok {
-		retry = int(val)
+	retry, err := strconv.Atoi(msg.Values["retry_count"].(string))
+	if err != nil {
+		log.WithContext(msgCtx).Errorw("Failed to parse retry count", "error", err, "stream", cfg.Stream, "group", cfg.Group, "consumer", cfg.Consumer)
+		return
 	}
 
 	handler, ok := GetHandler(cfg.Stream)
@@ -127,7 +129,7 @@ func processMessage(
 		return
 	}
 
-	err := handler.Handle(msgCtx, payload)
+	err = handler.Handle(msgCtx, payload)
 
 	if err != nil {
 		handleFailure(msgCtx, rdb, cfg, msg, payload, ctxFields, retry, err)

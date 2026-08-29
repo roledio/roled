@@ -3,6 +3,7 @@ package configs
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -14,6 +15,7 @@ import (
 
 type DefaultConfig struct {
 	BaseURL        string `mapstructure:"base_url"`
+	ConsoleBaseURL string `mapstructure:"console_base_url"`
 	Env            string `mapstructure:"env"`
 	Port           int64  `mapstructure:"port"`
 	WebUseMinified bool   `mapstructure:"web_use_minified"`
@@ -115,6 +117,16 @@ func LoadDefaultConfig(path string) (*DefaultConfig, error) {
 	var c DefaultConfig
 	if err := v.Unmarshal(&c); err != nil {
 		return nil, err
+	}
+
+	// Expose base URLs as environment variables for migrations
+	if os.Getenv("BASE_URL") == "" {
+		err := os.Setenv("BASE_URL", c.BaseURL)
+		fmt.Println("Error setting base url:", err)
+	}
+	if os.Getenv("CONSOLE_BASE_URL") == "" {
+		err := os.Setenv("CONSOLE_BASE_URL", c.ConsoleBaseURL)
+		fmt.Println("Error setting console base url:", err)
 	}
 
 	now := time.Now()

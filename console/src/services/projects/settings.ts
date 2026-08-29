@@ -14,7 +14,7 @@ export type ProjectSettings = {
  * Fetches the settings for a given project.
  *
  * @param httpClient - Authenticated HTTP client instance.
- * @param baseUrl    - Base URL of the auth service (e.g. `http://localhost:8082`).
+ * @param baseUrl    - Base URL of the auth service (e.g. `http://localhost:8080`).
  * @param projectId  - The project ID whose settings to fetch.
  */
 export async function fetchProjectSettings(

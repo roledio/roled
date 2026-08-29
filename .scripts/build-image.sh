@@ -18,9 +18,7 @@ if [ "${GITHUB_REF_NAME:-}" = "main" ] && [ -z "${IMAGE_TAG_OVERRIDE:-}" ]; then
 fi
 
 docker build \
-  --build-arg GITHUB_SHORT_SHA=${GITHUB_SHORT_SHA} \
-  --build-arg GITHUB_ACTOR=$GITHUB_ACTOR \
-  --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
+  --build-arg GIT_COMMIT_HASH=${GITHUB_SHORT_SHA} \
   -t ghcr.io/roledio/roled-auth:${IMAGE_TAG} \
   ./auth
 

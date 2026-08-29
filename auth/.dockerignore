@@ -1,0 +1,36 @@
+# Git
+.git
+.gitignore
+.github
+
+# Documentation
+README.md
+
+# Development files
+.air.toml
+
+# Test files and coverage
+*.out
+coverage.html
+report.json
+
+# IDE files
+.vscode
+.idea
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.log
+
+# Test data
+testdata/
+
+# CI/CD files
+.gitlab-ci.yml
+*.gitlab-ci.yml
+
+# Docker files
+Dockerfile*

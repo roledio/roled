@@ -1,8 +1,8 @@
 import logger from '@/lib/logger';
+import { AuthService } from '@/services/core/authService';
+import { TokenService } from '@/services/core/tokenService';
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import type { AuthService } from '../services/core/authService';
-import type { TokenService } from '../services/core/tokenService';
 
 type Props = { auth: AuthService; tokenService: TokenService; signup?: boolean };
 

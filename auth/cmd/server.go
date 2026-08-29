@@ -36,9 +36,7 @@ import (
 func setupFiberApp(defaultConfig *configs.DefaultConfig, nrapp *newrelic.Application, registry repositories.Registry, redis infra.RedisService, services *Services) *fiber.App {
 	buildInfo := models.GetCurrentBuildInfo(defaultConfig)
 	engine := html.NewFileSystem(http.FS(views.TemplatesFS), ".html")
-	engine.AddFunc("getenv", func(key string) string {
-		return os.Getenv(key)
-	})
+	engine.AddFunc("getenv", os.Getenv)
 
 	app := fiber.New(fiber.Config{
 		AppName:    fmt.Sprintf("%s v%s-%s", buildInfo.AppName, buildInfo.AppVersion, buildInfo.CommitHash),

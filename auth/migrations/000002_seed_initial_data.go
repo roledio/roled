@@ -14,11 +14,19 @@ import (
 	"github.com/roledio/roled/pkg/utils/passwordutil"
 )
 
+var (
+	authBaseURL    string
+	consoleBaseURL string
+)
+
 func init() {
 	goose.AddMigrationContext(up000002, down000002)
 }
 
 func up000002(ctx context.Context, tx *sql.Tx) error {
+	authBaseURL = os.Getenv("BASE_URL")
+	consoleBaseURL = os.Getenv("CONSOLE_BASE_URL")
+
 	// Generate all IDs upfront
 	ids := generateSeedIDs()
 
@@ -177,7 +185,7 @@ func seedMembers(ctx context.Context, tx *sql.Tx, ids *seedIDs) error {
 func seedProjects(ctx context.Context, tx *sql.Tx, ids *seedIDs) error {
 	name := "Roled Console"
 	description := "Roled Console is a web-based control panel for managing projects, users, and roles using Roled's centralized authentication and authorization platform."
-	logoURL := "https://static.roled.io/file/roled-production/project-logo/roled-logo.png"
+	logoURL := fmt.Sprintf("%s/assets/static/roled-logo.png", authBaseURL)
 	projects := []struct {
 		ID          string
 		AccountID   string
@@ -199,14 +207,14 @@ func seedProjects(ctx context.Context, tx *sql.Tx, ids *seedIDs) error {
 }
 
 func seedRedirectURIs(ctx context.Context, tx *sql.Tx, ids *seedIDs) error {
+	redirectURI := fmt.Sprintf("%s/signin/callback", consoleBaseURL)
+	loginURL := fmt.Sprintf("%s/signin", consoleBaseURL)
 	redirectURIs := []struct {
 		ProjectID   string
 		RedirectURI string
 		LoginURL    string
 	}{
-		{ids.SystemProjectID, "http://localhost:4000/signin/callback", "http://localhost:4000/signin"},
-		{ids.SystemProjectID, "https://console-staging.roled.io/signin/callback", "https://console-staging.roled.io/signin"},
-		{ids.SystemProjectID, "https://console.roled.io/signin/callback", "https://console.roled.io/signin"},
+		{ids.SystemProjectID, redirectURI, loginURL},
 	}
 	for _, uri := range redirectURIs {
 		_, err := tx.ExecContext(ctx, `INSERT INTO redirect_uris (project_id, redirect_uri, login_url) VALUES (?, ?, ?)`, uri.ProjectID, uri.RedirectURI, uri.LoginURL)
@@ -214,6 +222,9 @@ func seedRedirectURIs(ctx context.Context, tx *sql.Tx, ids *seedIDs) error {
 			return err
 		}
 	}
+	// Set environment variables for the generated URLs
+	_ = os.Setenv("GENERATED_REDIRECT_URI", redirectURI)
+	_ = os.Setenv("GENERATED_LOGIN_URL", loginURL)
 	return nil
 }
 
