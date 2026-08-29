@@ -81,4 +81,4 @@ jobs:
         with:
           apiToken: ${{ vars.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy ./dist --project-name=${{ vars.CLOUDFLARE_PAGES_CONSOLE_PROJECT_NAME }} --commit-dirty=true --branch=main
+          command: pages deploy ./console/dist --project-name=${{ vars.CLOUDFLARE_PAGES_CONSOLE_PROJECT_NAME }} --commit-dirty=true --branch=main
