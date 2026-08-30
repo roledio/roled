@@ -1,6 +1,10 @@
 package databases
 
-import "fmt"
+import (
+	"fmt"
+
+	"gorm.io/gorm/logger"
+)
 
 const (
 	DriverMySQL    = "mysql"
@@ -41,6 +45,9 @@ type Config struct {
 
 	// Application name
 	ApplicationName string
+
+	// Custom logger for GORM
+	Logger logger.Interface
 }
 
 // GetDSN returns the Data Source Name for the database connection specified in the Config.
