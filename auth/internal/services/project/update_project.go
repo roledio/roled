@@ -39,6 +39,7 @@ func (s *projectService) UpdateProject(ctx context.Context, req *models.UpdatePr
 		mapRedirectURIs[redirectURI.RedirectURI] = lo.EmptyableToPtr(redirectURI.LoginURL)
 	}
 
+	var oldRedirectURIs []entities.RedirectURI
 	err = s.registry.Tx(func(registry repositories.Registry) error {
 		project.Name = req.Name
 		project.Description = req.Description
@@ -54,8 +55,14 @@ func (s *projectService) UpdateProject(ctx context.Context, req *models.UpdatePr
 			return errors.ErrProjectNotFound
 		}
 
-		// Update redirect URIs: delete all existing redirect URIs and create new ones
 		redirectURIRepository := registry.RedirectURIRepository()
+		// Get old redirect URIs for cache invalidation
+		oldRedirectURIs, err = redirectURIRepository.FindByProjectID(ctx, project.ID)
+		if err != nil {
+			log.WithContext(ctx).Errorw("Failed to get redirect URIs by project ID", "error", err, "project_id", project.ID)
+			return pkgerrors.ErrSystemError.WithError(err)
+		}
+		// Update redirect URIs: delete all existing redirect URIs and create new ones
 		_, err = redirectURIRepository.DeleteByProjectID(ctx, project.ID)
 		if err != nil {
 			log.WithContext(ctx).Errorw("Failed to delete existing redirect URIs by project ID", "error", err, "project_id", project.ID)
@@ -103,6 +110,7 @@ func (s *projectService) UpdateProject(ctx context.Context, req *models.UpdatePr
 
 	// Invalidate cache after successful update
 	shared.InvalidateProjectCache(ctx, s.redis, project)
+	shared.InvalidateRedirectURICache(ctx, s.redis, project.ID, oldRedirectURIs)
 
 	res := &models.ProjectDetails{
 		ID:          project.ID,

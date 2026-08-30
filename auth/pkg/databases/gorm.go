@@ -21,7 +21,8 @@ func (c *Config) dsn() string {
 	if dsn != "" {
 		return dsn
 	}
-	if c.Driver == DriverMySQL {
+	switch c.Driver {
+	case DriverMySQL:
 		dsn = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true",
 			c.Username,
 			c.Password,
@@ -29,7 +30,7 @@ func (c *Config) dsn() string {
 			c.Port,
 			c.Name,
 		)
-	} else if c.Driver == DriverPostgres {
+	case DriverPostgres:
 		dsn = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s",
 			c.Host,
 			c.Port,

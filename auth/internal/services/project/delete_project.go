@@ -28,10 +28,17 @@ func (s *projectService) DeleteProject(ctx context.Context, req *models.DeletePr
 		return errors.ErrProjectNameRequiredForDeletion
 	}
 
+	// Get redirect URIs for this project to invalidate cache
+	oldRedirectURIs, err := s.registry.RedirectURIRepository().FindByProjectID(ctx, project.ID)
+	if err != nil {
+		log.WithContext(ctx).Errorw("Failed to get existing redirect URIs of project", "error", err, "project_id", req.ProjectID)
+		return pkgerrors.ErrSystemError.WithError(err)
+	}
+
 	err = s.registry.Tx(func(registry repositories.Registry) error {
 
 		// Delete all access tokens associated with this project
-		_, err := registry.AccessTokenRepository().DeleteByProjectID(ctx, req.ProjectID)
+		_, err = registry.AccessTokenRepository().DeleteByProjectID(ctx, req.ProjectID)
 		if err != nil {
 			log.WithContext(ctx).Errorw("Failed to delete access tokens by project ID", "error", err, "project_id", req.ProjectID)
 			return pkgerrors.ErrSystemError.WithError(err)
@@ -75,6 +82,7 @@ func (s *projectService) DeleteProject(ctx context.Context, req *models.DeletePr
 		// Invalidate caches related to this project after the transaction is committed successfully
 		shared.InvalidateProjectCache(ctx, s.redis, project)
 		shared.InvalidateProjectSettingCache(ctx, s.redis, project.ID)
+		shared.InvalidateRedirectURICache(ctx, s.redis, project.ID, oldRedirectURIs)
 	}
 
 	return err

@@ -98,6 +98,26 @@ func InvalidateProjectCache(ctx context.Context, redis infra.RedisService, proje
 	}
 }
 
+func InvalidateRedirectURICache(ctx context.Context, redis infra.RedisService, projectID string, oldRedirectURIs []entities.RedirectURI) {
+	if redis == nil {
+		log.WithContext(ctx).Warnw("Redis service is nil, skipping redirect URI cache invalidation", "project_id", projectID)
+		return
+	}
+
+	// Invalidate all redirect URI cache keys
+	keys := []string{
+		rediskeys.RedirectURIsByProjectID(projectID),
+	}
+	for _, redirectURI := range oldRedirectURIs {
+		keys = append(keys, rediskeys.RedirectURIByProjectIDAndURI(projectID, redirectURI.RedirectURI))
+	}
+
+	// Delete all cache keys in a single operation
+	if err := redis.DeleteManyWithContext(ctx, keys); err != nil {
+		log.WithContext(ctx).Warnw("Failed to invalidate redirect URI cache", "error", err, "project_id", projectID, "keys", keys)
+	}
+}
+
 func InvalidateProjectSettingCache(ctx context.Context, redis infra.RedisService, projectID string) {
 	if redis == nil {
 		log.WithContext(ctx).Warnw("Redis service is nil, skipping project setting cache invalidation", "project_id", projectID)
