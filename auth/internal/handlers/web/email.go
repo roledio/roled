@@ -3,9 +3,9 @@ package web
 import (
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/log"
-	"github.com/roledio/roled/internal/models"
-	"github.com/roledio/roled/internal/views"
-	"github.com/roledio/roled/pkg/utils/requestutil"
+	"github.com/roledio/roled/auth/internal/models"
+	"github.com/roledio/roled/auth/internal/views"
+	"github.com/roledio/roled/auth/pkg/utils/requestutil"
 )
 
 func (h *handler) renderVerifyEmail(c fiber.Ctx) error {

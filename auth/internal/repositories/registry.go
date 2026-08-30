@@ -8,11 +8,11 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/gofiber/fiber/v3/log"
 	"github.com/jmoiron/sqlx"
-	"github.com/roledio/roled/internal/configs"
-	"github.com/roledio/roled/internal/repositories/interfaces"
-	"github.com/roledio/roled/internal/repositories/mariadb"
-	"github.com/roledio/roled/internal/repositories/redis"
-	"github.com/roledio/roled/internal/services/infra"
+	"github.com/roledio/roled/auth/internal/configs"
+	"github.com/roledio/roled/auth/internal/repositories/interfaces"
+	"github.com/roledio/roled/auth/internal/repositories/mariadb"
+	"github.com/roledio/roled/auth/internal/repositories/redis"
+	"github.com/roledio/roled/auth/internal/services/infra"
 )
 
 type Registry interface {

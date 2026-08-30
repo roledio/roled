@@ -74,8 +74,9 @@ jobs:
         run: |
           ENV="${{ steps.validate-ref.outputs.env }}"
           if [ "$ENV" = "production" ]; then
-            echo "image_tag=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
-            echo "Using production tag: ${GITHUB_REF_NAME}"
+            PROD_TAG="${GITHUB_REF_NAME#auth/}"
+            echo "image_tag=${PROD_TAG}" >> $GITHUB_OUTPUT
+            echo "Using production tag: ${PROD_TAG}"
             exit 0
           fi
           # staging: build version-based tag

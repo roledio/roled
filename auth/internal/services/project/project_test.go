@@ -6,12 +6,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/roledio/roled/internal/configs"
-	"github.com/roledio/roled/internal/entities"
-	"github.com/roledio/roled/pkg/errors"
+	"github.com/roledio/roled/auth/internal/configs"
+	"github.com/roledio/roled/auth/internal/entities"
+	"github.com/roledio/roled/auth/pkg/errors"
 
-	repositorymocks "github.com/roledio/roled/internal/mocks/repositories"
-	servicemocks "github.com/roledio/roled/internal/mocks/services"
+	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
+	servicemocks "github.com/roledio/roled/auth/internal/mocks/services"
 )
 
 func TestProjectService_GetConsoleConfig_Success(t *testing.T) {

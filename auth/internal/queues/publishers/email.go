@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
-	"github.com/roledio/roled/internal/queues"
-	"github.com/roledio/roled/internal/services/infra"
+	"github.com/roledio/roled/auth/internal/queues"
+	"github.com/roledio/roled/auth/internal/services/infra"
 )
 
 type emailPublisher struct {

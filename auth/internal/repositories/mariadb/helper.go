@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/roledio/roled/internal/repositories/interfaces"
+	"github.com/roledio/roled/auth/internal/repositories/interfaces"
 )
 
 var (

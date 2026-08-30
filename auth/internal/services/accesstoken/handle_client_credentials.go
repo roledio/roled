@@ -4,12 +4,12 @@ import (
 	"context"
 
 	"github.com/gofiber/fiber/v3/log"
-	"github.com/roledio/roled/internal/entities"
-	"github.com/roledio/roled/internal/errors"
-	"github.com/roledio/roled/internal/models"
-	pkgconstants "github.com/roledio/roled/pkg/constants"
-	pkgerrors "github.com/roledio/roled/pkg/errors"
-	"github.com/roledio/roled/pkg/utils/encryptionutil"
+	"github.com/roledio/roled/auth/internal/entities"
+	"github.com/roledio/roled/auth/internal/errors"
+	"github.com/roledio/roled/auth/internal/models"
+	pkgconstants "github.com/roledio/roled/auth/pkg/constants"
+	pkgerrors "github.com/roledio/roled/auth/pkg/errors"
+	"github.com/roledio/roled/auth/pkg/utils/encryptionutil"
 )
 
 func (s *accessTokenService) handleClientCredentials(ctx context.Context, req *models.ExchangeTokenRequest, client *entities.Client,

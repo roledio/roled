@@ -3,7 +3,7 @@ package repositories
 import (
 	"strings"
 
-	"github.com/roledio/roled/pkg/models"
+	"github.com/roledio/roled/auth/pkg/models"
 )
 
 // ToSQLOrderValue builds an SQL order value if the sort by and sort direction are provided.

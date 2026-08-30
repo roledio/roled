@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/newrelic/go-agent/v3/newrelic"
-	"github.com/roledio/roled/internal/configs"
-	pkgmodels "github.com/roledio/roled/pkg/models"
+	"github.com/roledio/roled/auth/internal/configs"
+	pkgmodels "github.com/roledio/roled/auth/pkg/models"
 )
 
 type NewrelicService interface {

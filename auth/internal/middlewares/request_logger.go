@@ -5,8 +5,8 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/requestid"
-	"github.com/roledio/roled/internal/constants"
-	pkgmodels "github.com/roledio/roled/pkg/models"
+	"github.com/roledio/roled/auth/internal/constants"
+	pkgmodels "github.com/roledio/roled/auth/pkg/models"
 )
 
 func RequestLogger(buildInfo pkgmodels.BuildInfo) fiber.Handler {

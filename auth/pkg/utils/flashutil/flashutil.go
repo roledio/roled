@@ -9,7 +9,7 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/log"
-	pkgerrors "github.com/roledio/roled/pkg/errors"
+	pkgerrors "github.com/roledio/roled/auth/pkg/errors"
 )
 
 const (

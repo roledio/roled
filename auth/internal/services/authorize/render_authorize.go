@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/gofiber/fiber/v3/log"
-	"github.com/roledio/roled/internal/entities"
-	"github.com/roledio/roled/internal/errors"
-	"github.com/roledio/roled/internal/models"
-	pkgerrors "github.com/roledio/roled/pkg/errors"
+	"github.com/roledio/roled/auth/internal/entities"
+	"github.com/roledio/roled/auth/internal/errors"
+	"github.com/roledio/roled/auth/internal/models"
+	pkgerrors "github.com/roledio/roled/auth/pkg/errors"
 )
 
 func (s *authorizeService) RenderAuthorize(ctx context.Context, req *models.RenderAuthorizeRequest) (*models.RenderAuthorizeResult, error) {

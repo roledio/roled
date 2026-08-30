@@ -9,12 +9,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.openly.dev/pointy"
 
-	"github.com/roledio/roled/internal/constants"
-	"github.com/roledio/roled/internal/entities"
-	"github.com/roledio/roled/internal/errors"
-	repositorymocks "github.com/roledio/roled/internal/mocks/repositories"
-	"github.com/roledio/roled/internal/models"
-	pkgerrors "github.com/roledio/roled/pkg/errors"
+	"github.com/roledio/roled/auth/internal/constants"
+	"github.com/roledio/roled/auth/internal/entities"
+	"github.com/roledio/roled/auth/internal/errors"
+	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
+	"github.com/roledio/roled/auth/internal/models"
+	pkgerrors "github.com/roledio/roled/auth/pkg/errors"
 )
 
 func TestMemberService_UpdateMember_SystemProjectNotFound(t *testing.T) {

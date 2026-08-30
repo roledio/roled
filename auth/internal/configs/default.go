@@ -9,7 +9,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/karrick/tparse/v2"
-	"github.com/roledio/roled/pkg/constants"
+	"github.com/roledio/roled/auth/pkg/constants"
 	"github.com/spf13/viper"
 )
 

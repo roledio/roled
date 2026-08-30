@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v3"
-	"github.com/roledio/roled/internal/configs"
+	"github.com/roledio/roled/auth/internal/configs"
 )
 
 //go:embed templates

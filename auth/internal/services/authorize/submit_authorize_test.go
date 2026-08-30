@@ -8,14 +8,14 @@ import (
 	"github.com/stretchr/testify/mock"
 	"go.openly.dev/pointy"
 
-	"github.com/roledio/roled/internal/configs"
-	"github.com/roledio/roled/internal/entities"
-	"github.com/roledio/roled/internal/errors"
-	"github.com/roledio/roled/internal/repositories"
-	"github.com/roledio/roled/pkg/utils/passwordutil"
+	"github.com/roledio/roled/auth/internal/configs"
+	"github.com/roledio/roled/auth/internal/entities"
+	"github.com/roledio/roled/auth/internal/errors"
+	"github.com/roledio/roled/auth/internal/repositories"
+	"github.com/roledio/roled/auth/pkg/utils/passwordutil"
 
-	repositorymocks "github.com/roledio/roled/internal/mocks/repositories"
-	"github.com/roledio/roled/internal/models"
+	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
+	"github.com/roledio/roled/auth/internal/models"
 )
 
 func TestAuthorizeService_SubmitAuthorize_Success(t *testing.T) {

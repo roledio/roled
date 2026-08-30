@@ -8,11 +8,11 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/log"
 	"github.com/gofiber/fiber/v3/middleware/csrf"
-	"github.com/roledio/roled/internal/configs"
-	"github.com/roledio/roled/internal/models"
-	"github.com/roledio/roled/internal/services/infra"
-	"github.com/roledio/roled/pkg/errors"
-	"github.com/roledio/roled/pkg/utils/flashutil"
+	"github.com/roledio/roled/auth/internal/configs"
+	"github.com/roledio/roled/auth/internal/models"
+	"github.com/roledio/roled/auth/internal/services/infra"
+	"github.com/roledio/roled/auth/pkg/errors"
+	"github.com/roledio/roled/auth/pkg/utils/flashutil"
 )
 
 func CSRF(defaultConfig *configs.DefaultConfig, redisService infra.RedisService) fiber.Handler {

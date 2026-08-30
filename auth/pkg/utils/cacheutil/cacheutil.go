@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v3/log"
-	"github.com/roledio/roled/pkg/utils/copyutil"
+	"github.com/roledio/roled/auth/pkg/utils/copyutil"
 )
 
 type Service interface {

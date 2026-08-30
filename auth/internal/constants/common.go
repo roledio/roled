@@ -1,6 +1,6 @@
 package constants
 
-import "github.com/roledio/roled/pkg/types"
+import "github.com/roledio/roled/auth/pkg/types"
 
 const (
 	RoledConsoleDefaultRoleCode = "default"

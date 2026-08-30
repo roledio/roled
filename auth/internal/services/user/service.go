@@ -3,13 +3,13 @@ package user
 import (
 	"context"
 
-	"github.com/roledio/roled/internal/configs"
-	"github.com/roledio/roled/internal/constants"
-	"github.com/roledio/roled/internal/models"
-	"github.com/roledio/roled/internal/queues"
-	"github.com/roledio/roled/internal/repositories"
-	"github.com/roledio/roled/internal/services/infra"
-	"github.com/roledio/roled/internal/services/upload"
+	"github.com/roledio/roled/auth/internal/configs"
+	"github.com/roledio/roled/auth/internal/constants"
+	"github.com/roledio/roled/auth/internal/models"
+	"github.com/roledio/roled/auth/internal/queues"
+	"github.com/roledio/roled/auth/internal/repositories"
+	"github.com/roledio/roled/auth/internal/services/infra"
+	"github.com/roledio/roled/auth/internal/services/upload"
 )
 
 type UserService interface {

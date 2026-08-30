@@ -8,15 +8,15 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/roledio/roled/internal/configs"
-	"github.com/roledio/roled/internal/constants"
-	"github.com/roledio/roled/internal/constants/rediskeys"
-	"github.com/roledio/roled/internal/entities"
-	apperrors "github.com/roledio/roled/internal/errors"
-	repositorymocks "github.com/roledio/roled/internal/mocks/repositories"
-	servicemocks "github.com/roledio/roled/internal/mocks/services"
-	"github.com/roledio/roled/internal/models"
-	pkgerrors "github.com/roledio/roled/pkg/errors"
+	"github.com/roledio/roled/auth/internal/configs"
+	"github.com/roledio/roled/auth/internal/constants"
+	"github.com/roledio/roled/auth/internal/constants/rediskeys"
+	"github.com/roledio/roled/auth/internal/entities"
+	apperrors "github.com/roledio/roled/auth/internal/errors"
+	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
+	servicemocks "github.com/roledio/roled/auth/internal/mocks/services"
+	"github.com/roledio/roled/auth/internal/models"
+	pkgerrors "github.com/roledio/roled/auth/pkg/errors"
 )
 
 // newUpdateSignupRoleTestCtx returns a context with an active system account and shared test fixtures.

@@ -4,12 +4,12 @@ import (
 	"context"
 
 	"github.com/gofiber/fiber/v3/log"
-	"github.com/roledio/roled/internal/constants/singeflightkeys"
-	"github.com/roledio/roled/internal/errors"
-	"github.com/roledio/roled/internal/models"
-	"github.com/roledio/roled/internal/services/shared"
-	pkgerrors "github.com/roledio/roled/pkg/errors"
-	"github.com/roledio/roled/pkg/utils/singleflightutil"
+	"github.com/roledio/roled/auth/internal/constants/singeflightkeys"
+	"github.com/roledio/roled/auth/internal/errors"
+	"github.com/roledio/roled/auth/internal/models"
+	"github.com/roledio/roled/auth/internal/services/shared"
+	pkgerrors "github.com/roledio/roled/auth/pkg/errors"
+	"github.com/roledio/roled/auth/pkg/utils/singleflightutil"
 )
 
 func (s *projectService) GetProjectSettings(ctx context.Context, req *models.GetProjectSettingsRequest) (*models.ProjectSettings, error) {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/roledio/roled/internal/entities"
+	"github.com/roledio/roled/auth/internal/entities"
 )
 
 type AccessTokenRepository interface {

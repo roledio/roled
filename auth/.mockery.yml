@@ -12,25 +12,25 @@ require-template-schema-exists: true
 template: testify
 template-schema: "{{.Template}}.schema.json"
 packages:
-  github.com/roledio/roled/internal/repositories:
+  github.com/roledio/roled/auth/internal/repositories:
     config:
       all: true
       dir: "internal/mocks/repositories"
       filename: "Mock{{.InterfaceName}}.go"
       recursive: true
-  github.com/roledio/roled/internal/services:
+  github.com/roledio/roled/auth/internal/services:
     config:
       all: true
       dir: "internal/mocks/services"
       filename: "Mock{{.InterfaceName}}.go"
       recursive: true
-  github.com/roledio/roled/pkg/utils/cacheutil:
+  github.com/roledio/roled/auth/pkg/utils/cacheutil:
     config:
       all: true
       dir: "pkg/mocks/utils/cacheutil"
       filename: "Mock{{.InterfaceName}}.go"
       recursive: true
-  github.com/roledio/roled/internal/queues:
+  github.com/roledio/roled/auth/internal/queues:
     config:
       all: true
       dir: "internal/mocks/queues"

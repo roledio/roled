@@ -3,9 +3,9 @@ package models
 import (
 	"time"
 
-	"github.com/roledio/roled/internal/configs"
-	"github.com/roledio/roled/pkg/constants"
-	pkgmodels "github.com/roledio/roled/pkg/models"
+	"github.com/roledio/roled/auth/internal/configs"
+	"github.com/roledio/roled/auth/pkg/constants"
+	pkgmodels "github.com/roledio/roled/auth/pkg/models"
 )
 
 var (

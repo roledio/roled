@@ -7,12 +7,12 @@ import (
 	jwtware "github.com/gofiber/contrib/v3/jwt"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/log"
-	"github.com/roledio/roled/internal/configs"
-	"github.com/roledio/roled/internal/constants"
-	"github.com/roledio/roled/internal/models"
-	"github.com/roledio/roled/internal/repositories"
-	"github.com/roledio/roled/pkg/errors"
-	"github.com/roledio/roled/pkg/utils/responseutil"
+	"github.com/roledio/roled/auth/internal/configs"
+	"github.com/roledio/roled/auth/internal/constants"
+	"github.com/roledio/roled/auth/internal/models"
+	"github.com/roledio/roled/auth/internal/repositories"
+	"github.com/roledio/roled/auth/pkg/errors"
+	"github.com/roledio/roled/auth/pkg/utils/responseutil"
 	"go.openly.dev/pointy"
 )
 

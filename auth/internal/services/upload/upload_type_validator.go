@@ -11,9 +11,9 @@ import (
 	_ "image/png"
 
 	"github.com/gofiber/fiber/v3/log"
-	"github.com/roledio/roled/internal/constants"
-	"github.com/roledio/roled/internal/errors"
-	"github.com/roledio/roled/internal/models"
+	"github.com/roledio/roled/auth/internal/constants"
+	"github.com/roledio/roled/auth/internal/errors"
+	"github.com/roledio/roled/auth/internal/models"
 )
 
 var (

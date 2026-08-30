@@ -4,8 +4,8 @@ import (
 	"context"
 
 	strip "github.com/grokify/html-strip-tags-go"
-	"github.com/roledio/roled/internal/configs"
-	"github.com/roledio/roled/internal/models"
+	"github.com/roledio/roled/auth/internal/configs"
+	"github.com/roledio/roled/auth/internal/models"
 	"gopkg.in/gomail.v2"
 )
 

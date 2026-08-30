@@ -12,6 +12,7 @@ IMAGE_TAG="${VERSION}-${GITHUB_SHORT_SHA}"
 if [ -n "${IMAGE_TAG_OVERRIDE:-}" ]; then
   IMAGE_TAG="$IMAGE_TAG_OVERRIDE"
 fi
+IMAGE_TAG="${IMAGE_TAG#auth/}"
 
 if [ "${GITHUB_REF_NAME:-}" = "main" ] && [ -z "${IMAGE_TAG_OVERRIDE:-}" ]; then
   IMAGE_TAG="$VERSION"

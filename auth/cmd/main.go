@@ -9,10 +9,10 @@ import (
 	"syscall"
 
 	"github.com/gofiber/fiber/v3/log"
-	"github.com/roledio/roled/internal/configs"
-	"github.com/roledio/roled/internal/constants"
-	"github.com/roledio/roled/internal/queues"
-	"github.com/roledio/roled/internal/services/infra"
+	"github.com/roledio/roled/auth/internal/configs"
+	"github.com/roledio/roled/auth/internal/constants"
+	"github.com/roledio/roled/auth/internal/queues"
+	"github.com/roledio/roled/auth/internal/services/infra"
 )
 
 func main() {

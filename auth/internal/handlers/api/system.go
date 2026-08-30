@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v3"
-	"github.com/roledio/roled/internal/models"
-	"github.com/roledio/roled/pkg/constants"
-	"github.com/roledio/roled/pkg/utils/responseutil"
+	"github.com/roledio/roled/auth/internal/models"
+	"github.com/roledio/roled/auth/pkg/constants"
+	"github.com/roledio/roled/auth/pkg/utils/responseutil"
 )
 
 func (h *handler) ping(c fiber.Ctx) error {

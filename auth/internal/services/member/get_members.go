@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/gofiber/fiber/v3/log"
-	"github.com/roledio/roled/internal/errors"
-	"github.com/roledio/roled/internal/models"
-	"github.com/roledio/roled/internal/utils/contextutil"
-	pkgerrors "github.com/roledio/roled/pkg/errors"
+	"github.com/roledio/roled/auth/internal/errors"
+	"github.com/roledio/roled/auth/internal/models"
+	"github.com/roledio/roled/auth/internal/utils/contextutil"
+	pkgerrors "github.com/roledio/roled/auth/pkg/errors"
 )
 
 func (s *memberService) GetMembers(ctx context.Context, req *models.GetMembersRequest) ([]models.GetMembersResponse, int, error) {

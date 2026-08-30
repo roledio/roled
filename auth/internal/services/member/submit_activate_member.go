@@ -6,12 +6,12 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v3/log"
-	"github.com/roledio/roled/internal/constants/rediskeys"
-	"github.com/roledio/roled/internal/errors"
-	"github.com/roledio/roled/internal/models"
-	"github.com/roledio/roled/internal/services/shared"
-	pkgerrors "github.com/roledio/roled/pkg/errors"
-	"github.com/roledio/roled/pkg/utils/passwordutil"
+	"github.com/roledio/roled/auth/internal/constants/rediskeys"
+	"github.com/roledio/roled/auth/internal/errors"
+	"github.com/roledio/roled/auth/internal/models"
+	"github.com/roledio/roled/auth/internal/services/shared"
+	pkgerrors "github.com/roledio/roled/auth/pkg/errors"
+	"github.com/roledio/roled/auth/pkg/utils/passwordutil"
 	"github.com/shomali11/util/xhashes"
 )
 

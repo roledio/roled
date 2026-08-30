@@ -1,8 +1,8 @@
 package user
 
 import (
-	"github.com/roledio/roled/internal/configs"
-	"github.com/roledio/roled/internal/constants"
+	"github.com/roledio/roled/auth/internal/configs"
+	"github.com/roledio/roled/auth/internal/constants"
 )
 
 func newDefaultConfig() *configs.DefaultConfig {

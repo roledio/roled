@@ -5,12 +5,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/roledio/roled/internal/constants"
-	"github.com/roledio/roled/internal/entities"
-	"github.com/roledio/roled/internal/errors"
-	repositorymocks "github.com/roledio/roled/internal/mocks/repositories"
-	"github.com/roledio/roled/internal/models"
-	"github.com/roledio/roled/internal/repositories/interfaces"
+	"github.com/roledio/roled/auth/internal/constants"
+	"github.com/roledio/roled/auth/internal/entities"
+	"github.com/roledio/roled/auth/internal/errors"
+	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
+	"github.com/roledio/roled/auth/internal/models"
+	"github.com/roledio/roled/auth/internal/repositories/interfaces"
 	"github.com/stretchr/testify/assert"
 	"go.openly.dev/pointy"
 )

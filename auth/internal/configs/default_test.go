@@ -3,7 +3,7 @@ package configs
 import (
 	"testing"
 
-	"github.com/roledio/roled/pkg/constants"
+	"github.com/roledio/roled/auth/pkg/constants"
 	"github.com/stretchr/testify/assert"
 )
 

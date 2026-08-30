@@ -3,8 +3,8 @@ package mariadb
 import (
 	"context"
 
-	"github.com/roledio/roled/internal/entities"
-	"github.com/roledio/roled/internal/repositories/interfaces"
+	"github.com/roledio/roled/auth/internal/entities"
+	"github.com/roledio/roled/auth/internal/repositories/interfaces"
 )
 
 type userRoleRepository struct {

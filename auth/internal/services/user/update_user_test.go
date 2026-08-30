@@ -9,13 +9,13 @@ import (
 	"github.com/stretchr/testify/mock"
 	"go.openly.dev/pointy"
 
-	"github.com/roledio/roled/internal/constants"
-	"github.com/roledio/roled/internal/entities"
-	"github.com/roledio/roled/internal/errors"
-	repositorymocks "github.com/roledio/roled/internal/mocks/repositories"
-	servicemocks "github.com/roledio/roled/internal/mocks/services"
-	"github.com/roledio/roled/internal/models"
-	"github.com/roledio/roled/internal/repositories"
+	"github.com/roledio/roled/auth/internal/constants"
+	"github.com/roledio/roled/auth/internal/entities"
+	"github.com/roledio/roled/auth/internal/errors"
+	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
+	servicemocks "github.com/roledio/roled/auth/internal/mocks/services"
+	"github.com/roledio/roled/auth/internal/models"
+	"github.com/roledio/roled/auth/internal/repositories"
 )
 
 func TestUserService_UpdateUser_ChangeAvatar_Success(t *testing.T) {

@@ -3,9 +3,9 @@ package models
 import (
 	"errors"
 
-	"github.com/roledio/roled/pkg/constants"
-	pkgerrors "github.com/roledio/roled/pkg/errors"
-	"github.com/roledio/roled/pkg/models"
+	"github.com/roledio/roled/auth/pkg/constants"
+	pkgerrors "github.com/roledio/roled/auth/pkg/errors"
+	"github.com/roledio/roled/auth/pkg/models"
 )
 
 type TemplateData struct {

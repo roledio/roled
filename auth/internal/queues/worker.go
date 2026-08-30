@@ -10,8 +10,8 @@ import (
 	"github.com/gofiber/fiber/v3/log"
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
-	"github.com/roledio/roled/internal/services/infra"
-	"github.com/roledio/roled/pkg/utils/jsonutil"
+	"github.com/roledio/roled/auth/internal/services/infra"
+	"github.com/roledio/roled/auth/pkg/utils/jsonutil"
 )
 
 type WorkerConfig struct {

@@ -12,12 +12,12 @@ import (
 	"github.com/tidwall/gjson"
 	"go.openly.dev/pointy"
 
-	"github.com/roledio/roled/internal/constants"
-	"github.com/roledio/roled/internal/entities"
-	"github.com/roledio/roled/internal/repositories/interfaces"
-	"github.com/roledio/roled/pkg/errors"
+	"github.com/roledio/roled/auth/internal/constants"
+	"github.com/roledio/roled/auth/internal/entities"
+	"github.com/roledio/roled/auth/internal/repositories/interfaces"
+	"github.com/roledio/roled/auth/pkg/errors"
 
-	repositorymocks "github.com/roledio/roled/internal/mocks/repositories"
+	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
 )
 
 func testHandler(c fiber.Ctx) error {

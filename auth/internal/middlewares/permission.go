@@ -6,12 +6,12 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/log"
-	"github.com/roledio/roled/internal/constants"
-	"github.com/roledio/roled/internal/entities"
-	"github.com/roledio/roled/internal/repositories"
-	"github.com/roledio/roled/internal/repositories/interfaces"
-	"github.com/roledio/roled/pkg/errors"
-	"github.com/roledio/roled/pkg/utils/responseutil"
+	"github.com/roledio/roled/auth/internal/constants"
+	"github.com/roledio/roled/auth/internal/entities"
+	"github.com/roledio/roled/auth/internal/repositories"
+	"github.com/roledio/roled/auth/internal/repositories/interfaces"
+	"github.com/roledio/roled/auth/pkg/errors"
+	"github.com/roledio/roled/auth/pkg/utils/responseutil"
 )
 
 func Permission(registry repositories.Registry) fiber.Handler {

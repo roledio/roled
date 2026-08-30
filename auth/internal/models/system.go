@@ -1,6 +1,6 @@
 package models
 
-import "github.com/roledio/roled/pkg/models"
+import "github.com/roledio/roled/auth/pkg/models"
 
 type GetSystemInfoResponse struct {
 	models.BuildInfo

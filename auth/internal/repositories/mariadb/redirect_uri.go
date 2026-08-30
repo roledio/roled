@@ -6,8 +6,8 @@ import (
 	"errors"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/roledio/roled/internal/entities"
-	"github.com/roledio/roled/internal/repositories/interfaces"
+	"github.com/roledio/roled/auth/internal/entities"
+	"github.com/roledio/roled/auth/internal/repositories/interfaces"
 )
 
 type redirectURIRepository struct {

@@ -1,6 +1,6 @@
 package models
 
-import "github.com/roledio/roled/internal/entities"
+import "github.com/roledio/roled/auth/internal/entities"
 
 type SendEmailRequest struct {
 	To      []string

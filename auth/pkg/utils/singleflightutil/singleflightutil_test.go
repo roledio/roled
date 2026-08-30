@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/roledio/roled/pkg/utils/singleflightutil"
+	"github.com/roledio/roled/auth/pkg/utils/singleflightutil"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sync/singleflight"
 )

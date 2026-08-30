@@ -9,7 +9,7 @@ import (
 	_ "github.com/lib/pq"
 	_ "github.com/newrelic/go-agent/v3/integrations/nrmysql"
 	_ "github.com/newrelic/go-agent/v3/integrations/nrpq"
-	"github.com/roledio/roled/pkg/utils/validationutil"
+	"github.com/roledio/roled/auth/pkg/utils/validationutil"
 )
 
 func Open(config Config) (*sql.DB, error) {

@@ -3,8 +3,8 @@ package contextutil
 import (
 	"context"
 
-	"github.com/roledio/roled/internal/constants"
-	"github.com/roledio/roled/internal/entities"
+	"github.com/roledio/roled/auth/internal/constants"
+	"github.com/roledio/roled/auth/internal/entities"
 )
 
 func HasPermission(ctx context.Context, permission string) bool {

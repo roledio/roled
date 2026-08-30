@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/gofiber/template/html/v3"
-	"github.com/roledio/roled/internal/views"
+	"github.com/roledio/roled/auth/internal/views"
 	"github.com/stretchr/testify/assert"
 )
 

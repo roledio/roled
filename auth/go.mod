@@ -1,4 +1,4 @@
-module github.com/roledio/roled
+module github.com/roledio/roled/auth
 
 go 1.26
 

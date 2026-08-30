@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/gofiber/fiber/v3"
-	"github.com/roledio/roled/internal/configs"
-	repositorymocks "github.com/roledio/roled/internal/mocks/repositories"
-	servicemocks "github.com/roledio/roled/internal/mocks/services"
+	"github.com/roledio/roled/auth/internal/configs"
+	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
+	servicemocks "github.com/roledio/roled/auth/internal/mocks/services"
 	"github.com/stretchr/testify/assert"
 )
 

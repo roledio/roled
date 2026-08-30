@@ -5,8 +5,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/roledio/roled/pkg/errors"
-	"github.com/roledio/roled/pkg/models"
+	"github.com/roledio/roled/auth/pkg/errors"
+	"github.com/roledio/roled/auth/pkg/models"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/gofiber/fiber/v3"

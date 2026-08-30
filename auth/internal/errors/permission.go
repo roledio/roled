@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/roledio/roled/pkg/errors"
+	"github.com/roledio/roled/auth/pkg/errors"
 )
 
 var (

@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/roledio/roled/internal/entities"
-	"github.com/roledio/roled/internal/models"
+	"github.com/roledio/roled/auth/internal/entities"
+	"github.com/roledio/roled/auth/internal/models"
 )
 
 type PermissionRepository interface {

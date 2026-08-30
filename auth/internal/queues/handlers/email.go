@@ -10,15 +10,15 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/gofiber/fiber/v3/log"
 	"github.com/karrick/tparse/v2"
-	"github.com/roledio/roled/internal/configs"
-	"github.com/roledio/roled/internal/constants"
-	"github.com/roledio/roled/internal/constants/rediskeys"
-	"github.com/roledio/roled/internal/mail"
-	"github.com/roledio/roled/internal/models"
-	"github.com/roledio/roled/internal/queues"
-	"github.com/roledio/roled/internal/queues/payloads"
-	"github.com/roledio/roled/internal/services/infra"
-	"github.com/roledio/roled/pkg/utils/idutil"
+	"github.com/roledio/roled/auth/internal/configs"
+	"github.com/roledio/roled/auth/internal/constants"
+	"github.com/roledio/roled/auth/internal/constants/rediskeys"
+	"github.com/roledio/roled/auth/internal/mail"
+	"github.com/roledio/roled/auth/internal/models"
+	"github.com/roledio/roled/auth/internal/queues"
+	"github.com/roledio/roled/auth/internal/queues/payloads"
+	"github.com/roledio/roled/auth/internal/services/infra"
+	"github.com/roledio/roled/auth/pkg/utils/idutil"
 	"github.com/shomali11/util/xhashes"
 )
 
@@ -146,7 +146,7 @@ func (h emailHandler) send(ctx context.Context, from, to, subject, body string) 
 	req := models.SendEmailRequest{
 		From:    from,
 		To:      []string{to},
-		Subject: subject,
+		Subject: h.appendEnv(subject),
 		Body:    body,
 		IsHTML:  true,
 	}
@@ -157,4 +157,12 @@ func (h emailHandler) send(ctx context.Context, from, to, subject, body string) 
 	}
 	log.WithContext(ctx).Debugw("Successfully sent email", "from", from, "to", to, "subject", subject)
 	return nil
+}
+
+func (h emailHandler) appendEnv(subject string) string {
+	env := fmt.Sprintf("#%s", h.defaultConfig.Env)
+	if !h.defaultConfig.IsEnvProd() && !strings.HasSuffix(subject, env) {
+		return fmt.Sprintf("%s %s", subject, env)
+	}
+	return subject
 }

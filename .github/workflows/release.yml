@@ -35,8 +35,10 @@ jobs:
         run: |
           set -euo pipefail
           VERSION="v$(cd auth && make version)"
+          TAG="auth/${VERSION}"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "Releasing version: $VERSION"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Releasing version: $VERSION with git tag: $TAG"
 
       - name: Make build script executable
         run: chmod +x .scripts/build-image.sh
@@ -56,14 +58,14 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          if git rev-parse "${VERSION}" >/dev/null 2>&1; then
-            echo "Tag ${VERSION} already exists."
+          if git rev-parse "${TAG}" >/dev/null 2>&1; then
+            echo "Tag ${TAG} already exists."
           else
-            git tag "${VERSION}"
-            git push origin "${VERSION}"
+            git tag "${TAG}"
+            git push origin "${TAG}"
           fi
         env:
-          VERSION: ${{ steps.version.outputs.version }}
+          TAG: ${{ steps.version.outputs.tag }}
 
       - name: Bump auth version for the next release
         if: success()

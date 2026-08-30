@@ -3,7 +3,7 @@ package repositories
 import (
 	"testing"
 
-	"github.com/roledio/roled/pkg/models"
+	"github.com/roledio/roled/auth/pkg/models"
 	"github.com/stretchr/testify/assert"
 )
 

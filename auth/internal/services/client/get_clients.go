@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/gofiber/fiber/v3/log"
-	"github.com/roledio/roled/internal/models"
-	"github.com/roledio/roled/internal/services/shared"
-	"github.com/roledio/roled/pkg/errors"
+	"github.com/roledio/roled/auth/internal/models"
+	"github.com/roledio/roled/auth/internal/services/shared"
+	"github.com/roledio/roled/auth/pkg/errors"
 )
 
 func (s *clientService) GetClients(ctx context.Context, req *models.GetClientsRequest) ([]models.ClientDetails, int, error) {

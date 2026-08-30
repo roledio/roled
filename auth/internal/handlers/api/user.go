@@ -4,9 +4,9 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v3"
-	"github.com/roledio/roled/internal/models"
-	"github.com/roledio/roled/pkg/utils/requestutil"
-	"github.com/roledio/roled/pkg/utils/responseutil"
+	"github.com/roledio/roled/auth/internal/models"
+	"github.com/roledio/roled/auth/pkg/utils/requestutil"
+	"github.com/roledio/roled/auth/pkg/utils/responseutil"
 )
 
 func (h *handler) getProjectUsers(c fiber.Ctx) error {

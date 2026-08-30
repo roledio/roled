@@ -24,10 +24,9 @@ User and role management is an inevitable infrastructure requirement for virtual
 
 As an open-source platform, Roled gives you complete control over your data and deployment. Host it within your private infrastructure, keep full ownership of your user data, and standardize access control across all your apps without vendor lock-in.
 
-> **What Roled is (and isn't):**  
+> [!NOTE]
 > Roled is **not** an identity provider (IdP) or Single Sign-On (SSO) suite designed for cross-app global identities. Instead, it is purpose-built for teams managing **multiple projects with isolated user bases**. Users registered in one project cannot access another project unless explicitly granted access. Roled provides built-in OAuth2 authentication to power project logins, while keeping its core focus on effortless user and role administration.
 
----
 
 ## Tech Stack
 
@@ -36,7 +35,6 @@ As an open-source platform, Roled gives you complete control over your data and 
 | **Backend** ([auth](./auth/)) | [Go](https://go.dev/), [Fiber](https://gofiber.io/), [MariaDB](https://mariadb.org/), [Redis](https://redis.io/) |
 | **Frontend** ([console](./console/)) | [React](https://react.dev/), [Vite](https://vite.dev/), [TailwindCSS](https://tailwindcss.com/) |
 
----
 
 ## Quick Start
 
@@ -65,7 +63,6 @@ Update the default secrets and connection credentials before starting:
 - `JWT_SIGNING_KEY`: 32–64 byte secret key (for HS256 JWT tokens).
 - `EMAIL_SMTP_*`: Your SMTP server credentials for transactional emails (verification & password resets).
 
----
 
 ### 2. Start Services
 
@@ -75,7 +72,6 @@ Launch the stack and follow the logs:
 docker compose up -d --build && docker compose logs -f
 ```
 
----
 
 ### 3. Retrieve Initial Seed Credentials
 
@@ -108,11 +104,11 @@ During the very first startup, Roled automatically seeds the database with initi
 ================================================================================          
 ```
 
-> **Note:** Save these credentials securely. You can now open your browser, visit `http://localhost:4000`, and log in to the Roled Console using the generated Admin credentials.
+> [!NOTE]
+> Save these credentials securely. You can now open your browser, visit `http://localhost:4000`, and log in to the Roled Console using the generated Admin credentials.
 
----
 
-## Cloud vs. Self-Hosted
+## Self-Hosted vs. Cloud
 
 | Feature | Self-Hosted (Open Source) | Roled Cloud |
 |---|---|---|
@@ -124,7 +120,6 @@ During the very first startup, Roled automatically seeds the database with initi
 
 If you want to integrate immediately without setting up infrastructure, try **[Roled Cloud](https://roled.io)** for free.
 
----
 
 ## Contributing
 
@@ -138,4 +133,5 @@ Roled is open source and contributions are welcome! The project is under active 
 - **Login Layouts**: Ready-to-use login page templates for quick project integration.
 - **User Groups**: Define reusable sets of default users for quick assignment to new projects.
 - **Users View**: Inverse management view, assign a user to multiple projects from a central user list without navigating project-by-project.
+- And many more!
 

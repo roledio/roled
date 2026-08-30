@@ -11,7 +11,7 @@ import (
 	fiberredis "github.com/gofiber/storage/redis/v3"
 	nrredis "github.com/newrelic/go-agent/v3/integrations/nrredis-v9"
 	"github.com/redis/go-redis/v9"
-	"github.com/roledio/roled/internal/configs"
+	"github.com/roledio/roled/auth/internal/configs"
 )
 
 type RedisService interface {

@@ -8,10 +8,10 @@ import (
 	"time"
 
 	"github.com/pressly/goose/v3"
-	"github.com/roledio/roled/pkg/constants"
-	"github.com/roledio/roled/pkg/utils/encryptionutil"
-	"github.com/roledio/roled/pkg/utils/idutil"
-	"github.com/roledio/roled/pkg/utils/passwordutil"
+	"github.com/roledio/roled/auth/pkg/constants"
+	"github.com/roledio/roled/auth/pkg/utils/encryptionutil"
+	"github.com/roledio/roled/auth/pkg/utils/idutil"
+	"github.com/roledio/roled/auth/pkg/utils/passwordutil"
 )
 
 var (

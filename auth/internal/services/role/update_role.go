@@ -7,12 +7,12 @@ import (
 
 	"github.com/gofiber/fiber/v3/log"
 	"github.com/gookit/goutil/maputil"
-	"github.com/roledio/roled/internal/entities"
-	"github.com/roledio/roled/internal/errors"
-	"github.com/roledio/roled/internal/models"
-	"github.com/roledio/roled/internal/repositories"
-	"github.com/roledio/roled/internal/services/shared"
-	pkgerrors "github.com/roledio/roled/pkg/errors"
+	"github.com/roledio/roled/auth/internal/entities"
+	"github.com/roledio/roled/auth/internal/errors"
+	"github.com/roledio/roled/auth/internal/models"
+	"github.com/roledio/roled/auth/internal/repositories"
+	"github.com/roledio/roled/auth/internal/services/shared"
+	pkgerrors "github.com/roledio/roled/auth/pkg/errors"
 )
 
 func (s *roleService) UpdateRole(ctx context.Context, req *models.UpdateRoleRequest) (*models.RoleDetailsAndPermissions, error) {

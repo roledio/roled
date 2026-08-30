@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	mocks "github.com/roledio/roled/pkg/mocks/utils/cacheutil"
+	mocks "github.com/roledio/roled/auth/pkg/mocks/utils/cacheutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"

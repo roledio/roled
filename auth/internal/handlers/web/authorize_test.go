@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/roledio/roled/internal/models"
+	"github.com/roledio/roled/auth/internal/models"
 )
 
 func TestBuildRedirectURL_PreservesSignupQueryParam(t *testing.T) {

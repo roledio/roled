@@ -8,12 +8,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/roledio/roled/internal/constants"
-	"github.com/roledio/roled/internal/constants/rediskeys"
-	"github.com/roledio/roled/internal/entities"
-	repositorymocks "github.com/roledio/roled/internal/mocks/repositories"
-	servicemocks "github.com/roledio/roled/internal/mocks/services"
-	"github.com/roledio/roled/internal/repositories/redis"
+	"github.com/roledio/roled/auth/internal/constants"
+	"github.com/roledio/roled/auth/internal/constants/rediskeys"
+	"github.com/roledio/roled/auth/internal/entities"
+	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
+	servicemocks "github.com/roledio/roled/auth/internal/mocks/services"
+	"github.com/roledio/roled/auth/internal/repositories/redis"
 )
 
 func TestCachedRefreshTokenRepository_FindByClientIDAndRefreshTokenHash_CacheHit(t *testing.T) {

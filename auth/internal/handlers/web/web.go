@@ -2,12 +2,12 @@ package web
 
 import (
 	"github.com/gofiber/fiber/v3"
-	"github.com/roledio/roled/internal/configs"
-	"github.com/roledio/roled/internal/repositories"
-	"github.com/roledio/roled/internal/services/authorize"
-	"github.com/roledio/roled/internal/services/infra"
-	"github.com/roledio/roled/internal/services/member"
-	"github.com/roledio/roled/internal/services/user"
+	"github.com/roledio/roled/auth/internal/configs"
+	"github.com/roledio/roled/auth/internal/repositories"
+	"github.com/roledio/roled/auth/internal/services/authorize"
+	"github.com/roledio/roled/auth/internal/services/infra"
+	"github.com/roledio/roled/auth/internal/services/member"
+	"github.com/roledio/roled/auth/internal/services/user"
 )
 
 type Dependencies struct {

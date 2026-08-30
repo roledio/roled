@@ -8,11 +8,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.openly.dev/pointy"
 
-	"github.com/roledio/roled/internal/constants"
-	"github.com/roledio/roled/internal/entities"
-	repositorymocks "github.com/roledio/roled/internal/mocks/repositories"
-	"github.com/roledio/roled/internal/models"
-	"github.com/roledio/roled/internal/repositories/interfaces"
+	"github.com/roledio/roled/auth/internal/constants"
+	"github.com/roledio/roled/auth/internal/entities"
+	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
+	"github.com/roledio/roled/auth/internal/models"
+	"github.com/roledio/roled/auth/internal/repositories/interfaces"
 )
 
 func TestUserService_GetUsers_Success(t *testing.T) {

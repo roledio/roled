@@ -10,9 +10,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/gofiber/fiber/v3/log"
-	"github.com/roledio/roled/internal/configs"
-	"github.com/roledio/roled/internal/models"
-	"github.com/roledio/roled/pkg/errors"
+	"github.com/roledio/roled/auth/internal/configs"
+	"github.com/roledio/roled/auth/internal/models"
+	"github.com/roledio/roled/auth/pkg/errors"
 )
 
 type s3UploadService struct {

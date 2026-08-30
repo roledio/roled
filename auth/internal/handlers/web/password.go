@@ -6,10 +6,10 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/log"
 	"github.com/gofiber/fiber/v3/middleware/csrf"
-	"github.com/roledio/roled/internal/models"
-	"github.com/roledio/roled/internal/views"
-	"github.com/roledio/roled/pkg/utils/flashutil"
-	"github.com/roledio/roled/pkg/utils/requestutil"
+	"github.com/roledio/roled/auth/internal/models"
+	"github.com/roledio/roled/auth/internal/views"
+	"github.com/roledio/roled/auth/pkg/utils/flashutil"
+	"github.com/roledio/roled/auth/pkg/utils/requestutil"
 )
 
 func (h *handler) renderForgotPassword(c fiber.Ctx) error {

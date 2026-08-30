@@ -7,7 +7,7 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/log"
 	"github.com/gofiber/fiber/v3/middleware/cors"
-	"github.com/roledio/roled/internal/configs"
+	"github.com/roledio/roled/auth/internal/configs"
 )
 
 func CORS(defaultConfig *configs.DefaultConfig) fiber.Handler {

@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/roledio/roled/internal/entities"
-	"github.com/roledio/roled/pkg/utils/flashutil"
+	"github.com/roledio/roled/auth/internal/entities"
+	"github.com/roledio/roled/auth/pkg/utils/flashutil"
 )
 
 type RenderForgotPasswordRequest struct {

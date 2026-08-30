@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/roledio/roled/internal/handlers/api"
-	"github.com/roledio/roled/internal/handlers/web"
-	"github.com/roledio/roled/internal/repositories"
-	"github.com/roledio/roled/internal/services/infra"
+	"github.com/roledio/roled/auth/internal/handlers/api"
+	"github.com/roledio/roled/auth/internal/handlers/web"
+	"github.com/roledio/roled/auth/internal/repositories"
+	"github.com/roledio/roled/auth/internal/services/infra"
 )
 
 func newApiHandlerDeps(registry repositories.Registry, redis infra.RedisService, services *Services) *api.Dependencies {

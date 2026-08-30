@@ -8,11 +8,11 @@ import (
 	"testing"
 
 	"github.com/gofiber/fiber/v3"
-	"github.com/roledio/roled/internal/configs"
-	customerrors "github.com/roledio/roled/internal/errors"
-	repositorymocks "github.com/roledio/roled/internal/mocks/repositories"
-	servicemocks "github.com/roledio/roled/internal/mocks/services"
-	"github.com/roledio/roled/internal/models"
+	"github.com/roledio/roled/auth/internal/configs"
+	customerrors "github.com/roledio/roled/auth/internal/errors"
+	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
+	servicemocks "github.com/roledio/roled/auth/internal/mocks/services"
+	"github.com/roledio/roled/auth/internal/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/tidwall/gjson"
 )

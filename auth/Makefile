@@ -1,9 +1,9 @@
 VERSION := 0.17.0
 COMMIT_HASH := $(shell git log -1 --pretty=format:%h || echo ${GIT_COMMIT_HASH})
 BUILD_TIMESTAMP := $(shell date -u -Iseconds)
-LDFLAGS := -X 'github.com/roledio/roled/internal/models.AppVersion=${VERSION}'
-LDFLAGS := ${LDFLAGS} -X 'github.com/roledio/roled/internal/models.BuildTimestamp=${BUILD_TIMESTAMP}'
-LDFLAGS := ${LDFLAGS} -X 'github.com/roledio/roled/internal/models.CommitHash=${COMMIT_HASH}'
+LDFLAGS := -X 'github.com/roledio/roled/auth/internal/models.AppVersion=${VERSION}'
+LDFLAGS := ${LDFLAGS} -X 'github.com/roledio/roled/auth/internal/models.BuildTimestamp=${BUILD_TIMESTAMP}'
+LDFLAGS := ${LDFLAGS} -X 'github.com/roledio/roled/auth/internal/models.CommitHash=${COMMIT_HASH}'
 
 test-verbose:
 	go test -v --cover ./...

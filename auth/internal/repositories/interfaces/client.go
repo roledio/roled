@@ -3,8 +3,8 @@ package interfaces
 import (
 	"context"
 
-	"github.com/roledio/roled/internal/entities"
-	"github.com/roledio/roled/internal/models"
+	"github.com/roledio/roled/auth/internal/entities"
+	"github.com/roledio/roled/auth/internal/models"
 )
 
 type ClientRepository interface {

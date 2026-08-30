@@ -5,11 +5,11 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v3/log"
-	"github.com/roledio/roled/internal/errors"
-	"github.com/roledio/roled/internal/models"
-	"github.com/roledio/roled/internal/repositories"
-	"github.com/roledio/roled/internal/services/shared"
-	pkgerrors "github.com/roledio/roled/pkg/errors"
+	"github.com/roledio/roled/auth/internal/errors"
+	"github.com/roledio/roled/auth/internal/models"
+	"github.com/roledio/roled/auth/internal/repositories"
+	"github.com/roledio/roled/auth/internal/services/shared"
+	pkgerrors "github.com/roledio/roled/auth/pkg/errors"
 )
 
 func (s *projectService) DeleteProject(ctx context.Context, req *models.DeleteProjectRequest) error {

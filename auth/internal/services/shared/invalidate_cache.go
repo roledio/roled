@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/gofiber/fiber/v3/log"
-	"github.com/roledio/roled/internal/constants/rediskeys"
-	"github.com/roledio/roled/internal/entities"
-	"github.com/roledio/roled/internal/repositories"
-	"github.com/roledio/roled/internal/services/infra"
+	"github.com/roledio/roled/auth/internal/constants/rediskeys"
+	"github.com/roledio/roled/auth/internal/entities"
+	"github.com/roledio/roled/auth/internal/repositories"
+	"github.com/roledio/roled/auth/internal/services/infra"
 )
 
 func InvalidateAccountCache(ctx context.Context, redis infra.RedisService, accountID string) {

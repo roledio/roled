@@ -8,14 +8,14 @@ import (
 	"github.com/stretchr/testify/mock"
 	"go.openly.dev/pointy"
 
-	"github.com/roledio/roled/internal/constants"
-	"github.com/roledio/roled/internal/entities"
-	"github.com/roledio/roled/internal/errors"
-	"github.com/roledio/roled/internal/models"
-	"github.com/roledio/roled/internal/repositories"
-	pkgerrors "github.com/roledio/roled/pkg/errors"
+	"github.com/roledio/roled/auth/internal/constants"
+	"github.com/roledio/roled/auth/internal/entities"
+	"github.com/roledio/roled/auth/internal/errors"
+	"github.com/roledio/roled/auth/internal/models"
+	"github.com/roledio/roled/auth/internal/repositories"
+	pkgerrors "github.com/roledio/roled/auth/pkg/errors"
 
-	repositorymocks "github.com/roledio/roled/internal/mocks/repositories"
+	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
 )
 
 func TestMemberService_DeleteMember_SystemProjectNotFound(t *testing.T) {

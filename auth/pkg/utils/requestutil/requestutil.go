@@ -1,8 +1,8 @@
 package requestutil
 
 import (
-	"github.com/roledio/roled/pkg/errors"
-	"github.com/roledio/roled/pkg/utils/validationutil"
+	"github.com/roledio/roled/auth/pkg/errors"
+	"github.com/roledio/roled/auth/pkg/utils/validationutil"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/log"

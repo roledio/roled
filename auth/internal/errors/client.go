@@ -3,7 +3,7 @@ package errors
 import (
 	"net/http"
 
-	"github.com/roledio/roled/pkg/errors"
+	"github.com/roledio/roled/auth/pkg/errors"
 )
 
 var (

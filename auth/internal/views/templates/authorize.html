@@ -240,7 +240,7 @@
                 var errorMessage = tmplData.errorMessage || tmplData.flashErrorMessage || '';
                 var errorDebug = tmplData.errorDebug || tmplData.flashErrorDebug || '';
                 if (errorMessage) {
-                    Roled.showErrorFromTemplate(errorMessage, errorDebug);
+                    Roled.showErrorFromTemplate(errorMessage, errorDebug, 10000);
                 }
             }
         });

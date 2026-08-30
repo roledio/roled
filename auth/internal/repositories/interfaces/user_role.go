@@ -3,7 +3,7 @@ package interfaces
 import (
 	"context"
 
-	"github.com/roledio/roled/internal/entities"
+	"github.com/roledio/roled/auth/internal/entities"
 )
 
 type UserRoleRepository interface {

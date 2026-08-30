@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v3/log"
-	"github.com/roledio/roled/internal/configs"
-	"github.com/roledio/roled/internal/constants"
-	"github.com/roledio/roled/pkg/utils/jwtutil"
+	"github.com/roledio/roled/auth/internal/configs"
+	"github.com/roledio/roled/auth/internal/constants"
+	"github.com/roledio/roled/auth/pkg/utils/jwtutil"
 )
 
 type ExchangeTokenRequest struct {
