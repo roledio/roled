@@ -66,7 +66,10 @@ func (s *memberService) SubmitActivateMember(ctx context.Context, req *models.Su
 	}
 
 	// Invalidate user cache after successful user update
-	shared.InvalidateUserCache(ctx, s.redisService, user)
+	shared.InvalidateUserCache(ctx, s.redisService, user, &shared.OldUserCacheKeyParts{
+		ExternalUserID: user.ExternalUserID,
+		Email:          user.Email,
+	})
 
 	// Delete the token from redis
 	// Failed to delete token should not block the process

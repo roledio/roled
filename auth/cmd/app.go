@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"os"
 	"time"
 
@@ -105,7 +106,12 @@ func NewApp(config *configs.DefaultConfig) (*App, error) {
 func (a *App) Run() error {
 	printGeneratedCredentials()
 	addr := fmt.Sprintf(":%d", a.config.Port)
-	return a.app.Listen(addr, fiber.ListenConfig{DisableStartupMessage: true})
+	return a.app.Listen(addr, fiber.ListenConfig{
+		DisableStartupMessage: true,
+		ListenerAddrFunc: func(addr net.Addr) {
+			log.Info("Server is listening on ", addr.String())
+		},
+	})
 }
 
 func (a *App) Shutdown() error {

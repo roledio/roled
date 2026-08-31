@@ -67,7 +67,10 @@ func (s *userService) DeleteUser(ctx context.Context, req *models.DeleteUserRequ
 
 	if err == nil {
 		// Invalidate cache after successful deletion
-		shared.InvalidateUserCache(ctx, s.redisService, user)
+		shared.InvalidateUserCache(ctx, s.redisService, user, &shared.OldUserCacheKeyParts{
+			Email:          user.Email,
+			ExternalUserID: user.ExternalUserID,
+		})
 	}
 
 	return err

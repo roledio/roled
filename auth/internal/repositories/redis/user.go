@@ -48,8 +48,22 @@ func (r *userRepository) FindByID(ctx context.Context, id string) (*entities.Use
 		return nil, nil
 	}
 
-	if setErr := r.redis.SetData(ctx, cacheKey, userPtr, r.ttl); setErr != nil {
-		log.WithContext(ctx).Warnw("Failed to cache user in redis", "error", setErr, "user_id", id)
+	// Cache with all possible keys
+	cacheKeys := []string{
+		cacheKey,
+		rediskeys.UserByIDAndProjectID(id, userPtr.ProjectID),
+	}
+	if userPtr.Email != nil {
+		cacheKeys = append(cacheKeys, rediskeys.UserByProjectIDAndEmail(userPtr.ProjectID, *userPtr.Email))
+	}
+	if userPtr.ExternalUserID != nil {
+		cacheKeys = append(cacheKeys, rediskeys.UserByProjectIDAndExternalUserID(userPtr.ProjectID, *userPtr.ExternalUserID))
+	}
+
+	for _, key := range cacheKeys {
+		if setErr := r.redis.SetData(ctx, key, userPtr, r.ttl); setErr != nil {
+			log.WithContext(ctx).Warnw("Failed to cache user in redis", "error", setErr, "user_id", id)
+		}
 	}
 
 	return userPtr, nil
@@ -57,12 +71,12 @@ func (r *userRepository) FindByID(ctx context.Context, id string) (*entities.Use
 
 func (r *userRepository) FindByIDAndProjectID(ctx context.Context, id string, projectID string) (*entities.User, error) {
 	// Try to get from cache first using individual key
-	cacheKey := rediskeys.UserByID(id)
+	cacheKey := rediskeys.UserByIDAndProjectID(id, projectID)
 	var user entities.User
 
 	found, err := r.redis.GetData(ctx, cacheKey, &user)
 	if err != nil {
-		log.WithContext(ctx).Warnw("Failed to get user from redis cache, falling back to DB", "error", err, "user_id", id)
+		log.WithContext(ctx).Warnw("Failed to get user from redis cache, falling back to DB", "error", err, "user_id", id, "project_id", projectID)
 	} else if found {
 		return &user, nil
 	}
@@ -76,8 +90,9 @@ func (r *userRepository) FindByIDAndProjectID(ctx context.Context, id string, pr
 		return nil, nil
 	}
 
-	// Cache with all available keys
+	// Cache with all possible keys
 	cacheKeys := []string{
+		cacheKey,
 		rediskeys.UserByID(id),
 	}
 	if userPtr.Email != nil {

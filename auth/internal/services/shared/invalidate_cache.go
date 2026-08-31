@@ -21,7 +21,12 @@ func InvalidateAccountCache(ctx context.Context, redis infra.RedisService, accou
 	}
 }
 
-func InvalidateUserCache(ctx context.Context, redis infra.RedisService, user *entities.User) {
+type OldUserCacheKeyParts struct {
+	Email          *string
+	ExternalUserID *string
+}
+
+func InvalidateUserCache(ctx context.Context, redis infra.RedisService, user *entities.User, oldData *OldUserCacheKeyParts) {
 	if user == nil {
 		return
 	}
@@ -31,16 +36,22 @@ func InvalidateUserCache(ctx context.Context, redis infra.RedisService, user *en
 	}
 
 	// Invalidate user by ID cache
-	keys := []string{rediskeys.UserByID(user.ID)}
-
-	// Invalidate user by project and email cache if email is available
-	if user.Email != nil {
-		keys = append(keys, rediskeys.UserByProjectIDAndEmail(user.ProjectID, *user.Email))
+	keys := []string{
+		rediskeys.UserByID(user.ID),
+		rediskeys.UserByIDAndProjectID(user.ID, user.ProjectID),
 	}
 
-	// Invalidate user by project and external user ID cache if external user ID is available
-	if user.ExternalUserID != nil {
-		keys = append(keys, rediskeys.UserByProjectIDAndExternalUserID(user.ProjectID, *user.ExternalUserID))
+	if oldData != nil {
+
+		// Invalidate user by project and email cache if email is available
+		if oldData.Email != nil {
+			keys = append(keys, rediskeys.UserByProjectIDAndEmail(user.ProjectID, *oldData.Email))
+		}
+
+		// Invalidate user by project and external user ID cache if external user ID is available
+		if oldData.ExternalUserID != nil {
+			keys = append(keys, rediskeys.UserByProjectIDAndExternalUserID(user.ProjectID, *oldData.ExternalUserID))
+		}
 	}
 
 	// Invalidate role by user ID cache

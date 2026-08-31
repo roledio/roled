@@ -52,6 +52,13 @@ func (s *userService) UpdateCurrentUser(ctx context.Context, req *models.UpdateC
 	var ptrEmail *string
 	var ptrPasswordHash = user.PasswordHash
 
+	// Store previous data that are used for the cache keys and the values can change,
+	// so we need to use the old values to delete the cache keys later
+	oldCacheKeyParts := shared.OldUserCacheKeyParts{
+		Email:          user.Email,
+		ExternalUserID: user.ExternalUserID,
+	}
+
 	// Validate email if provided
 	email := strings.ToLower(strings.TrimSpace(req.Email))
 	if email != "" {
@@ -129,7 +136,7 @@ func (s *userService) UpdateCurrentUser(ctx context.Context, req *models.UpdateC
 	}
 
 	// Invalidate cache after successful update
-	shared.InvalidateUserCache(ctx, s.redisService, user)
+	shared.InvalidateUserCache(ctx, s.redisService, user, &oldCacheKeyParts)
 
 	res := models.UserDetails{
 		ID:              user.ID,

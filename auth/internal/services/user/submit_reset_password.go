@@ -39,7 +39,10 @@ func (s *userService) SubmitResetPassword(ctx context.Context, req *models.Submi
 	}
 
 	// Invalidate user cache after successful password update
-	shared.InvalidateUserCache(ctx, s.redisService, user)
+	shared.InvalidateUserCache(ctx, s.redisService, user, &shared.OldUserCacheKeyParts{
+		Email:          user.Email,
+		ExternalUserID: user.ExternalUserID,
+	})
 
 	// Delete the token from redis
 	// Failed to delete token should not block the process
