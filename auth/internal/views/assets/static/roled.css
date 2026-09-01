@@ -400,10 +400,17 @@ h6 { font-size: 1rem; }
 }
 
 .roled-auth-card {
+  position: relative;
   background-color: var(--roled-card);
   border-radius: calc(var(--roled-radius) * 2);
   box-shadow: var(--roled-shadow-xl);
-  overflow: hidden;
+}
+
+.roled-auth-corner-info {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 20;
 }
 
 .roled-auth-header {
@@ -476,6 +483,152 @@ h6 { font-size: 1rem; }
   height: 1.25em;
   margin: 0 0.25rem;
   vertical-align: middle;
+}
+
+/* ============================================
+   Tooltip Component
+   ============================================ */
+.roled-tooltip-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+.roled-tooltip-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  margin: 0;
+  background-color: var(--roled-muted);
+  border: 1px solid var(--roled-border);
+  color: var(--roled-muted-foreground);
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all var(--roled-transition-fast);
+  line-height: 1;
+}
+
+.roled-tooltip-trigger:hover,
+.roled-tooltip-trigger:focus-visible {
+  color: var(--roled-primary);
+  background-color: var(--roled-accent);
+  border-color: var(--roled-accent);
+}
+
+.roled-tooltip-trigger:focus {
+  outline: none;
+}
+
+.roled-tooltip-trigger:focus-visible {
+  box-shadow: 0 0 0 2px var(--roled-ring);
+}
+
+.roled-tooltip-icon {
+  width: 0.9375rem;
+  height: 0.9375rem;
+  display: block;
+}
+
+.roled-tooltip-content {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  width: max-content;
+  max-width: 240px;
+  padding: 0.5rem 0.75rem;
+  background-color: var(--roled-card);
+  color: var(--roled-muted-foreground);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.4;
+  text-align: center;
+  border-radius: var(--roled-radius);
+  border: 1px solid var(--roled-border);
+  box-shadow: var(--roled-shadow-lg);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--roled-transition-fast), transform var(--roled-transition-fast), visibility var(--roled-transition-fast);
+  z-index: 50;
+  white-space: normal;
+}
+
+/* Tooltip Arrow - Top / Center */
+.roled-tooltip-content::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: var(--roled-border) transparent transparent transparent;
+}
+
+.roled-tooltip-content::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: var(--roled-card) transparent transparent transparent;
+}
+
+/* Bottom-Left Tooltip Placement (e.g. for top-right corner placement) */
+.roled-tooltip-content.roled-tooltip-bottom-left {
+  top: calc(100% + 8px);
+  bottom: auto;
+  right: 0;
+  left: auto;
+  transform: translateY(-4px);
+  text-align: left;
+}
+
+.roled-tooltip-content.roled-tooltip-bottom-left::before {
+  top: -6px;
+  bottom: auto;
+  right: 10px;
+  left: auto;
+  transform: none;
+  border-width: 0 6px 6px 6px;
+  border-color: transparent transparent var(--roled-border) transparent;
+}
+
+.roled-tooltip-content.roled-tooltip-bottom-left::after {
+  top: -5px;
+  bottom: auto;
+  right: 11px;
+  left: auto;
+  transform: none;
+  border-width: 0 5px 5px 5px;
+  border-color: transparent transparent var(--roled-card) transparent;
+}
+
+/* Tooltip Hover & Focus States */
+.roled-tooltip-container:hover .roled-tooltip-content,
+.roled-tooltip-trigger:focus .roled-tooltip-content,
+.roled-tooltip-trigger:focus-visible .roled-tooltip-content {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+.roled-tooltip-container:hover .roled-tooltip-content.roled-tooltip-bottom-left,
+.roled-tooltip-trigger:focus .roled-tooltip-content.roled-tooltip-bottom-left,
+.roled-tooltip-trigger:focus-visible .roled-tooltip-content.roled-tooltip-bottom-left {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
 /* ============================================

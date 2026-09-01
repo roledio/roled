@@ -265,6 +265,12 @@ minify_html() {
             else
                 restored_content=$(echo "$restored_content" | sed -E 's|/assets/static/([a-zA-Z0-9_-]+)\.js\?v=1|/assets/static/\1.min.js?v=1|g')
             fi
+
+            # Update partial definitions in minified files (e.g., {{define "partials/head"}} -> {{define "partials/head.min"}})
+            restored_content=$(echo "$restored_content" | sed -E 's/\{\{([ -]*)define "([^"]+)"([ -]*)\}\}/{{\1define "\2.min"\3}}/g')
+
+            # Update partial calls/includes in minified files (e.g., {{template "partials/head" .}} -> {{template "partials/head.min" .}})
+            restored_content=$(echo "$restored_content" | sed -E 's/\{\{([ -]*)template "([^".]+)"([ ]*)/{{\1template "\2.min"\3/g')
             
             echo "$restored_content" > "$output_file"
         fi
@@ -337,13 +343,13 @@ generate_report() {
     # HTML files
     echo ""
     echo "HTML Templates:"
-    for html_file in "${TEMPLATES_DIR}"/*.html; do
+    while IFS= read -r -d '' html_file; do
         if [ -f "$html_file" ]; then
-            local filename=$(basename "$html_file")
+            local rel_path="${html_file#${TEMPLATES_DIR}/}"
             local size=$(wc -c < "$html_file" | awk '{printf "%.2f KB", $1/1024}')
-            printf "  %-40s %s\n" "$filename" "$size"
+            printf "  %-40s %s\n" "$rel_path" "$size"
         fi
-    done
+    done < <(find "${TEMPLATES_DIR}" -name "*.html" -print0 | sort -z)
     
     echo ""
     echo "=============================================="

@@ -104,8 +104,9 @@ During the very first startup, Roled automatically seeds the database with initi
 ================================================================================          
 ```
 
-> [!NOTE]
-> Save these credentials securely. You can now open your browser, visit `http://localhost:4000`, and log in to the Roled Console using the generated Admin credentials.
+**Save these credentials securely**. 
+
+You can now open your browser, visit `http://localhost:4000`, and log in to the Roled Console using the generated Admin user or Standard user credentials. The Admin user belongs to the system account and has access to the system project: Roled Console. The Standard user is a regular user with access to projects under their user account.
 
 
 ## Self-Hosted vs. Cloud
