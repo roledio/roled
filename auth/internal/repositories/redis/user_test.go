@@ -95,6 +95,21 @@ func TestCachedUserRepository_FindByID_CacheMiss(t *testing.T) {
 		SetData(ctx, cacheKey, dbUser, 24*time.Hour).
 		Return(nil)
 
+	// Mock Redis SetData saving to cache
+	mockRedis.EXPECT().
+		SetData(ctx, rediskeys.UserByIDAndProjectID(userID, dbUser.ProjectID), dbUser, 24*time.Hour).
+		Return(nil)
+
+	// Mock Redis SetData saving to cache
+	mockRedis.EXPECT().
+		SetData(ctx, rediskeys.UserByProjectIDAndEmail(dbUser.ProjectID, userEmail), dbUser, 24*time.Hour).
+		Return(nil)
+
+	// Mock Redis SetData saving to cache
+	mockRedis.EXPECT().
+		SetData(ctx, rediskeys.UserByProjectIDAndExternalUserID(dbUser.ProjectID, externalUserID), dbUser, 24*time.Hour).
+		Return(nil)
+
 	result, err := cachedRepo.FindByID(ctx, userID)
 
 	assert.NoError(t, err)
