@@ -1,4 +1,4 @@
-VERSION := 0.19.0
+VERSION := 0.20.0
 COMMIT_HASH := $(shell git log -1 --pretty=format:%h || echo ${GIT_COMMIT_HASH})
 BUILD_TIMESTAMP := $(shell date -u -Iseconds)
 LDFLAGS := -X 'github.com/roledio/roled/auth/internal/models.AppVersion=${VERSION}'
