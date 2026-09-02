@@ -229,6 +229,12 @@ func TestMemberService_DeleteMember_ClientJWT_SystemAccount_Success(t *testing.T
 		IsAdmin:   false,
 	}
 
+	targetUser := &entities.User{
+		ID:        "target-user-id",
+		AccountID: "other-account",
+		ProjectID: "system-project-id",
+	}
+
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
 	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
@@ -248,6 +254,10 @@ func TestMemberService_DeleteMember_ClientJWT_SystemAccount_Success(t *testing.T
 
 	// Mock admin count (2 admins, so deleting one is OK)
 	mockMemberRepo.EXPECT().CountByAccountID(ctx, "other-account", pointy.Bool(true)).Return(2, nil)
+
+	// Mock user found (called before transaction)
+	mockRegistry.EXPECT().UserRepository().Return(mockUserRepo)
+	mockUserRepo.EXPECT().FindByID(ctx, "target-user-id").Return(targetUser, nil)
 
 	// Mock transaction
 	mockRegistry.EXPECT().Tx(mock.AnythingOfType("func(repositories.Registry) error")).RunAndReturn(func(fn func(repositories.Registry) error) error {
@@ -373,6 +383,12 @@ func TestMemberService_DeleteMember_ClientJWT_NonSystemAccount_Success(t *testin
 		IsAdmin:   false,
 	}
 
+	targetUser := &entities.User{
+		ID:        "target-user-id",
+		AccountID: "test-account",
+		ProjectID: "system-project-id",
+	}
+
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
 	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
@@ -392,6 +408,10 @@ func TestMemberService_DeleteMember_ClientJWT_NonSystemAccount_Success(t *testin
 
 	// Mock admin count (2 admins, so deleting one is OK)
 	mockMemberRepo.EXPECT().CountByAccountID(ctx, "test-account", pointy.Bool(true)).Return(2, nil)
+
+	// Mock user found (called before transaction)
+	mockRegistry.EXPECT().UserRepository().Return(mockUserRepo)
+	mockUserRepo.EXPECT().FindByID(ctx, "target-user-id").Return(targetUser, nil)
 
 	// Mock transaction
 	mockRegistry.EXPECT().Tx(mock.AnythingOfType("func(repositories.Registry) error")).RunAndReturn(func(fn func(repositories.Registry) error) error {
@@ -568,6 +588,12 @@ func TestMemberService_DeleteMember_UserJWT_SystemAccount_Success(t *testing.T) 
 		IsAdmin:   false,
 	}
 
+	targetUser := &entities.User{
+		ID:        "target-user-id",
+		AccountID: "other-account",
+		ProjectID: "system-project-id",
+	}
+
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
 	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
@@ -587,6 +613,10 @@ func TestMemberService_DeleteMember_UserJWT_SystemAccount_Success(t *testing.T) 
 
 	// Mock admin count (2 admins, so deleting one is OK)
 	mockMemberRepo.EXPECT().CountByAccountID(ctx, "other-account", pointy.Bool(true)).Return(2, nil)
+
+	// Mock user found (called before transaction)
+	mockRegistry.EXPECT().UserRepository().Return(mockUserRepo)
+	mockUserRepo.EXPECT().FindByID(ctx, "target-user-id").Return(targetUser, nil)
 
 	// Mock transaction
 	mockRegistry.EXPECT().Tx(mock.AnythingOfType("func(repositories.Registry) error")).RunAndReturn(func(fn func(repositories.Registry) error) error {
@@ -717,6 +747,12 @@ func TestMemberService_DeleteMember_UserJWT_NonSystemAccount_Success(t *testing.
 		IsAdmin:   false,
 	}
 
+	targetUser := &entities.User{
+		ID:        "target-user-id",
+		AccountID: "test-account",
+		ProjectID: "system-project-id",
+	}
+
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
 	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
@@ -739,6 +775,10 @@ func TestMemberService_DeleteMember_UserJWT_NonSystemAccount_Success(t *testing.
 
 	// Mock admin count (2 admins, so deleting one is OK)
 	mockMemberRepo.EXPECT().CountByAccountID(ctx, "test-account", pointy.Bool(true)).Return(2, nil)
+
+	// Mock user found (called before transaction)
+	mockRegistry.EXPECT().UserRepository().Return(mockUserRepo)
+	mockUserRepo.EXPECT().FindByID(ctx, "target-user-id").Return(targetUser, nil)
 
 	// Mock transaction
 	mockRegistry.EXPECT().Tx(mock.AnythingOfType("func(repositories.Registry) error")).RunAndReturn(func(fn func(repositories.Registry) error) error {
@@ -1006,10 +1046,17 @@ func TestMemberService_DeleteMember_TransactionFailure_MemberDeleteError(t *test
 		IsAdmin:   false,
 	}
 
+	targetUser := &entities.User{
+		ID:        "target-user-id",
+		AccountID: "other-account",
+		ProjectID: "system-project-id",
+	}
+
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
 	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
 	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
+	mockUserRepo := repositorymocks.NewMockUserRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -1023,6 +1070,10 @@ func TestMemberService_DeleteMember_TransactionFailure_MemberDeleteError(t *test
 
 	// Mock admin count (2 admins, so deleting one is OK)
 	mockMemberRepo.EXPECT().CountByAccountID(ctx, "other-account", pointy.Bool(true)).Return(2, nil)
+
+	// Mock user found (called before transaction)
+	mockRegistry.EXPECT().UserRepository().Return(mockUserRepo)
+	mockUserRepo.EXPECT().FindByID(ctx, "target-user-id").Return(targetUser, nil)
 
 	// Mock transaction
 	mockRegistry.EXPECT().Tx(mock.AnythingOfType("func(repositories.Registry) error")).RunAndReturn(func(fn func(repositories.Registry) error) error {
@@ -1083,6 +1134,12 @@ func TestMemberService_DeleteMember_TransactionFailure_UserDeleteError(t *testin
 		IsAdmin:   false,
 	}
 
+	targetUser := &entities.User{
+		ID:        "target-user-id",
+		AccountID: "other-account",
+		ProjectID: "system-project-id",
+	}
+
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
 	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
@@ -1101,6 +1158,10 @@ func TestMemberService_DeleteMember_TransactionFailure_UserDeleteError(t *testin
 
 	// Mock admin count (2 admins, so deleting one is OK)
 	mockMemberRepo.EXPECT().CountByAccountID(ctx, "other-account", pointy.Bool(true)).Return(2, nil)
+
+	// Mock user found (called before transaction)
+	mockRegistry.EXPECT().UserRepository().Return(mockUserRepo)
+	mockUserRepo.EXPECT().FindByID(ctx, "target-user-id").Return(targetUser, nil)
 
 	// Mock transaction
 	mockRegistry.EXPECT().Tx(mock.AnythingOfType("func(repositories.Registry) error")).RunAndReturn(func(fn func(repositories.Registry) error) error {
@@ -1163,6 +1224,12 @@ func TestMemberService_DeleteMember_TransactionFailure_AccessTokenDeleteError(t 
 		IsAdmin:   false,
 	}
 
+	targetUser := &entities.User{
+		ID:        "target-user-id",
+		AccountID: "other-account",
+		ProjectID: "system-project-id",
+	}
+
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
 	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
@@ -1182,6 +1249,10 @@ func TestMemberService_DeleteMember_TransactionFailure_AccessTokenDeleteError(t 
 
 	// Mock admin count (2 admins, so deleting one is OK)
 	mockMemberRepo.EXPECT().CountByAccountID(ctx, "other-account", pointy.Bool(true)).Return(2, nil)
+
+	// Mock user found (called before transaction)
+	mockRegistry.EXPECT().UserRepository().Return(mockUserRepo)
+	mockUserRepo.EXPECT().FindByID(ctx, "target-user-id").Return(targetUser, nil)
 
 	// Mock transaction
 	mockRegistry.EXPECT().Tx(mock.AnythingOfType("func(repositories.Registry) error")).RunAndReturn(func(fn func(repositories.Registry) error) error {
