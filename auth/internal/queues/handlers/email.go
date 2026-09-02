@@ -49,6 +49,8 @@ func (h emailHandler) Handle(ctx context.Context, payload string) error {
 		return h.handleActivateMember(ctx, p)
 	case constants.EmailPayloadTypeVerifyEmail:
 		return h.handleVerificationEmail(ctx, p)
+	case constants.EmailPayloadTypeInviteUser:
+		return h.handleInviteUser(ctx, p)
 	default:
 		return fmt.Errorf("unsupported email type: %s", p.Type)
 	}
@@ -137,6 +139,31 @@ func (h emailHandler) handleVerificationEmail(ctx context.Context, payload paylo
 		"LoginURL":        payload.LoginURL,
 		"DisplayName":     payload.DisplayName,
 		"IsSignup":        payload.IsSignup,
+	})
+	if err != nil {
+		log.WithContext(ctx).Errorw("Failed to load email template", "error", err)
+		return err
+	}
+	return h.send(ctx, payload.From, payload.To, payload.Subject, body)
+}
+
+func (h emailHandler) handleInviteUser(ctx context.Context, payload payloads.EmailPayload) error {
+	now := time.Now()
+	duration, err := tparse.AbsoluteDuration(now, h.defaultConfig.ActivateMemberExpiryDuration)
+	if err != nil {
+		return err
+	}
+	expiresIn := humanize.RelTime(now, now.Add(duration), "", "")
+	activateProjectUserURL := fmt.Sprintf("%s/user/activate/%s", h.defaultConfig.BaseURL, payload.Token)
+	body, err := mail.LoadAndParseTemplate("templates/html/invite-user.html", map[string]any{
+		"AccountName":            payload.AccountName,
+		"ProjectName":            payload.ProjectName,
+		"ProjectLogoURL":         payload.ProjectLogoURL,
+		"ProjectIsSystem":        payload.ProjectIsSystem,
+		"DisplayName":            payload.DisplayName,
+		"Year":                   now.Year(),
+		"ExpiresIn":              strings.TrimSpace(expiresIn),
+		"ActivateProjectUserURL": activateProjectUserURL,
 	})
 	if err != nil {
 		log.WithContext(ctx).Errorw("Failed to load email template", "error", err)

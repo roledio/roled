@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    {{template "partials/head" .}}
+    {{if not .IsError}}
+    <title>Project User Activation</title>
+    {{else}}
+    <title>Project User Activation Error</title>
+    {{end}}
+</head>
+
+<body>
+    <main class="roled-auth-page" role="main">
+        <div class="roled-auth-container">
+            {{if not .IsError}}
+            <div class="roled-auth-card roled-animate-slide-up">
+                <!-- Info Tooltip in Top-Right Corner -->
+                {{if not .Data.Project.IsSystem}}
+                <div class="roled-auth-corner-info">
+                    <div class="roled-tooltip-container">
+                        <button type="button" class="roled-tooltip-trigger" aria-describedby="roled-auth-tooltip"
+                            aria-label="About security">
+                            <svg class="roled-tooltip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            </svg>
+                        </button>
+                        <div id="roled-auth-tooltip" class="roled-tooltip-content roled-tooltip-bottom-left"
+                            role="tooltip">
+                            {{.Data.Project.Name}} uses Roled to securely manage your account.
+                        </div>
+                    </div>
+                </div>
+                {{end}}
+
+                <!-- Header with Logo and Project Name -->
+                <header class="roled-auth-header">
+                    {{if .Data.Project.LogoURL}}
+                    <img class="roled-auth-logo" src="{{.Data.Project.LogoURL}}" alt="{{.Data.Project.Name}} logo">
+                    {{end}}
+                    <h1 class="roled-auth-title">Welcome to {{.Data.Project.Name}}</h1>
+                    <p class="roled-auth-subtitle">
+                        Please set your password to activate your account and sign in to
+                        <strong>{{.Data.Project.Name}}</strong>.
+                    </p>
+                </header>
+
+                <!-- Activation Form -->
+                <div class="roled-auth-body">
+                    <form method="POST" id="activate-form" data-auth-form data-validate>
+                        <input type="hidden" name="csrf_token" value="{{ .Map.CSRFToken }}">
+
+                        <!-- Display Name Field -->
+                        <div class="roled-form-group">
+                            <label class="roled-label" for="display_name">Display Name</label>
+                            <input type="text" name="display_name" id="display_name" class="roled-input"
+                                placeholder="Display Name" required minlength="3" maxlength="60"
+                                data-minlength-message="Display name must be at least 3 characters"
+                                data-maxlength-message="Display name must be at most 60 characters" {{if
+                                .Flash.IsSuccess}}readonly{{end}} {{if .Flash.DisplayName}}
+                                value="{{.Flash.DisplayName}}" {{else}} value="{{.Data.User.DisplayName}}" {{end}}>
+                        </div>
+
+                        <!-- Email Field (Read-only) -->
+                        <div class="roled-form-group">
+                            <label class="roled-label" for="email">Email</label>
+                            <input type="email" name="email" id="email" class="roled-input" placeholder="Email"
+                                value="{{.Data.User.Email}}" readonly>
+                        </div>
+
+                        <!-- Password Field -->
+                        <div class="roled-form-group">
+                            <label class="roled-label" for="password">New Password</label>
+                            <div class="roled-password-wrapper">
+                                <input type="password" name="password" id="password" class="roled-input"
+                                    placeholder="New Password" required minlength="8"
+                                    data-minlength-message="Password must be at least 8 characters" {{if
+                                    .Flash.IsSuccess}}readonly{{end}} autocomplete="new-password">
+                                <button type="button" class="roled-password-toggle" aria-label="Show password">
+                                    <!-- Eye Open Icon -->
+                                    <svg class="icon-eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" style="display: none;">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                        <circle cx="12" cy="12" r="3" />
+                                    </svg>
+                                    <!-- Eye Closed Icon -->
+                                    <svg class="icon-eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path
+                                            d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                                        <line x1="1" y1="1" x2="23" y2="23" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Confirm Password Field -->
+                        <div class="roled-form-group">
+                            <label class="roled-label" for="password_confirmation">Confirm Password</label>
+                            <div class="roled-password-wrapper">
+                                <input type="password" name="password_confirmation" id="password_confirmation"
+                                    class="roled-input" placeholder="Confirm Password" required
+                                    data-required-message="Password confirmation is required"
+                                    data-confirm-match="#password" data-confirm-match-message="Passwords do not match"
+                                    {{if .Flash.IsSuccess}}readonly{{end}} autocomplete="new-password">
+                                <button type="button" class="roled-password-toggle" aria-label="Show password">
+                                    <svg class="icon-eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" style="display: none;">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                        <circle cx="12" cy="12" r="3" />
+                                    </svg>
+                                    <svg class="icon-eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path
+                                            d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                                        <line x1="1" y1="1" x2="23" y2="23" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="roled-form-group">
+                            <button type="submit" class="roled-btn roled-btn-primary roled-btn-block" {{if
+                                .Flash.IsSuccess}}disabled{{end}}>Activate</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Powered By Roled Badge -->
+            <div class="roled-powered-by">
+                Powered by
+                <a href="https://roled.io" target="_blank" style="color: var(--roled-muted-foreground);">
+                    <img src="/assets/static/favicon.ico" alt="Roled Logo">
+                    <strong>Roled</strong>
+                </a>
+            </div>
+            {{end}}
+        </div>
+    </main>
+
+    <!-- Template Data -->
+    <div id="tmpl-data" {{if .Flash}} data-flash-error-message="{{.Flash.ErrorMessage}}"
+        data-flash-is-success="{{.Flash.IsSuccess}}" data-flash-login-url="{{.Flash.LoginURL}}" {{end}}
+        data-error-message="{{.Error.Msg}}" {{if not .IsEnvProd}} data-flash-error-debug="{{.Flash.ErrorDebug}}"
+        data-error-debug="{{.Error.Err}}" {{end}} data-is-env-prod="{{.IsEnvProd}}" data-is-error="{{.IsError}}">
+    </div>
+
+    <!-- JavaScript Dependencies -->
+    <script src="/assets/static/roled.js?v=1"></script>
+
+    <script>
+        const tmplData = document.getElementById('tmpl-data').dataset;
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof Roled !== 'undefined') {
+                var errorMessage = tmplData.errorMessage || tmplData.flashErrorMessage || '';
+                var errorDebug = tmplData.errorDebug || tmplData.flashErrorDebug || '';
+                if (errorMessage) {
+                    Roled.showErrorFromTemplate(errorMessage, errorDebug);
+                }
+
+                if (tmplData.flashIsSuccess === 'true') {
+                    var successMessage = 'You can now work on this project. Please sign in to continue.';
+                    Roled.showToast({
+                        title: 'Activation successful',
+                        message: successMessage,
+                        type: 'success',
+                        duration: 10000
+                    });
+                    if (tmplData.flashLoginUrl) {
+                        setTimeout(function () {
+                            window.location.href = tmplData.flashLoginUrl;
+                        }, 5000);
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

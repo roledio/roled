@@ -73,3 +73,67 @@ func (h *handler) submitActivateMember(c fiber.Ctx) error {
 	}
 	return views.RenderTemplate(c, "templates/activate-member-success", &templateData, h.defaultConfig)
 }
+
+func (h *handler) renderActivateProjectUser(c fiber.Ctx) error {
+	ctx := c.Context()
+	templateData := models.TemplateData{
+		BuildInfo: models.GetCurrentBuildInfo(h.defaultConfig),
+	}
+	var flash models.SubmitActivateProjectUserFlash
+	err := flashutil.ReadData(c, &flash)
+	if err != nil {
+		log.WithContext(ctx).Errorw("Failed to read flash", "error", err)
+	}
+	templateData.Flash = flash
+	req := models.RenderActivateProjectUserRequest{}
+	err = requestutil.BindAndValidate(c, &req)
+	if err != nil {
+		log.WithContext(ctx).Errorw("Failed to bind and validate request", "error", err)
+		return views.RenderTemplate(c, "templates/activate-project-user", templateData.WithError(err), h.defaultConfig)
+	}
+	// Populate UserID from flash if available
+	if flash.UserID != "" {
+		req.UserID = &flash.UserID
+	}
+	res, err := h.userService.RenderActivateProjectUser(ctx, &req)
+	if err != nil {
+		log.WithContext(ctx).Errorw("Failed to render activate project user", "error", err)
+		return views.RenderTemplate(c, "templates/activate-project-user", templateData.WithError(err), h.defaultConfig)
+	}
+	templateData.Data = res
+	templateData.Map = map[string]any{
+		"CSRFToken": csrf.TokenFromContext(c),
+	}
+	return views.RenderTemplate(c, "templates/activate-project-user", &templateData, h.defaultConfig)
+}
+
+func (h *handler) submitActivateProjectUser(c fiber.Ctx) error {
+	ctx := c.Context()
+	req := models.SubmitActivateProjectUserRequest{}
+	err := requestutil.BindAndValidate(c, &req)
+	redirectPath := fmt.Sprintf("/user/activate/%s", req.Token)
+	if err != nil {
+		log.WithContext(ctx).Errorw("Failed to bind and validate request", "error", err)
+		flash := new(models.SubmitActivateProjectUserFlash)
+		flash.WithError(err)
+		flash.DisplayName = req.DisplayName
+		flash.Email = req.Email
+		flashutil.SetData(c, flash)
+		return c.Redirect().To(redirectPath)
+	}
+	res, err := h.userService.SubmitActivateProjectUser(ctx, &req)
+	if err != nil {
+		log.WithContext(ctx).Errorw("Failed to submit activate project user", "error", err)
+		flash := new(models.SubmitActivateProjectUserFlash)
+		flash.WithError(err)
+		flash.DisplayName = req.DisplayName
+		flash.Email = req.Email
+		flashutil.SetData(c, flash)
+		return c.Redirect().To(redirectPath)
+	}
+	templateData := models.TemplateData{
+		BuildInfo: models.GetCurrentBuildInfo(h.defaultConfig),
+		Data:      res,
+	}
+	return views.RenderTemplate(c, "templates/activate-project-user-success", &templateData, h.defaultConfig)
+}

@@ -28,6 +28,9 @@ type UserService interface {
 	DeleteUser(ctx context.Context, req *models.DeleteUserRequest) error
 	ResendVerificationEmail(ctx context.Context, req *models.ResendVerificationEmailRequest) error
 	RequestPasswordReset(ctx context.Context, req *models.RequestPasswordResetRequest) error
+	InviteUser(ctx context.Context, req *models.InviteUserRequest) (*models.UserDetails, error)
+	RenderActivateProjectUser(ctx context.Context, req *models.RenderActivateProjectUserRequest) (*models.RenderActivateProjectUserResponse, error)
+	SubmitActivateProjectUser(ctx context.Context, req *models.SubmitActivateProjectUserRequest) (*models.SubmitActivateProjectUserResponse, error)
 }
 
 type userService struct {

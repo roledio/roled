@@ -137,6 +137,7 @@ func (h *handler) SetupRoutes() {
 	h.protectedDelete("/api/v1/projects/:project_id/users/:user_id", constants.RouteDeleteProjectUsers, h.deleteProjectUser)
 	h.protectedPost("/api/v1/projects/:project_id/users/:user_id/verification-email", constants.RouteResendVerificationEmail, h.resendVerificationEmail)
 	h.protectedPost("/api/v1/projects/:project_id/users/:user_id/password-reset", constants.RouteRequestPasswordReset, h.requestPasswordReset)
+	h.protectedPost("/api/v1/projects/:project_id/users/invitation", constants.RouteInviteProjectUser, h.inviteProjectUser)
 }
 
 // protectedGet registers a protected GET route with JWT and Permission middlewares

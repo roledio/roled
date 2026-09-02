@@ -58,6 +58,7 @@ const (
 	RouteCreateProjectUsers            = "create_project_users"
 	RouteUpdateProjectUsers            = "update_project_users"
 	RouteDeleteProjectUsers            = "delete_project_users"
+	RouteInviteProjectUser             = "invite_project_user"
 
 	RouteResendVerificationEmail = "resend_verification_email"
 	RouteRequestPasswordReset    = "request_password_reset"

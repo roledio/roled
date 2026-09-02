@@ -3,7 +3,9 @@ package models
 import (
 	"time"
 
+	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/pkg/models"
+	"github.com/roledio/roled/auth/pkg/utils/flashutil"
 )
 
 type GetUsersRequest struct {
@@ -85,4 +87,50 @@ type RequestPasswordResetRequest struct {
 	ProjectID   string  `uri:"project_id" validate:"required"`
 	UserID      string  `uri:"user_id" validate:"required"`
 	RedirectURI *string `json:"redirect_uri" validate:"omitempty,uri"` // Optional redirect URI for login link
+}
+
+type InviteUserRequest struct {
+	ProjectID   string  `uri:"project_id" validate:"required"`
+	Email       string  `json:"email" validate:"required,email,max=100"`
+	RoleID      *string `json:"role_id"`
+	RedirectURI *string `json:"redirect_uri" validate:"omitempty,uri"`
+}
+
+type RenderActivateProjectUserRequest struct {
+	Token  string `uri:"token" validate:"required"`
+	UserID *string
+}
+
+type RenderActivateProjectUserResponse struct {
+	User     *entities.User
+	Project  *entities.Project
+	LoginURL *string
+}
+
+type SubmitActivateProjectUserFlash struct {
+	flashutil.FlashData
+	DisplayName string
+	UserID      string
+	Email       string
+	LoginURL    *string
+	IsSuccess   bool
+}
+
+type SubmitActivateProjectUserRequest struct {
+	Token                string `uri:"token" validate:"required"`
+	DisplayName          string `form:"display_name" validate:"required,min=3,max=60"`
+	Email                string `form:"email" validate:"required,email"` // Read-only but included for form submission
+	Password             string `form:"password" validate:"required,min=8"`
+	PasswordConfirmation string `form:"password_confirmation" validate:"required,min=8,eqfield=Password"`
+}
+
+type SubmitActivateProjectUserResponse struct {
+	UserID   string
+	Project  *entities.Project
+	LoginURL *string
+}
+
+type ActivateProjectUserTokenData struct {
+	UserID   string
+	LoginURL *string
 }

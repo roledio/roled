@@ -53,4 +53,7 @@ func (h *handler) SetupRoutes() {
 
 	h.app.Get("/member/activate/:token", h.renderActivateMember)
 	h.app.Post("/member/activate/:token", h.submitActivateMember)
+
+	h.app.Get("/user/activate/:token", h.renderActivateProjectUser)
+	h.app.Post("/user/activate/:token", h.submitActivateProjectUser)
 }

@@ -152,4 +152,5 @@ var routePermissionsMap = map[string][]string{
 	constants.RouteDeleteProjectUsers:            {constants.PermissionDeleteUsers},
 	constants.RouteResendVerificationEmail:       {constants.PermissionReadUsers},
 	constants.RouteRequestPasswordReset:          {constants.PermissionReadUsers},
+	constants.RouteInviteProjectUser:             {constants.PermissionCreateUsers},
 }

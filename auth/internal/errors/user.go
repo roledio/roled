@@ -77,4 +77,14 @@ var (
 		Msg:      "This user's email address is already verified.",
 		HttpCode: http.StatusBadRequest,
 	}
+	ErrInvalidActivationToken = errors.CustomError{
+		Code:     "invalid_activation_token",
+		Msg:      "The activation link is invalid or has expired. Please request a new invitation.",
+		HttpCode: http.StatusNotFound,
+	}
+	ErrUserAlreadyActive = errors.CustomError{
+		Code:     "user_already_active",
+		Msg:      "This user is already activated.",
+		HttpCode: http.StatusBadRequest,
+	}
 )

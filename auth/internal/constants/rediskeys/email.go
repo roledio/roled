@@ -1,7 +1,8 @@
 package rediskeys
 
 const (
-	EmailVerifyPrefix    = "email_verify"
-	ResetPasswordPrefix  = "reset_password"
-	ActivateMemberPrefix = "activate_member"
+	EmailVerifyPrefix         = "email_verify"
+	ResetPasswordPrefix       = "reset_password"
+	ActivateMemberPrefix      = "activate_member"
+	ActivateProjectUserPrefix = "activate_project_user"
 )

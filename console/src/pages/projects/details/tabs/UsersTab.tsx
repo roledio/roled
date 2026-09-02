@@ -1,5 +1,6 @@
 import ApiPagination from '@/components/ApiPagination';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
+import InviteUserDialog from '@/components/InviteUserDialog';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -24,7 +25,7 @@ import { useToast } from '@/hooks/use-toast';
 import { formatDate } from '@/lib/date';
 import { saveProjectTabParams } from '@/lib/paramsStore';
 import type { HttpClient } from '@/services/core/httpClient';
-import { deleteProjectUser, fetchProjectRoles, fetchProjectUsers, requestProjectUserPasswordReset, resendProjectUserVerificationEmail, type Project } from '@/services/projects';
+import { deleteProjectUser, fetchProjectRoles, fetchProjectUsers, inviteProjectUser, requestProjectUserPasswordReset, resendProjectUserVerificationEmail, type Project } from '@/services/projects';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AlertCircle, CheckCircle2, ChevronDown, ChevronUp, Eye, KeyRound, Loader2, Mail, MoreVertical, Search, Trash2, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -66,6 +67,7 @@ export default function UsersTab({ httpClient, project }: Props) {
     const [removeTarget, setRemoveTarget] = useState<any | null>(null);
     const [actionState, setActionState] = useState<{ type: UserActionType; user: any | null }>({ type: null, user: null });
     const [selectedRedirectUri, setSelectedRedirectUri] = useState<string>('none');
+    const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
 
     const handleOpenAction = (type: UserActionType, user: any) => {
         setActionState({ type, user });
@@ -160,6 +162,23 @@ export default function UsersTab({ httpClient, project }: Props) {
         },
     });
 
+    const inviteMutation = useMutation({
+        mutationFn: ({ email, roleId, redirectUri }: { email: string; roleId?: string; redirectUri?: string }) =>
+            inviteProjectUser(httpClient, AUTH_BASE_URL, project!.id, {
+                email,
+                ...(roleId && { role_id: roleId }),
+                ...(redirectUri && { redirect_uri: redirectUri }),
+            }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['project', project?.id, 'users'] });
+            toast({ title: 'Invitation sent', description: 'User invitation has been sent successfully.', variant: 'default' });
+            setIsInviteDialogOpen(false);
+        },
+        onError: (err: any) => {
+            toast({ title: 'Invitation failed', description: err?.message ?? 'Unable to send invitation', variant: 'destructive' });
+        },
+    });
+
     const handleConfirmAction = () => {
         if (!actionState.user || !project?.id) return;
         const redirectUri = selectedRedirectUri === 'none' ? undefined : selectedRedirectUri;
@@ -241,7 +260,14 @@ export default function UsersTab({ httpClient, project }: Props) {
                     ) : null}
                 </div>
 
-                <div>
+                <div className="flex items-center gap-2">
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setIsInviteDialogOpen(true)}
+                    >
+                        Invite User
+                    </Button>
                     <Button
                         size="sm"
                         onClick={() => { if (project?.id) saveProjectTabParams(project.id, 'users', location.search ?? ''); navigate(`/projects/${project?.id}/users/new`, { state: { from: location.search } }); }}
@@ -483,6 +509,17 @@ export default function UsersTab({ httpClient, project }: Props) {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            <InviteUserDialog
+                open={isInviteDialogOpen}
+                onOpenChange={setIsInviteDialogOpen}
+                roles={roles}
+                redirectUris={project?.redirect_uris ?? []}
+                onInvite={({ email, roleId, redirectUri }) =>
+                    inviteMutation.mutateAsync({ email, roleId, redirectUri })
+                }
+                isPending={inviteMutation.isPending}
+            />
         </section>
     );
 }

@@ -176,3 +176,25 @@ export async function requestProjectUserPasswordReset(
     throw new Error(msg);
   }
 }
+
+export async function inviteProjectUser(
+  httpClient: HttpClient,
+  baseUrl: string,
+  projectId: string,
+  payload: { email: string; role_id?: string; redirect_uri?: string },
+): Promise<any> {
+  const url = `${baseUrl.replace(/\/$/, '')}/api/v1/projects/${projectId}/users/invitation`;
+  try {
+    const res = await httpClient.instanceRef.post<ApiResponse<any>>(url, payload, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!res.data?.success) {
+      const msg = res?.data?.error?.message ?? 'Failed to invite user';
+      throw new Error(msg);
+    }
+    return res.data.data;
+  } catch (err: any) {
+    const msg = err?.response?.data?.error?.message ?? err?.response?.data?.message ?? err?.message ?? 'Failed to invite user';
+    throw new Error(msg);
+  }
+}

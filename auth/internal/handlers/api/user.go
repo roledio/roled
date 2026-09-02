@@ -144,3 +144,17 @@ func (h *handler) requestPasswordReset(c fiber.Ctx) error {
 	}
 	return responseutil.SendSuccess(c, nil)
 }
+
+func (h *handler) inviteProjectUser(c fiber.Ctx) error {
+	ctx := c.Context()
+	var req models.InviteUserRequest
+	err := requestutil.BindAndValidate(c, &req)
+	if err != nil {
+		return responseutil.SendError(c, err)
+	}
+	user, err := h.userService.InviteUser(ctx, &req)
+	if err != nil {
+		return responseutil.SendError(c, err)
+	}
+	return responseutil.SendSuccess(c, user)
+}
