@@ -15,6 +15,24 @@
         <div class="roled-auth-container">
             {{if not .IsError}}
             <div class="roled-auth-card roled-animate-slide-up">
+                <!-- Info Tooltip in Top-Right Corner -->
+                {{if not .Data.Project.IsSystem}}
+                <div class="roled-auth-corner-info">
+                    <div class="roled-tooltip-container">
+                        <button type="button" class="roled-tooltip-trigger" aria-describedby="roled-auth-tooltip" aria-label="About security">
+                            <svg class="roled-tooltip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            </svg>
+                        </button>
+                        <div id="roled-auth-tooltip" class="roled-tooltip-content roled-tooltip-bottom-left" role="tooltip">
+                            {{.Data.Project.Name}} uses Roled to securely manage your account.
+                        </div>
+                    </div>
+                </div>
+                {{end}}
+
                 <!-- Header with Logo and Project Name -->
                 <header class="roled-auth-header">
                     {{if .Data.Project.LogoURL}}

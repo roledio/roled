@@ -65,6 +65,7 @@ func (h emailHandler) handleResetPassword(ctx context.Context, payload payloads.
 	body, err := mail.LoadAndParseTemplate("templates/html/reset-password.html", map[string]any{
 		"ProjectName":      payload.ProjectName,
 		"ProjectLogoURL":   payload.ProjectLogoURL,
+		"ProjectIsSystem":  payload.ProjectIsSystem,
 		"DisplayName":      payload.DisplayName,
 		"Year":             now.Year(),
 		"ExpiresIn":        strings.TrimSpace(expiresIn),
@@ -89,6 +90,7 @@ func (h emailHandler) handleActivateMember(ctx context.Context, payload payloads
 		"AccountName":       payload.AccountName,
 		"ProjectName":       payload.ProjectName,
 		"ProjectLogoURL":    payload.ProjectLogoURL,
+		"ProjectIsSystem":   payload.ProjectIsSystem,
 		"DisplayName":       payload.DisplayName,
 		"Year":              now.Year(),
 		"ExpiresIn":         strings.TrimSpace(expiresIn),
@@ -126,14 +128,15 @@ func (h emailHandler) handleVerificationEmail(ctx context.Context, payload paylo
 	expiresIn := humanize.RelTime(now, now.Add(tokenExpiryDuration), "", "")
 	verifyURL := fmt.Sprintf("%s/email/verify/%s", h.defaultConfig.BaseURL, token)
 	body, err := mail.LoadAndParseTemplate("templates/html/verify-email.html", map[string]any{
-		"ProjectName":    payload.ProjectName,
-		"ProjectLogoURL": payload.ProjectLogoURL,
-		"VerifyURL":      verifyURL,
-		"Year":           now.Year(),
-		"ExpiresIn":      strings.TrimSpace(expiresIn),
-		"LoginURL":       payload.LoginURL,
-		"DisplayName":    payload.DisplayName,
-		"IsSignup":       payload.IsSignup,
+		"ProjectName":     payload.ProjectName,
+		"ProjectLogoURL":  payload.ProjectLogoURL,
+		"ProjectIsSystem": payload.ProjectIsSystem,
+		"VerifyURL":       verifyURL,
+		"Year":            now.Year(),
+		"ExpiresIn":       strings.TrimSpace(expiresIn),
+		"LoginURL":        payload.LoginURL,
+		"DisplayName":     payload.DisplayName,
+		"IsSignup":        payload.IsSignup,
 	})
 	if err != nil {
 		log.WithContext(ctx).Errorw("Failed to load email template", "error", err)

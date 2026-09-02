@@ -34,16 +34,18 @@
         </div>
         <hr style="margin:16px;border:none;border-top:1px solid #e0e0e0" />
         <div style="break-inside:avoid;color:#b0b0b0;margin-top:10px;line-height:16px;padding:0 16px;">
-            <div style="margin-bottom:30px">
+            <div>
                 © {{.Year}} {{.ProjectName}}
             </div>
+            {{if not .ProjectIsSystem}}
             <!-- Roled disclosure -->
-            <div style="font-size: 12px;line-height:16px;">
+            <div style="font-size: 12px;line-height:16px;margin-top:30px;">
                 You are receiving this email because {{.ProjectName}} uses Roled to securely manage user accounts. <a
                     href="https://roled.io" style="color:inherit;text-decoration:none;white-space:nowrap;">
                     <strong>Learn more about Roled.</strong>
                 </a>
             </div>
+            {{end}}
         </div>
     </div>
 </div>

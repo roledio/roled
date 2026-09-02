@@ -262,15 +262,16 @@ func (s *authorizeService) processSignup(ctx context.Context,
 
 func (s *authorizeService) publishVerificationEmail(ctx context.Context, loginURL *string, user *entities.User, project *entities.Project) error {
 	payload := payloads.EmailPayload{
-		Type:           constants.EmailPayloadTypeVerifyEmail,
-		To:             *user.Email,
-		From:           fmt.Sprintf(s.defaultConfig.Email.From, project.Name),
-		Subject:        "Verify your email for " + project.Name,
-		ProjectName:    project.Name,
-		ProjectLogoURL: project.LogoURL,
-		LoginURL:       loginURL,
-		UserID:         user.ID,
-		IsSignup:       true,
+		Type:            constants.EmailPayloadTypeVerifyEmail,
+		To:              *user.Email,
+		From:            fmt.Sprintf(s.defaultConfig.Email.From, project.Name),
+		Subject:         "Verify your email for " + project.Name,
+		ProjectName:     project.Name,
+		ProjectLogoURL:  project.LogoURL,
+		ProjectIsSystem: project.IsSystem,
+		LoginURL:        loginURL,
+		UserID:          user.ID,
+		IsSignup:        true,
 	}
 	contextFields := contextutil.GetFields(ctx, constants.RequestLoggerKeys)
 	message := queues.Message{

@@ -16,6 +16,7 @@
             {{if not .IsError}}
             <div class="roled-auth-card roled-animate-slide-up">
                 <!-- Info Tooltip in Top-Right Corner -->
+                {{if not .Data.Project.IsSystem}}
                 <div class="roled-auth-corner-info">
                     <div class="roled-tooltip-container">
                         <button type="button" class="roled-tooltip-trigger" aria-describedby="roled-auth-tooltip" aria-label="About security">
@@ -30,6 +31,7 @@
                         </div>
                     </div>
                 </div>
+                {{end}}
 
                 <!-- Header with Logo and Project Name -->
                 <header class="roled-auth-header">

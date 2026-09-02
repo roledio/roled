@@ -75,14 +75,15 @@ func (s *userService) SubmitForgotPassword(ctx context.Context, req *models.Subm
 
 func (s *userService) publishResetPasswordEmail(ctx context.Context, token string, user *entities.User, project *entities.Project) error {
 	payload := payloads.EmailPayload{
-		Type:           constants.EmailPayloadTypeResetPassword,
-		To:             *user.Email,
-		From:           fmt.Sprintf(s.defaultConfig.Email.From, project.Name),
-		Subject:        "Reset your password on " + project.Name,
-		ProjectName:    project.Name,
-		ProjectLogoURL: project.LogoURL,
-		DisplayName:    user.DisplayName,
-		Token:          token,
+		Type:            constants.EmailPayloadTypeResetPassword,
+		To:              *user.Email,
+		From:            fmt.Sprintf(s.defaultConfig.Email.From, project.Name),
+		Subject:         "Reset your password for " + project.Name,
+		ProjectName:     project.Name,
+		ProjectLogoURL:  project.LogoURL,
+		ProjectIsSystem: project.IsSystem,
+		DisplayName:     user.DisplayName,
+		Token:           token,
 	}
 	contextFields := contextutil.GetFields(ctx, constants.RequestLoggerKeys)
 	message := queues.Message{

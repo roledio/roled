@@ -40,6 +40,17 @@ func (s *memberService) DeleteMember(ctx context.Context, req *models.DeleteMemb
 		return err
 	}
 
+	// Find user record to get user info
+	user, err := s.registry.UserRepository().FindByID(ctx, member.UserID)
+	if err != nil {
+		log.WithContext(ctx).Errorw("Failed to find user by ID", "error", err, "user_id", member.UserID)
+		return pkgerrors.ErrSystemError.WithError(err)
+	}
+	if user == nil {
+		log.WithContext(ctx).Errorw("User not found", "user_id", member.UserID)
+		return errors.ErrUserNotFound
+	}
+
 	// Proceed to delete the member, user, and associated access tokens in a transaction
 	err = s.registry.Tx(func(registry repositories.Registry) error {
 		// Delete member record
@@ -76,6 +87,10 @@ func (s *memberService) DeleteMember(ctx context.Context, req *models.DeleteMemb
 	if err == nil {
 		// Invalidate member cache after successful deletion
 		shared.InvalidateMemberCache(ctx, s.redisService, member)
+		shared.InvalidateUserCache(ctx, s.redisService, user, &shared.OldUserCacheKeyParts{
+			Email:          user.Email,
+			ExternalUserID: user.ExternalUserID,
+		})
 	}
 
 	return err

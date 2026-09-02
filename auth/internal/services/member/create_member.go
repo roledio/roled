@@ -214,15 +214,16 @@ func (s *memberService) CreateMember(ctx context.Context, req *models.CreateMemb
 
 func (s *memberService) publishMemberActivationEmail(ctx context.Context, token string, user *entities.User, project *entities.Project, account *entities.Account) error {
 	payload := payloads.EmailPayload{
-		Type:           constants.EmailPayloadTypeActivateMember,
-		To:             *user.Email,
-		From:           fmt.Sprintf(s.defaultConfig.Email.From, project.Name),
-		Subject:        fmt.Sprintf("You are invited to join the %s account", account.Name),
-		AccountName:    account.Name,
-		ProjectName:    project.Name,
-		ProjectLogoURL: project.LogoURL,
-		DisplayName:    user.DisplayName,
-		Token:          token,
+		Type:            constants.EmailPayloadTypeActivateMember,
+		To:              *user.Email,
+		From:            fmt.Sprintf(s.defaultConfig.Email.From, project.Name),
+		Subject:         fmt.Sprintf("You are invited to join the %s account", account.Name),
+		AccountName:     account.Name,
+		ProjectName:     project.Name,
+		ProjectLogoURL:  project.LogoURL,
+		ProjectIsSystem: project.IsSystem,
+		DisplayName:     user.DisplayName,
+		Token:           token,
 	}
 	contextFields := contextutil.GetFields(ctx, constants.RequestLoggerKeys)
 	message := queues.Message{
