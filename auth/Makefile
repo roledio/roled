@@ -9,7 +9,7 @@ test-verbose:
 	go test -v --cover ./...
 
 test:
-	go test -v -covermode=count -coverprofile=coverage.out $(shell go list ./... | egrep -v '/cmd|/configs|/constants|/entities|/errors|/mocks|/models|/views|/migrations|/databases|/types') -json > report.json
+	go test -v -covermode=count -coverprofile=coverage.out $(shell go list ./... | egrep -v '/cmd|/configs|/constants|/entities|/errors|/mocks|/models|/views|/migrations|/databases|/types|/testutil') -json > report.json
 
 coverage:
 	go tool cover -func=coverage.out
