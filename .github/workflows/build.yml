@@ -207,4 +207,3 @@ jobs:
             -Dsonar.javascript.lcov.reportPaths=console/coverage/lcov.info
             -Dsonar.exclusions=console/src/**/*.test.tsx,console/src/**/*.test.ts,console/src/**/*.spec.tsx,console/src/**/*.spec.ts
             -Dsonar.test.inclusions=console/src/**/*.test.tsx,console/src/**/*.test.ts
-            -Dsonar.testExecutionReportPaths=console/coverage/test-report.xml

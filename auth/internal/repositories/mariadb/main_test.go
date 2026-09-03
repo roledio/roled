@@ -47,7 +47,7 @@ func TestMain(m *testing.M) {
 
 	// Run migrations using databases.Migrate (includes both SQL and Go migrations)
 	if err := db.RunMigrations(migrationsPath); err != nil {
-		db.Close()
+		_ = db.Close()
 		_ = container.Terminate(ctx)
 		fmt.Fprintf(os.Stderr, "Failed to run migrations: %v\n", err)
 		os.Exit(1)
@@ -67,7 +67,7 @@ func TestMain(m *testing.M) {
 
 	// Cleanup
 	fmt.Println("Cleaning up test suite...")
-	db.Close()
+	_ = db.Close()
 	_ = container.Terminate(ctx)
 	fmt.Println("Test suite cleanup complete")
 
