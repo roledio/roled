@@ -138,6 +138,54 @@ jobs:
           name: console-coverage
           path: console/coverage/coverage-summary.json
 
+  sonarcloud-scan:
+    name: SonarCloud Scan
+    runs-on: ubuntu-latest
+    needs: [auth-test, console-test]
+    if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
+    permissions:
+      contents: read
+      pull-requests: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Download auth coverage artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: coverage-out
+      - name: Download console coverage artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: console-coverage
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: console/package-lock.json
+      - name: Install console dependencies
+        working-directory: console
+        run: npm ci
+      - name: Generate console coverage for SonarCloud
+        working-directory: console
+        run: npm run test:coverage
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=roledio_roled
+            -Dsonar.organization=roledio
+            -Dsonar.sources=auth,console/src
+            -Dsonar.go.coverage.reportPaths=coverage.out
+            -Dsonar.javascript.lcov.reportPaths=console/coverage/lcov.info
+            -Dsonar.exclusions=auth/**/*_mock.go,auth/mocks/**,auth/cmd/**,auth/configs/**,auth/constants/**,auth/entities/**,auth/errors/**,auth/models/**,auth/views/**,auth/migrations/**,auth/databases/**,auth/types/**,auth/testutil/**,console/src/**/*.test.tsx,console/src/**/*.test.ts,console/src/**/*.spec.tsx,console/src/**/*.spec.ts
+            -Dsonar.tests=auth,console/src
+
   update-badges:
     name: Generate and commit badges
     needs: [auth-test, console-test]

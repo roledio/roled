@@ -85,3 +85,70 @@ jobs:
             git commit -m "chore: :pushpin: bump auth version to ${NEXT_VERSION}"
             git push origin HEAD:main
           fi
+
+      - name: Generate changelog from merged PRs
+        if: success()
+        id: changelog
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Get the previous tag (if exists)
+          PREVIOUS_TAG=$(git tag -l "auth/*" --sort=-v:refname | head -n 2 | tail -n 1) || true
+          CURRENT_TAG="${{ steps.version.outputs.tag }}"
+
+          echo "Previous tag: ${PREVIOUS_TAG}"
+          echo "Current tag: ${CURRENT_TAG}"
+
+          # Generate changelog based on merged PRs
+          if [ -z "${PREVIOUS_TAG}" ]; then
+            # First release - get all PRs
+            PR_RANGE="HEAD"
+          else
+            # Get PRs merged since previous tag
+            PR_RANGE="${PREVIOUS_TAG}..HEAD"
+          fi
+
+          # Use gh CLI to fetch merged PRs and format them
+          CHANGELOG="## What's Changed\n\n"
+          
+          if command -v gh &> /dev/null; then
+            PRS=$(gh pr list --state merged --limit 100 --json number,title,author,url --search "${PR_RANGE}" || true)
+            
+            if [ -n "${PRS}" ] && [ "${PRS}" != "[]" ]; then
+              echo "${PRS}" | jq -r '.[] | "- \(.title) by @\(.author.login) ([#\(.number)](\(.url)))"' >> /tmp/pr_list.txt
+              CHANGELOG="${CHANGELOG}$(cat /tmp/pr_list.txt)\n"
+            else
+              CHANGELOG="${CHANGELOG}No merged PRs found in this range.\n"
+            fi
+          else
+            CHANGELOG="${CHANGELOG}GitHub CLI not available. Please add PRs manually.\n"
+          fi
+
+          # Add footer
+          CHANGELOG="${CHANGELOG}\n---\n\nFull Changelog: https://github.com/${{ github.repository }}/compare/${PREVIOUS_TAG}...${CURRENT_TAG}"
+
+          # Save to file and output
+          echo "${CHANGELOG}" > /tmp/changelog.md
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          cat /tmp/changelog.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          echo "Generated changelog:"
+          cat /tmp/changelog.md
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        if: success()
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.version }}
+          body: ${{ steps.changelog.outputs.changelog }}
+          draft: false
+          prerelease: false
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

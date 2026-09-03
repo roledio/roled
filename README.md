@@ -1,4 +1,10 @@
-![Version](.badges/version.svg)  ![Build](.badges/build.svg)  ![Auth Coverage](.badges/coverage-auth.svg)  ![Console Coverage](.badges/coverage-console.svg)
+[![GitHub Release](https://img.shields.io/github/v/release/roledio/roled)](https://github.com/roledio/roled/releases)
+[![CI](https://github.com/roledio/roled/actions/workflows/ci.yml/badge.svg)](https://github.com/roledio/roled/actions/workflows/ci.yml)
+[![Auth Coverage](https://github.com/roledio/roled/raw/main/.badges/coverage-auth.svg)](https://github.com/roledio/roled/actions/workflows/build.yml)
+[![Console Coverage](https://github.com/roledio/roled/raw/main/.badges/coverage-console.svg)](https://github.com/roledio/roled/actions/workflows/build.yml)
+[![Quality gate status](https://sonarcloud.io/api/project_badges/measure?project=roledio_roled&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=roledio_roled)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=roledio_roled&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=roledio_roled)
+[![License](https://img.shields.io/github/license/roledio/roled)](https://github.com/roledio/roled/blob/main/LICENSE)
 
 <p align="center">
   <img src="console/public/roled-logo-text-dark.png" alt="Roled Logo" style="height: 48px;" />
