@@ -110,6 +110,14 @@ During the very first startup, Roled automatically seeds the database with initi
 
 You can now open your browser, visit `http://localhost:4000`, and log in to the Roled Console using the generated Admin user or Standard user credentials. The Admin user belongs to the system account and has access to the system project: Roled Console. The Standard user is a regular user with access to projects under their user account.
 
+## Screenshots
+
+Here are some screenshots of the Roled Console for you to take a look at so you get the idea of what Roled is all about:
+
+|                                                        |                                                        |
+| ------------------------------------------------------ | ------------------------------------------------------ |
+| ![Project List](docs/images/project-list.png)<br>**Project List**<br>Overview of all active projects with quick access and project creation. | ![User Management](docs/images/user-list.png)<br>**User Management**<br>Manage project users, email verification status, and role assignments. |
+| ![Project Settings](docs/images/project-settings.png)<br>**Project Settings**<br>Configure authentication flows, default sign-up roles, and security policies. | ![Sign In Page](docs/images/signin.png)<br>**Sign In Page**<br>Clean, customizable sign-in and authentication screen for your project users. |
 
 ## Self-Hosted vs. Cloud
 
