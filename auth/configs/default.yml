@@ -64,3 +64,9 @@ upload:
     bucket: your-s3-bucket-name
     base_url: https://your-s3-bucket.s3.your-s3-region.amazonaws.com # To build URL for the uploaded files
     endpoint: https://your-s3-bucket.s3.your-s3-region.amazonaws.com # Endpoint URL for S3 operations
+
+google_oauth:
+  enabled: false
+  client_id: your-google-client-id
+  client_secret: your-google-client-secret
+  redirect_uri: http://localhost:8080/oauth/google/callback

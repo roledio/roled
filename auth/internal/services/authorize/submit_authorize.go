@@ -4,10 +4,8 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/gofiber/fiber/v3/log"
-	"github.com/karrick/tparse/v2"
 	disposable "github.com/rocketlaunchr/anti-disposable-email"
 	"github.com/roledio/roled/auth/internal/constants"
 	"github.com/roledio/roled/auth/internal/entities"
@@ -21,7 +19,6 @@ import (
 	"github.com/roledio/roled/auth/pkg/utils/idutil"
 	"github.com/roledio/roled/auth/pkg/utils/jsonutil"
 	"github.com/roledio/roled/auth/pkg/utils/passwordutil"
-	"github.com/shomali11/util/xhashes"
 )
 
 func (s *authorizeService) SubmitAuthorize(ctx context.Context, req *models.SubmitAuthorizeRequest) (*models.SubmitAuthorizeResult, error) {
@@ -53,38 +50,14 @@ func (s *authorizeService) SubmitAuthorize(ctx context.Context, req *models.Subm
 			}
 		}
 
-		now := time.Now()
-		expiresAt, err := tparse.AddDuration(now, s.defaultConfig.JWT.AuthCodeExpiryDuration)
-		if err != nil {
-			log.WithContext(ctx).Warnw("Failed to calculate auth code expiry time, set default to 2 minutes", "auth_code_expiry_duration", s.defaultConfig.JWT.AuthCodeExpiryDuration)
-			expiresAt = now.Add(2 * time.Minute) // default to 2 minutes
-		}
-
-		// Generate authorization code
-		code = idutil.NanoID(64)
-
-		// Create auth code record
-		authCode := &entities.AuthCode{
-			ID:                  idutil.NewID(),
-			AccountID:           user.AccountID, // Account ID from user to differentiate between system and non-system users
-			ProjectID:           project.ID,
-			ClientID:            req.ClientID,
-			UserID:              &user.ID,
-			CodeHash:            xhashes.SHA256(code),
-			CodeChallenge:       req.CodeChallenge,
-			CodeChallengeMethod: req.CodeChallengeMethod,
-			RedirectURI:         req.RedirectURI,
-			State:               &req.State,
-			ExpiresAt:           expiresAt,
-		}
-
+		generated, authCode := s.buildAuthCode(ctx, user, project, &req.RenderAuthorizeRequest)
 		authCodeRepo := registry.AuthCodeRepository()
 		err = authCodeRepo.Create(ctx, authCode)
 		if err != nil {
 			log.WithContext(ctx).Errorw("Failed to create auth code", "error", err)
 			return pkgerrors.ErrSystemError.WithError(err)
 		}
-
+		code = generated
 		return nil
 	})
 	if err != nil {
@@ -124,14 +97,6 @@ func (s *authorizeService) validateSignin(ctx context.Context, project *entities
 }
 
 func (s *authorizeService) validateSignup(ctx context.Context, project *entities.Project, projectSetting *entities.ProjectSetting, req *models.SubmitAuthorizeRequest) error {
-	if !projectSetting.IsSignupEnabled {
-		log.WithContext(ctx).Errorw("Signup not enabled for project", "project_id", project.ID)
-		return errors.ErrUnableToProcessSignup.WithDebugMessage("Signup not enabled for project")
-	}
-	if projectSetting.DefaultSignupRoleID == nil {
-		log.WithContext(ctx).Errorw("Default signup role not set for project", "project_id", project.ID)
-		return errors.ErrUnableToProcessSignup.WithDebugMessage("Default signup role not set for project")
-	}
 	if !projectSetting.IsAllowTempEmail {
 		parsedEmail, err := disposable.ParseEmail(req.Email)
 		if err != nil || parsedEmail.Disposable {

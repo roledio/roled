@@ -708,11 +708,11 @@ func TestAuthorizeService_SubmitAuthorize_SignupSuccess_SystemProject(t *testing
 			CodeChallenge:       "test-challenge",
 			CodeChallengeMethod: "S256",
 			State:               "test-state",
+			IsSignup:            true,
 		},
 		Email:                "newuser@example.com",
 		Password:             "password123",
 		PasswordConfirmation: "password123",
-		IsSignup:             true,
 	}
 
 	// Execute
@@ -792,11 +792,11 @@ func TestAuthorizeService_SubmitAuthorize_SignupNotEnabled(t *testing.T) {
 			CodeChallenge:       "test-challenge",
 			CodeChallengeMethod: "S256",
 			State:               "test-state",
+			IsSignup:            true,
 		},
 		Email:                "newuser@example.com",
 		Password:             "password123",
 		PasswordConfirmation: "password123",
-		IsSignup:             true,
 	}
 
 	// Execute
@@ -888,11 +888,11 @@ func TestAuthorizeService_SubmitAuthorize_UserAlreadyExists(t *testing.T) {
 			CodeChallenge:       "test-challenge",
 			CodeChallengeMethod: "S256",
 			State:               "test-state",
+			IsSignup:            true,
 		},
 		Email:                "existing@example.com",
 		Password:             "password123",
 		PasswordConfirmation: "password123",
-		IsSignup:             true,
 	}
 
 	// Execute

@@ -44,7 +44,7 @@ export class AuthService {
     });
 
     if (signup) {
-      params.set('signup', 'true');
+      params.set('is_signup', 'true');
     }
 
     const authorizeUrl = `${this.config.getAuthBaseUrl().replace(/\/$/, '')}/authorize?${params.toString()}`;

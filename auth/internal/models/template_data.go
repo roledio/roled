@@ -3,6 +3,7 @@ package models
 import (
 	"errors"
 
+	"github.com/roledio/roled/auth/internal/configs"
 	"github.com/roledio/roled/auth/pkg/constants"
 	pkgerrors "github.com/roledio/roled/auth/pkg/errors"
 	"github.com/roledio/roled/auth/pkg/models"
@@ -13,6 +14,7 @@ type TemplateData struct {
 	Flash     any
 	Error     pkgerrors.CustomError
 	IsError   bool
+	Config    *configs.DefaultConfig
 	BuildInfo models.BuildInfo
 	Map       map[string]any
 }

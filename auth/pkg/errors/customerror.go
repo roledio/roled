@@ -20,6 +20,14 @@ func (e CustomError) Error() string {
 	return e.Msg
 }
 
+func (e CustomError) Is(target error) bool {
+	t, ok := target.(CustomError)
+	if !ok {
+		return false
+	}
+	return e.Code == t.Code
+}
+
 func (e CustomError) WithError(err error) CustomError {
 	if err != nil {
 		e.Err = err

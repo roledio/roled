@@ -381,6 +381,47 @@ h6 { font-size: 1rem; }
   font-size: 1rem;
 }
 
+/* Google Button */
+.roled-btn-google {
+  color: #374151;
+  background-color: #ffffff;
+  border-color: #d1d5db;
+  font-weight: 500;
+}
+
+.roled-btn-google:hover:not(:disabled) {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.roled-btn-google:focus {
+  box-shadow: 0 0 0 3px hsla(220, 10%, 55%, 0.3);
+}
+
+.roled-btn-google-icon {
+  margin-right: 0.5rem;
+}
+
+/* Auth Divider */
+.roled-auth-divider {
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+  color: var(--roled-muted-foreground);
+}
+
+.roled-auth-divider::before,
+.roled-auth-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--roled-border);
+}
+
+.roled-auth-divider-text {
+  padding: 0 1rem;
+  font-size: 0.875rem;
+}
+
 /* ============================================
    Auth Page Layout
    ============================================ */

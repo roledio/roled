@@ -87,4 +87,24 @@ var (
 		Msg:      "This user is already activated.",
 		HttpCode: http.StatusBadRequest,
 	}
+	ErrInvalidGoogleState = errors.CustomError{
+		Code:     "invalid_google_state",
+		Msg:      "The Google OAuth state is invalid or has expired.",
+		HttpCode: http.StatusBadRequest,
+	}
+	ErrGoogleTokenExchangeFailed = errors.CustomError{
+		Code:     "google_token_exchange_failed",
+		Msg:      "Failed to exchange Google authorization code.",
+		HttpCode: http.StatusInternalServerError,
+	}
+	ErrGoogleIDTokenMissing = errors.CustomError{
+		Code:     "google_id_token_missing",
+		Msg:      "Google ID token is missing from the response.",
+		HttpCode: http.StatusInternalServerError,
+	}
+	ErrGoogleIDTokenInvalid = errors.CustomError{
+		Code:     "google_id_token_invalid",
+		Msg:      "Google ID token is invalid.",
+		HttpCode: http.StatusInternalServerError,
+	}
 )

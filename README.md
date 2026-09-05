@@ -116,8 +116,8 @@ Here are some screenshots of the Roled Console for you to take a look at so you 
 
 |                                                        |                                                        |
 | ------------------------------------------------------ | ------------------------------------------------------ |
-| ![Project List](docs/images/project-list.png)<br>**Project List**<br>Overview of all active projects with quick access and project creation. | ![User Management](docs/images/user-list.png)<br>**User Management**<br>Manage project users, email verification status, and role assignments. |
-| ![Project Settings](docs/images/project-settings.png)<br>**Project Settings**<br>Configure authentication flows, default sign-up roles, and security policies. | ![Sign In Page](docs/images/signin.png)<br>**Sign In Page**<br>Clean, customizable sign-in and authentication screen for your project users. |
+| ![Project List](docs/images/project-list.png)<br>**Project List**<br>Overview of all projects with quick access and project creation. | ![User Management](docs/images/user-list.png)<br>**User Management**<br>Manage project users, including invitations, email verification, password resets, and role assignments. |
+| ![Project Settings](docs/images/project-settings.png)<br>**Project Settings**<br>Configure authentication flows, default sign-up roles, and security policies. | ![Sign In Page](docs/images/signin.png)<br>**Sign In Page**<br>Clean sign-in and authentication screen for your project users. |
 
 ## Self-Hosted vs. Cloud
 

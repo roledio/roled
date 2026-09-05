@@ -16,6 +16,7 @@ import (
 func (h *handler) renderAuthorize(c fiber.Ctx) error {
 	ctx := c.Context()
 	templateData := models.TemplateData{
+		Config:    h.defaultConfig,
 		BuildInfo: models.GetCurrentBuildInfo(h.defaultConfig),
 	}
 	var flash models.SubmitAuthorizeFlash
@@ -38,10 +39,10 @@ func (h *handler) renderAuthorize(c fiber.Ctx) error {
 	}
 	templateData.Data = result
 	templateData.Map = map[string]any{
-		"ClientID":    req.ClientID,
-		"RedirectURI": req.RedirectURI,
-		"CSRFToken":   csrf.TokenFromContext(c),
-		"IsSignup":    req.IsSignup,
+		"CSRFToken":          csrf.TokenFromContext(c),
+		"Req":                req,
+		"ForgotPasswordPath": h.buildForgotPasswordPath(&req),
+		"GoogleOAuthPath":    h.buildGoogleOAuthPath(&req),
 	}
 	return views.RenderTemplate(c, "templates/authorize", &templateData, h.defaultConfig)
 }
@@ -80,20 +81,37 @@ func (h *handler) submitAuthorize(c fiber.Ctx) error {
 
 func (h *handler) buildRedirectURL(req *models.RenderAuthorizeRequest, authCode string) string {
 	if authCode == "" {
-		redirectURL := fmt.Sprintf("/authorize?client_id=%s&redirect_uri=%s&response_type=%s&code_challenge=%s&code_challenge_method=%s&state=%s",
-			req.ClientID,
-			url.QueryEscape(req.RedirectURI),
-			req.ResponseType,
-			req.CodeChallenge,
-			req.CodeChallengeMethod,
-			req.State)
-		if req.IsSignup {
-			redirectURL += "&signup=true"
-		}
-		return redirectURL
+		query := url.Values{}
+		query.Set("client_id", req.ClientID)
+		query.Set("redirect_uri", req.RedirectURI)
+		query.Set("response_type", req.ResponseType)
+		query.Set("code_challenge", req.CodeChallenge)
+		query.Set("code_challenge_method", req.CodeChallengeMethod)
+		query.Set("state", req.State)
+		query.Set("is_signup", fmt.Sprintf("%v", req.IsSignup))
+		return fmt.Sprintf("/authorize?%s", query.Encode())
 	}
 	return fmt.Sprintf("%s?code=%s&state=%s",
 		req.RedirectURI,
 		authCode,
 		req.State)
+}
+
+func (h *handler) buildForgotPasswordPath(req *models.RenderAuthorizeRequest) string {
+	query := url.Values{}
+	query.Set("client_id", req.ClientID)
+	query.Set("redirect_uri", req.RedirectURI)
+	return fmt.Sprintf("/password/forgot?%s", query.Encode())
+}
+
+func (h *handler) buildGoogleOAuthPath(req *models.RenderAuthorizeRequest) string {
+	query := url.Values{}
+	query.Set("client_id", req.ClientID)
+	query.Set("redirect_uri", req.RedirectURI)
+	query.Set("response_type", req.ResponseType)
+	query.Set("code_challenge", req.CodeChallenge)
+	query.Set("code_challenge_method", req.CodeChallengeMethod)
+	query.Set("state", req.State)
+	query.Set("is_signup", fmt.Sprintf("%v", req.IsSignup))
+	return fmt.Sprintf("/oauth/google?%s", query.Encode())
 }

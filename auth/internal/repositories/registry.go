@@ -29,6 +29,7 @@ type Registry interface {
 	RefreshTokenRepository() interfaces.RefreshTokenRepository
 	UserRepository() interfaces.UserRepository
 	UserRoleRepository() interfaces.UserRoleRepository
+	UserIdentityRepository() interfaces.UserIdentityRepository
 	ResourceRepository() interfaces.ResourceRepository
 	PermissionRepository() interfaces.PermissionRepository
 	RolePermissionRepository() interfaces.RolePermissionRepository
@@ -234,4 +235,14 @@ func (r *registry) ClientRepository() interfaces.ClientRepository {
 
 func (r *registry) ClientPermissionRepository() interfaces.ClientPermissionRepository {
 	return mariadb.NewClientPermissionRepository(r.qx)
+}
+
+func (r *registry) UserIdentityRepository() interfaces.UserIdentityRepository {
+	repo := mariadb.NewUserIdentityRepository(r.qx)
+	if r.redisService != nil {
+		return redis.NewUserIdentityRepository(repo,
+			r.redisService,
+			r.defaultConfig.CacheDefaultTTLDuration)
+	}
+	return repo
 }

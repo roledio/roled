@@ -79,5 +79,15 @@ func (s *authorizeService) validateAuthorizeRequest(ctx context.Context, req *mo
 		log.WithContext(ctx).Errorw("Failed to find project settings by project ID", "project_id", project.ID, "error", err)
 		return nil, nil, nil, pkgerrors.ErrSystemError.WithError(err)
 	}
+	if req.IsSignup {
+		if !projectSetting.IsSignupEnabled {
+			log.WithContext(ctx).Errorw("Signup is not enabled for project", "project_id", project.ID)
+			return nil, nil, nil, errors.ErrUnableToProcessSignup.WithDebugMessage("Signup not enabled for project")
+		}
+		if projectSetting.DefaultSignupRoleID == nil {
+			log.WithContext(ctx).Errorw("Default signup role not set for project", "project_id", project.ID)
+			return nil, nil, nil, errors.ErrUnableToProcessSignup.WithDebugMessage("Default signup role not set for project")
+		}
+	}
 	return project, redirectURI, projectSetting, nil
 }

@@ -56,4 +56,10 @@ func (h *handler) SetupRoutes() {
 
 	h.app.Get("/user/activate/:token", h.renderActivateProjectUser)
 	h.app.Post("/user/activate/:token", h.submitActivateProjectUser)
+
+	// Register OAuth routes if enabled
+	if h.defaultConfig.GoogleOAuth.Enabled {
+		h.app.Get("/oauth/google", h.handleGoogleOAuth)
+		h.app.Get("/oauth/google/callback", h.handleGoogleOAuthCallback)
+	}
 }
