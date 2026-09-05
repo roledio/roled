@@ -422,6 +422,10 @@ h6 { font-size: 1rem; }
   font-size: 0.875rem;
 }
 
+a.roled-btn:hover {
+  color: inherit;
+}
+
 /* ============================================
    Auth Page Layout
    ============================================ */

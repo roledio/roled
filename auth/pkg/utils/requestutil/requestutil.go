@@ -8,6 +8,9 @@ import (
 	"github.com/gofiber/fiber/v3/log"
 )
 
+// BindAndValidate attempts to bind the request to the given struct and validate it.
+// The binding will be done in the order of header, URI, query, and body (form/json), no matter the order in the field tags.
+// It will return an error if validation fails.
 func BindAndValidate(c fiber.Ctx, req any) error {
 	ctx := c.Context()
 	_ = c.Bind().Header(req)

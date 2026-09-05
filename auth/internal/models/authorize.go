@@ -12,8 +12,7 @@ type RenderAuthorizeRequest struct {
 	State               string `form:"state" query:"state"`
 	CodeChallenge       string `form:"code_challenge" query:"code_challenge" validate:"required,base64rawurl"`
 	CodeChallengeMethod string `form:"code_challenge_method" query:"code_challenge_method" validate:"required,oneof=S256"` // Method "plain" (no transformation) is not supported, only "S256"
-
-	IsSignup bool `form:"is_signup"` // Always read from form, query is used to render the form initially
+	IsSignup            bool   `form:"is_signup" query:"is_signup"`
 }
 
 type RenderAuthorizeResult struct {

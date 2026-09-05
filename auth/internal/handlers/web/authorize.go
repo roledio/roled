@@ -112,6 +112,5 @@ func (h *handler) buildGoogleOAuthPath(req *models.RenderAuthorizeRequest) strin
 	query.Set("code_challenge", req.CodeChallenge)
 	query.Set("code_challenge_method", req.CodeChallengeMethod)
 	query.Set("state", req.State)
-	query.Set("is_signup", fmt.Sprintf("%v", req.IsSignup))
 	return fmt.Sprintf("/oauth/google?%s", query.Encode())
 }

@@ -212,6 +212,11 @@ func (s *authorizeService) createOrUpdateUserFromGoogle(ctx context.Context, reg
 		return existingUser, nil
 	}
 
+	if !projectSetting.IsSignupEnabled {
+		log.WithContext(ctx).Errorw("Unable to continue signup with google oauth, signup is disabled for project", "project_id", project.ID)
+		return nil, autherrors.ErrUnableToProcessSignup.WithDebugMessage("Signup not enabled for project")
+	}
+
 	// Create new user
 	var account *entities.Account
 	if project.IsSystem {

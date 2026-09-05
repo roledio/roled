@@ -97,6 +97,14 @@ func (s *authorizeService) validateSignin(ctx context.Context, project *entities
 }
 
 func (s *authorizeService) validateSignup(ctx context.Context, project *entities.Project, projectSetting *entities.ProjectSetting, req *models.SubmitAuthorizeRequest) error {
+	if !projectSetting.IsSignupEnabled {
+		log.WithContext(ctx).Errorw("Signup not enabled for project", "project_id", project.ID)
+		return errors.ErrUnableToProcessSignup.WithDebugMessage("Signup not enabled for project")
+	}
+	if projectSetting.DefaultSignupRoleID == nil {
+		log.WithContext(ctx).Errorw("Default signup role not set for project", "project_id", project.ID)
+		return errors.ErrUnableToProcessSignup.WithDebugMessage("Default signup role not set for project")
+	}
 	if !projectSetting.IsAllowTempEmail {
 		parsedEmail, err := disposable.ParseEmail(req.Email)
 		if err != nil || parsedEmail.Disposable {
