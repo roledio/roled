@@ -144,7 +144,8 @@ func (r *userRepository) Create(ctx context.Context, user *entities.User) error 
 				external_user_id,	
 				display_name,
 				avatar_url,
-				is_active
+				is_active,
+				email_verified_at
 			) VALUES (
 				:id,
 				:account_id,
@@ -154,7 +155,8 @@ func (r *userRepository) Create(ctx context.Context, user *entities.User) error 
 				:external_user_id,
 				:display_name,
 				:avatar_url,
-				:is_active
+				:is_active,
+				:email_verified_at
 			)`
 	_, err := r.qx.NamedExecContext(ctx, q, user)
 	return err
