@@ -1,0 +1,39 @@
+---
+description: "Console frontend specific patterns: React/TS, shadcn/ui, TanStack Query, URL-driven list state, forms with touched, confirm dialogs."
+alwaysApply: false
+globs: ["console/src/**/*.ts", "console/src/**/*.tsx", "console/**/*.{json,css}"]
+---
+
+# Console (React / TS) — Scoped Rules
+
+Reference source: `AGENTS.md` §2 + §6 "Adding a new console page under project details". Read for exhaustive detail.
+
+## Quick pattern anchors
+
+Pattern files to open when making something analogous:
+- List page with filters + sort + paginate + confirm delete → `console/src/pages/projects/Projects.tsx`
+- Create/edit form with touched + validation + logo upload + redirect URI list → `console/src/pages/projects/NewProject.tsx`
+- Tabbed detail layout (lazy secondary tabs, paramsStore restore per tab) → `console/src/pages/projects/details/ProjectDetails.tsx`
+- HTTP service function shape + error unwrap chain → `console/src/services/projects/projects.ts`
+- TanStack Query hooks mirroring → `console/src/hooks/projects/index.ts`
+
+## Service signature convention
+
+```ts
+export async function fetchXxx(
+  httpClient: HttpClient,
+  baseUrl: string,
+  params: Record<string, any> = {},
+): Promise<{ data: Xxx[]; pagination?: PaginationInfo }>
+```
+- Strip trailing `/`: `` `${baseUrl.replace(/\/$/, '')}/api/v1/xxx` ``
+- Error extraction order: `err?.response?.data?.error?.message ?? err?.response?.data?.message ?? err?.message ?? fallback`
+- Trust response only when `res.data?.success === true`
+
+## Tailwind semantic tokens (use these instead of raw palette)
+
+- Canvas: `bg-background text-foreground`
+- Subtle: `bg-muted text-muted-foreground`
+- Card: `bg-card text-card-foreground border-border`
+- Primary action: `bg-primary text-primary-foreground hover:bg-primary/90`
+- Destructive: `bg-destructive text-destructive-foreground hover:bg-destructive/90`

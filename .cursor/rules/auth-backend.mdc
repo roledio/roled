@@ -1,0 +1,30 @@
+---
+description: "Auth backend specific patterns: Go services split by verb_noun files, soft-delete repositories, CustomError chain, registry.Tx, cache invalidation helpers, protected route helpers."
+alwaysApply: false
+globs: ["auth/**/*.go", "auth/**/*.yml", "auth/**/*.sql"]
+---
+
+# Auth (Go Backend) — Scoped Rules
+
+Reference source: `AGENTS.md` §3 + §6 "Adding a new backend CRUD domain". Read for exhaustive detail.
+
+## Quick pattern anchors
+
+Pattern files to open when making something analogous:
+- Service file split + singleflight + constructor → `auth/internal/services/project/service.go`
+- Service Create method (with registry.Tx + post-success invalidate) → `auth/internal/services/project/create_project.go`
+- Handler skeleton + `SendSuccessWithPagination` → `auth/internal/handlers/api/project.go`
+- MariaDB repository (FindByID, FindAll with Squirrel, Count, Create (namedExecOne), Update, Delete) → `auth/internal/repositories/mariadb/project.go`
+- Redis cache-aside decorator + registry wiring → `auth/internal/repositories/redis/project.go` + `auth/internal/repositories/registry.go`
+- Domain error sentinels → `auth/internal/errors/project.go`
+- Cache invalidation helpers → `auth/internal/services/shared/invalidate_cache.go`
+- Cache key builders → `auth/internal/constants/rediskeys/project.go`
+
+## Hard blocks / anti-patterns
+
+- ❌ Multiple public service methods in one file → split to `<verb>_<noun>.go`.
+- ❌ SELECT without `WHERE deleted_at IS NULL` → add clause (Squirrel: `sq.Eq{"deleted_at": nil}`).
+- ❌ Write path missing cache invalidation → add `shared.Invalidate*Cache` after commit.
+- ❌ Handler calls repository directly → add service wrapper method.
+- ❌ Cache key built inline `fmt.Sprintf("x:%s", id)` → move to `rediskeys/` builder function.
+- ❌ `fmt.Errorf` returned from service method to handler → wrap in CustomError (either domain sentinel or pkg/errors base).

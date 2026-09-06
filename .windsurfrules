@@ -1,0 +1,68 @@
+---
+description: "Windsurf project rule anchor: first read AGENTS.md at repo root. Oriented for Cascade Write/Chat modes. Includes scope mapping to /auth (Go) and /console (React/TS), hard rules, and pattern-file pointers."
+alwaysApply: true
+---
+
+# Windsurf (Codeium Cascade) — Project Rules
+
+## On session start
+
+1. Open `AGENTS.md` at the repository root — it is the exhaustive, canonical source for all architecture decisions, naming conventions, file-splitting rules, checklists for new CRUD domains, lint/build/test commands, and anti-patterns.
+2. The monorepo has two subprojects; identify scope immediately:
+   - **`/auth/`** → Go backend (Fiber v3, sqlx/MariaDB, Redis v9 cache decorator, Zap, Goose, Testcontainers). Module: `github.com/roledio/roled/auth`.
+   - **`/console/`** → React frontend (Vite + TS, shadcn/ui, Tailwind, TanStack Query v5, React Router v6, Vitest).
+3. Load the closest pattern reference from AGENTS.md §2/§3 before generating code.
+
+## Hard rules (do not generate code that violates these)
+
+### Backend (/auth/**)
+
+1. **Strict 3-tier:** Handlers → services → repositories. Handlers do ONLY `BindAndValidate → service call → SendSuccess/SendError`. Repositories are SQL-only.
+2. **Service file split:** One public method per file `<verb>_<noun>.go`. `service.go` only has interface, struct, constructor, cross-method private helpers.
+3. **Soft delete always:** DELETE route = UPDATE `deleted_at = NOW(4)`. SELECT = `WHERE deleted_at IS NULL`.
+4. **CustomError only:** Domain sentinels in `internal/errors/<domain>.go`. Wrap cause with `.WithError(err)`.
+5. **Log then return:** `log.WithContext(ctx).Errorw("…", "error", err, …)` before every non-nil return.
+6. **Cache invariant:** Every successful mutation → `shared.Invalidate*Cache(ctx, s.redis, entity)` AFTER DB commit.
+7. **Tx boundary:** 2+ writes in one method → `s.registry.Tx(func(registry repositories.Registry) error { ... })`; use closure param `registry`, NOT `s.registry`.
+8. **Route helpers:** `h.protectedGet/Post/Put/Delete/Patch(path, constants.RouteXxx, handler)`. New route constants in `internal/constants/route.go`.
+9. **IDs:** PKs = `idutil.NewID()`; secrets/tokens = `idutil.NanoID(n)`.
+10. **Cache keys:** Build via functions in `internal/constants/rediskeys/<domain>.go`. NEVER inline.
+
+### Frontend (/console/**)
+
+1. `@/` alias; no `../../` for src-relative paths.
+2. `HttpClient` injected as prop on pages; hooks via options bag; services `(httpClient, baseUrl, …)`. No raw axios.
+3. List pages: state ↔ `useSearchParams`. 300 ms debounce on search. Persist params with `paramsStore` for back-nav.
+4. TanStack Query key tuple: `['domain', id | paramsObj]`. `keepPreviousData: true` on lists. `invalidateQueries` inside `onSuccess`.
+5. Forms = touched state + pure `validateXxxForm` (from `@/lib/validation`). Error UI only when touched.
+6. Destructive actions = `<ConfirmDialog destructive>`; Projects/Clients/Users add confirm-by-typing-name.
+7. UI = shadcn/ui components from `@/components/ui/*`; no raw Tailwind primitives for button/dialog/card/tabs/badge/select/input.
+8. Tailwind = semantic tokens (`bg-background`, `text-muted-foreground`, `border-border`, `bg-primary text-primary-foreground`); no raw palette colors.
+9. Icons = lucide-react; inline `h-4 w-4`, standalone `h-6 w-6`.
+10. Non-default tabs under `ProjectDetails.tsx` = `React.lazy + Suspense`; default preloaded on project load.
+
+## Pattern anchor files (open first for analogous work)
+
+| Task | Open |
+|---|---|
+| Go service with Tx + Invalidate | `auth/internal/services/project/create_project.go` |
+| Go handler skeleton | `auth/internal/handlers/api/project.go` |
+| Go repository + soft-delete | `auth/internal/repositories/mariadb/project.go` |
+| Go redis cache decorator | `auth/internal/repositories/redis/project.go` |
+| Go custom error sentinels | `auth/internal/errors/project.go` |
+| React list page (full pattern) | `console/src/pages/projects/Projects.tsx` |
+| React create/edit form | `console/src/pages/projects/NewProject.tsx` |
+| React tabbed detail page | `console/src/pages/projects/details/ProjectDetails.tsx` |
+| HTTP service function shape | `console/src/services/projects/projects.ts` |
+| React Query hooks | `console/src/hooks/projects/index.ts` |
+
+## Quality gate (run & share output before marking done)
+
+```bash
+# Frontend
+cd console && npm run lint && npm run test
+
+# Backend
+cd auth && go build ./... && golangci-lint run
+cd auth && go test ./internal/services/<changed>/... ./internal/handlers/... -count=1
+```
