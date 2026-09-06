@@ -21,6 +21,7 @@ type Registry interface {
 	AccountRepository() interfaces.AccountRepository
 	MemberRepository() interfaces.MemberRepository
 	ProjectRepository() interfaces.ProjectRepository
+	OAuthConnectionRepository() interfaces.OAuthConnectionRepository
 	ProjectSettingRepository() interfaces.ProjectSettingRepository
 	RedirectURIRepository() interfaces.RedirectURIRepository
 	RoleRepository() interfaces.RoleRepository
@@ -119,6 +120,16 @@ func (r *registry) ProjectRepository() interfaces.ProjectRepository {
 	repo := mariadb.NewProjectRepository(r.qx)
 	if r.redisService != nil {
 		return redis.NewProjectCacheRepository(repo,
+			r.redisService,
+			r.defaultConfig.CacheDefaultTTLDuration)
+	}
+	return repo
+}
+
+func (r *registry) OAuthConnectionRepository() interfaces.OAuthConnectionRepository {
+	repo := mariadb.NewOAuthConnectionRepository(r.qx)
+	if r.redisService != nil {
+		return redis.NewOAuthConnectionRepository(repo,
 			r.redisService,
 			r.defaultConfig.CacheDefaultTTLDuration)
 	}

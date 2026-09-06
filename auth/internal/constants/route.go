@@ -26,6 +26,8 @@ const (
 	RouteUpdateProjects    = "update_projects"
 	RouteDeleteProjects    = "delete_projects"
 
+	RouteGetProjectOAuthConnections = "get_project_oauth_connections"
+
 	RouteGetProjectSettings    = "get_project_settings"
 	RouteUpdateProjectSettings = "update_project_settings"
 

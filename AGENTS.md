@@ -3,7 +3,7 @@
 ## Overview
 
 Roled is a centralized User & Role Management Platform with two main sub-projects:
-- **`/auth/`** — Go backend (Fiber v3 + MariaDB + Redis + GORM/sqlx) providing OAuth2/OIDC auth, RBAC, project/client/resource/role management APIs
+- **`/auth/`** — Go backend (Fiber v3 + MariaDB + Redis + sqlx) providing OAuth2/OIDC auth, RBAC, project/client/resource/role management APIs
 - **`/console/`** — React + TypeScript + Vite + shadcn/ui + Tailwind + TanStack Query admin console
 
 ---
@@ -49,7 +49,7 @@ Roled is a centralized User & Role Management Platform with two main sub-project
 │   ├── migrations/                   # Goose migrations: 000001_init.sql, 000002_seed.go
 │   └── pkg/                          # Shared/reusable packages
 │       ├── constants/                # Env, KeyPurpose, Time constants
-│       ├── databases/                # DB open/migrate (gorm, sqlx, goose, zap adapters)
+│       ├── databases/                # DB open/migrate (sqlx, gorm, goose, zap adapters)
 │       ├── errors/                   # CustomError base type (Code, Msg, HttpCode, Err, DebugMessage)
 │       ├── models/                   # Shared DTOs: Request/Pagination, Response/ErrorBody, BuildInfo
 │       ├── repositories/             # WithPercentAround, FixSortDir helpers
@@ -199,7 +199,7 @@ Roled is a centralized User & Role Management Platform with two main sub-project
 - **Go 1.26** with module `github.com/roledio/roled/auth`
 - **Web**: Fiber v3 (zero-allocation HTTP). Templates: `gofiber/template/html/v3`
 - **Router**: Fiber group-based, with helpers `protectedGet/Post/Put/Delete/Patch` that chain `middlewares.JWT` + `middlewares.Permission`.
-- **DB**: MariaDB/MySQL via `sqlx` + raw SQL (**not** ORM-generated queries). Query builder: `github.com/Masterminds/squirrel` for dynamic SELECTs. `gorm` available only for migrations, Goose dialect.
+- **DB**: MariaDB/MySQL via `sqlx` + raw SQL (**not** ORM-generated queries). Query builder: `github.com/Masterminds/squirrel` for dynamic SELECTs.
 - **Cache**: Redis v9 (`redis/go-redis/v9`) with decorator-pattern cached repositories.
 - **Logging**: Zap via `fiber/contrib/zap` + lumberjack rotation. All handlers use `log.WithContext(ctx)`.
 - **Validation**: `go-playground/validator/v10` via `requestutil.BindAndValidate(c, &req)`.
@@ -233,6 +233,8 @@ Registry (decorator composition)
 
 ### 3.3 Package / File Conventions
 
+- Always follow the effective Go best practices and conventions first.
+- **Package naming**: Use short, lowercase, single-word package names without underscores or mixedCaps. Examples: `oauthconnection`, `project`, `user`, `member`, `accesstoken`.
 - **PascalCase for public symbols** (Go standard), **camelCase for private fields/structs**.
 - One-file-per-use-case in services: `create_project.go` holds only `func (s *projectService) CreateProject(...)`. Constructor, interface, and shared helpers live in `service.go`. This is non-negotiable — do NOT collapse methods into a single large file.
 - Repository interfaces: one file per aggregate in `internal/repositories/interfaces/<domain>.go`.
@@ -306,6 +308,7 @@ Registry (decorator composition)
   - Heavy aggregate lookups: GetProjectDetails, GetCurrentAccessToken.
   - Pattern: `sfGroup.Do(key, func() (any, error) { … })`. Don't forget to use keys from `constants/singleflightkeys`.
 - ID generation: `idutil.NewID()` for standard primary keys, `idutil.NanoID(n)` for token/secret strings.
+- **Project validation**: For any service method that accepts a `project_id` parameter from an API endpoint, always validate the project by calling `shared.ValidateProject(ctx, s.registry, projectID)` at the beginning of the method. This centralizes project validation logic, handles both system and non-system accounts, and returns appropriate errors.
 
 ### 3.11 Middleware
 

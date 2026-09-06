@@ -20,6 +20,7 @@ import (
 	"github.com/roledio/roled/auth/internal/services/client"
 	"github.com/roledio/roled/auth/internal/services/infra"
 	"github.com/roledio/roled/auth/internal/services/member"
+	"github.com/roledio/roled/auth/internal/services/oauthconnection"
 	"github.com/roledio/roled/auth/internal/services/permission"
 	"github.com/roledio/roled/auth/internal/services/project"
 	"github.com/roledio/roled/auth/internal/services/resource"
@@ -44,33 +45,35 @@ type QueueHandlers struct {
 }
 
 type Services struct {
-	AuthorizeService  authorize.AuthorizeService
-	ProjectService    project.ProjectService
-	TokenService      accesstoken.AccessTokenService
-	AccountService    account.AccountService
-	UserService       user.UserService
-	MemberService     member.MemberService
-	UploadService     upload.UploadService
-	ClientService     client.ClientService
-	ResourceService   resource.ResourceService
-	RoleService       role.RoleService
-	PermissionService permission.PermissionService
+	AuthorizeService       authorize.AuthorizeService
+	ProjectService         project.ProjectService
+	OAuthConnectionService oauthconnection.OAuthConnectionService
+	TokenService           accesstoken.AccessTokenService
+	AccountService         account.AccountService
+	UserService            user.UserService
+	MemberService          member.MemberService
+	UploadService          upload.UploadService
+	ClientService          client.ClientService
+	ResourceService        resource.ResourceService
+	RoleService            role.RoleService
+	PermissionService      permission.PermissionService
 }
 
 func setupServices(config *configs.DefaultConfig, registry repositories.Registry, publishers QueuePublishers, redis infra.RedisService, _ infra.EmailService) *Services {
 	uploadService := upload.NewUploadService(config)
 	return &Services{
-		AuthorizeService:  authorize.NewAuthorizeService(config, registry, redis, publishers.EmailPublisher),
-		ProjectService:    project.NewProjectService(config, registry, uploadService, redis),
-		TokenService:      accesstoken.NewAccessTokenService(config, registry, redis),
-		AccountService:    account.NewAccountService(registry, redis),
-		UserService:       user.NewUserService(config, registry, uploadService, redis, publishers.EmailPublisher),
-		MemberService:     member.NewMemberService(config, registry, publishers.EmailPublisher, redis),
-		UploadService:     uploadService,
-		ClientService:     client.NewClientService(config, registry, redis),
-		ResourceService:   resource.NewResourceService(registry, redis),
-		RoleService:       role.NewRoleService(registry, redis),
-		PermissionService: permission.NewPermissionService(config, registry),
+		AuthorizeService:       authorize.NewAuthorizeService(config, registry, redis, publishers.EmailPublisher),
+		ProjectService:         project.NewProjectService(config, registry, uploadService, redis),
+		OAuthConnectionService: oauthconnection.NewOAuthConnectionService(config, registry, redis),
+		TokenService:           accesstoken.NewAccessTokenService(config, registry, redis),
+		AccountService:         account.NewAccountService(registry, redis),
+		UserService:            user.NewUserService(config, registry, uploadService, redis, publishers.EmailPublisher),
+		MemberService:          member.NewMemberService(config, registry, publishers.EmailPublisher, redis),
+		UploadService:          uploadService,
+		ClientService:          client.NewClientService(config, registry, redis),
+		ResourceService:        resource.NewResourceService(registry, redis),
+		RoleService:            role.NewRoleService(registry, redis),
+		PermissionService:      permission.NewPermissionService(config, registry),
 	}
 }
 

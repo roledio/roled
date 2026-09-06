@@ -11,6 +11,7 @@ import (
 	"github.com/roledio/roled/auth/internal/services/client"
 	"github.com/roledio/roled/auth/internal/services/infra"
 	"github.com/roledio/roled/auth/internal/services/member"
+	"github.com/roledio/roled/auth/internal/services/oauthconnection"
 	"github.com/roledio/roled/auth/internal/services/permission"
 	"github.com/roledio/roled/auth/internal/services/project"
 	"github.com/roledio/roled/auth/internal/services/resource"
@@ -20,53 +21,56 @@ import (
 )
 
 type Dependencies struct {
-	Registry          repositories.Registry
-	Redis             infra.RedisService
-	ProjectService    project.ProjectService
-	TokenService      accesstoken.AccessTokenService
-	AccountService    account.AccountService
-	MemberService     member.MemberService
-	UploadService     upload.UploadService
-	ClientService     client.ClientService
-	ResourceService   resource.ResourceService
-	RoleService       role.RoleService
-	UserService       user.UserService
-	PermissionService permission.PermissionService
+	Registry               repositories.Registry
+	Redis                  infra.RedisService
+	ProjectService         project.ProjectService
+	OAuthConnectionService oauthconnection.OAuthConnectionService
+	TokenService           accesstoken.AccessTokenService
+	AccountService         account.AccountService
+	MemberService          member.MemberService
+	UploadService          upload.UploadService
+	ClientService          client.ClientService
+	ResourceService        resource.ResourceService
+	RoleService            role.RoleService
+	UserService            user.UserService
+	PermissionService      permission.PermissionService
 }
 
 type handler struct {
-	app               *fiber.App
-	defaultConfig     *configs.DefaultConfig
-	repo              repositories.Registry
-	redisService      infra.RedisService
-	projectService    project.ProjectService
-	tokenService      accesstoken.AccessTokenService
-	accountService    account.AccountService
-	memberService     member.MemberService
-	uploadService     upload.UploadService
-	clientService     client.ClientService
-	resourceService   resource.ResourceService
-	roleService       role.RoleService
-	userService       user.UserService
-	permissionService permission.PermissionService
+	app                    *fiber.App
+	defaultConfig          *configs.DefaultConfig
+	repo                   repositories.Registry
+	redisService           infra.RedisService
+	projectService         project.ProjectService
+	oAuthConnectionService oauthconnection.OAuthConnectionService
+	tokenService           accesstoken.AccessTokenService
+	accountService         account.AccountService
+	memberService          member.MemberService
+	uploadService          upload.UploadService
+	clientService          client.ClientService
+	resourceService        resource.ResourceService
+	roleService            role.RoleService
+	userService            user.UserService
+	permissionService      permission.PermissionService
 }
 
 func NewHandler(app *fiber.App, defaultConfig *configs.DefaultConfig, deps *Dependencies) *handler {
 	return &handler{
-		app:               app,
-		defaultConfig:     defaultConfig,
-		repo:              deps.Registry,
-		redisService:      deps.Redis,
-		projectService:    deps.ProjectService,
-		tokenService:      deps.TokenService,
-		accountService:    deps.AccountService,
-		memberService:     deps.MemberService,
-		uploadService:     deps.UploadService,
-		clientService:     deps.ClientService,
-		resourceService:   deps.ResourceService,
-		roleService:       deps.RoleService,
-		userService:       deps.UserService,
-		permissionService: deps.PermissionService,
+		app:                    app,
+		defaultConfig:          defaultConfig,
+		repo:                   deps.Registry,
+		redisService:           deps.Redis,
+		projectService:         deps.ProjectService,
+		oAuthConnectionService: deps.OAuthConnectionService,
+		tokenService:           deps.TokenService,
+		accountService:         deps.AccountService,
+		memberService:          deps.MemberService,
+		uploadService:          deps.UploadService,
+		clientService:          deps.ClientService,
+		resourceService:        deps.ResourceService,
+		roleService:            deps.RoleService,
+		userService:            deps.UserService,
+		permissionService:      deps.PermissionService,
 	}
 }
 
@@ -106,6 +110,8 @@ func (h *handler) SetupRoutes() {
 
 	h.protectedGet("/api/v1/projects/:project_id/settings", constants.RouteGetProjectSettings, h.getProjectSettings)
 	h.protectedPut("/api/v1/projects/:project_id/settings", constants.RouteUpdateProjectSettings, h.updateProjectSettings)
+
+	h.protectedGet("/api/v1/projects/:project_id/oauth-connections", constants.RouteGetProjectOAuthConnections, h.getProjectOAuthConnections)
 
 	h.protectedPatch("/api/v1/projects/:project_id/signup-role", constants.RouteUpdateProjectSignupRole, h.updateProjectSignupRole)
 

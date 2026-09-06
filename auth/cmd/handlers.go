@@ -9,18 +9,19 @@ import (
 
 func newApiHandlerDeps(registry repositories.Registry, redis infra.RedisService, services *Services) *api.Dependencies {
 	return &api.Dependencies{
-		Registry:          registry,
-		Redis:             redis,
-		ProjectService:    services.ProjectService,
-		TokenService:      services.TokenService,
-		AccountService:    services.AccountService,
-		MemberService:     services.MemberService,
-		UploadService:     services.UploadService,
-		ClientService:     services.ClientService,
-		ResourceService:   services.ResourceService,
-		RoleService:       services.RoleService,
-		UserService:       services.UserService,
-		PermissionService: services.PermissionService,
+		Registry:               registry,
+		Redis:                  redis,
+		ProjectService:         services.ProjectService,
+		OAuthConnectionService: services.OAuthConnectionService,
+		TokenService:           services.TokenService,
+		AccountService:         services.AccountService,
+		MemberService:          services.MemberService,
+		UploadService:          services.UploadService,
+		ClientService:          services.ClientService,
+		ResourceService:        services.ResourceService,
+		RoleService:            services.RoleService,
+		UserService:            services.UserService,
+		PermissionService:      services.PermissionService,
 	}
 }
 
