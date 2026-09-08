@@ -65,6 +65,16 @@ export type User = {
   avatar_url?: string | null;
 };
 
+export type OAuthConnection = {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  project_id: string;
+  provider: 'google' | string;
+  credential_type: 'default' | 'custom';
+  enabled: boolean;
+};
+
 export type PaginationInfo = {
   page_num: number;
   page_size: number;

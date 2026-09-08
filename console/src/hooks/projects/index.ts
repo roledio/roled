@@ -19,4 +19,4 @@ export function useProject({ httpClient, baseUrl, projectId, projectCode }: Opti
 
 export { useProjectClients } from './use-project-clients';
 export { useProjectSettings } from './use-project-settings';
-
+export { useOAuthConnections } from './use-oauth-connections';
