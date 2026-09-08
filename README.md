@@ -114,10 +114,28 @@ You can now open your browser, visit `http://localhost:4000`, and log in to the 
 
 Here are some screenshots of the Roled Console for you to take a look at so you get the idea of what Roled is all about:
 
-|                                                        |                                                        |
-| ------------------------------------------------------ | ------------------------------------------------------ |
-| ![Project List](docs/images/project-list.png)<br>**Project List**<br>Overview of all projects with quick access and project creation. | ![User Management](docs/images/user-list.png)<br>**User Management**<br>Manage project users, including invitations, email verification, password resets, and role assignments. |
-| ![Project Settings](docs/images/project-settings.png)<br>**Project Settings**<br>Configure authentication flows, default sign-up roles, and security policies. | ![Sign In Page](docs/images/signin.png)<br>**Sign In Page**<br>Clean sign-in and authentication screen for your project users. |
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px;">
+  <div style="text-align: center;">
+    <img src="docs/images/project-list.png" alt="Project List" style="max-width: 100%; border-radius: 8px;" />
+    <h3 style="margin-top: 15px; margin-bottom: 8px;">Project List</h3>
+    <p style="margin: 0; color: #666;">Overview of all projects with quick access and project creation.</p>
+  </div>
+  <div style="text-align: center;">
+    <img src="docs/images/user-list.png" alt="User Management" style="max-width: 100%; border-radius: 8px;" />
+    <h3 style="margin-top: 15px; margin-bottom: 8px;">User Management</h3>
+    <p style="margin: 0; color: #666;">Manage project users, including invitations, email verification, password resets, and role assignments.</p>
+  </div>
+  <div style="text-align: center;">
+    <img src="docs/images/project-settings.png" alt="Project Settings" style="max-width: 100%; border-radius: 8px;" />
+    <h3 style="margin-top: 15px; margin-bottom: 8px;">Project Settings</h3>
+    <p style="margin: 0; color: #666;">Configure authentication flows, default sign-up roles, and security policies.</p>
+  </div>
+  <div style="text-align: center;">
+    <img src="docs/images/signin.png" alt="Sign In Page" style="max-width: 100%; border-radius: 8px;" />
+    <h3 style="margin-top: 15px; margin-bottom: 8px;">Sign In Page</h3>
+    <p style="margin: 0; color: #666;">Clean sign-in and authentication screen for your project users.</p>
+  </div>
+</div>
 
 ## Self-Hosted vs. Cloud
 
