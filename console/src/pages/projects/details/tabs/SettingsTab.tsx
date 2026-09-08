@@ -487,7 +487,16 @@ export default function SettingsTab({ httpClient, project }: Props) {
                                                         )}
                                                         <div className="flex-1">
                                                             <div className="text-sm font-medium">
-                                                                {config?.name || connection.provider}
+                                                                <button
+                                                                    onClick={() => {
+                                                                        if (project_id) saveProjectTabParams(project_id, 'settings', location.search ?? '');
+                                                                        navigate(`/projects/${project_id}/social-connections/${connection.provider}/details`);
+                                                                    }}
+                                                                    className="text-sm font-medium text-left"
+                                                                    aria-label={`Open ${config?.name || connection.provider} connection details`}
+                                                                >
+                                                                    {config?.name || connection.provider}
+                                                                </button>
                                                             </div>
                                                             <div className="text-xs text-muted-foreground mt-0.5">
                                                                 {credentialLabel}
@@ -511,7 +520,12 @@ export default function SettingsTab({ httpClient, project }: Props) {
                                                                 </Button>
                                                             </DropdownMenuTrigger>
                                                             <DropdownMenuContent align="end">
-                                                                <DropdownMenuItem>
+                                                                <DropdownMenuItem
+                                                                    onClick={() => {
+                                                                        if (project_id) saveProjectTabParams(project_id, 'settings', location.search ?? '');
+                                                                        navigate(`/projects/${project_id}/social-connections/${connection.provider}/details`);
+                                                                    }}
+                                                                >
                                                                     <Eye className="h-4 w-4 mr-2" />
                                                                     View Details
                                                                 </DropdownMenuItem>

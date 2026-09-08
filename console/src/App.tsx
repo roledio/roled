@@ -20,6 +20,7 @@ import NewResource from './pages/projects/details/resources/NewResource';
 import ResourceDetails from './pages/projects/details/resources/ResourceDetails';
 import ProjectDetails from './pages/projects/details/ProjectDetails';
 import NewSocialConnection from './pages/projects/details/social-connections/NewSocialConnection';
+import SocialConnectionDetails from './pages/projects/details/social-connections/SocialConnectionDetails';
 import Projects from './pages/projects/Projects';
 import SignIn from './pages/auth/SignIn';
 import SignInCallback from './pages/auth/SignInCallback';
@@ -88,6 +89,7 @@ export default function App() {
               <Route path="/projects/:project_id/resources/new" element={<NewResource httpClient={httpClient} />} />
               <Route path="/projects/:project_id/resources/:resource_id/details" element={<ResourceDetails httpClient={httpClient} />} />
               <Route path="/projects/:project_id/social-connections/:provider/new" element={<NewSocialConnection httpClient={httpClient} />} />
+              <Route path="/projects/:project_id/social-connections/:provider/details" element={<SocialConnectionDetails httpClient={httpClient} />} />
               <Route path="/account" element={<Account httpClient={httpClient} tokenService={tokenService} />} />
               <Route path="/profile" element={<Profile httpClient={httpClient} />} />
             </Route>
