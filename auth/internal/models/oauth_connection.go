@@ -32,7 +32,7 @@ type CreateOAuthConnectionRequest struct {
 	CredentialType string   `json:"credential_type" validate:"required,oneof=default custom"`
 	ClientID       string   `json:"client_id" validate:"required_if=CredentialType custom,notblank,max=512"`
 	ClientSecret   string   `json:"client_secret" validate:"required_if=CredentialType custom,notblank,max=512"`
-	Scopes         []string `json:"scopes" validate:"required_if=CredentialType custom,min=1"`
+	Scopes         []string `json:"scopes" validate:"required_if=CredentialType custom,omitempty,min=1"`
 	Enabled        *bool    `json:"enabled" validate:"omitempty"`
 }
 
@@ -42,7 +42,7 @@ type UpdateOAuthConnectionRequest struct {
 	CredentialType string   `json:"credential_type" validate:"required,oneof=default custom"`
 	ClientID       string   `json:"client_id" validate:"required_if=CredentialType custom,notblank,max=512"`
 	ClientSecret   string   `json:"client_secret" validate:"required_if=CredentialType custom,notblank,max=512"`
-	Scopes         []string `json:"scopes" validate:"required_if=CredentialType custom,min=1"`
+	Scopes         []string `json:"scopes" validate:"required_if=CredentialType custom,omitempty,min=1"`
 	Enabled        *bool    `json:"enabled" validate:"omitempty"`
 }
 

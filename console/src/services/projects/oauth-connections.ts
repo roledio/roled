@@ -11,6 +11,15 @@ export type OAuthConnection = {
   enabled: boolean;
 };
 
+export type CreateOAuthConnectionPayload = {
+  provider: string;
+  credential_type: 'default' | 'custom';
+  client_id?: string;
+  client_secret?: string;
+  scopes?: string[];
+  enabled?: boolean;
+};
+
 export async function fetchOAuthConnections(
   httpClient: HttpClient,
   baseUrl: string,
@@ -36,19 +45,20 @@ export async function fetchOAuthConnections(
   }
 }
 
-export async function createOAuthConnection(
+export async function createOAuthConnectionWithCredentials(
   httpClient: HttpClient,
   baseUrl: string,
   projectId: string,
-  payload: { provider: string; credential_type?: 'default' | 'custom' },
+  provider: string,
+  payload: Omit<CreateOAuthConnectionPayload, 'provider'>,
 ): Promise<OAuthConnection> {
-  const url = `${baseUrl.replace(/\/$/, '')}/api/v1/projects/${projectId}/oauth-connections`;
+  const url = `${baseUrl.replace(/\/$/, '')}/api/v1/projects/${projectId}/oauth-connections/${provider}`;
   try {
     const res = await httpClient.instanceRef.post<ApiResponse<OAuthConnection>>(url, payload, {
       headers: { 'Content-Type': 'application/json' },
     });
     if (!res.data?.success) {
-      const msg = res?.data?.error?.message ?? 'Failed to create oauth connection';
+      const msg = res?.data?.error?.message ?? 'Failed to create oauth connection with credentials';
       throw new Error(msg);
     }
     return res.data.data;
@@ -57,7 +67,7 @@ export async function createOAuthConnection(
       err?.response?.data?.error?.message ??
       err?.response?.data?.message ??
       err?.message ??
-      'Failed to create oauth connection';
+      'Failed to create oauth connection with credentials';
     throw new Error(msg);
   }
 }

@@ -22,7 +22,6 @@ import type { HttpClient } from '@/services/core/httpClient';
 import {
     fetchProjectRoles,
     updateProjectSettings,
-    createOAuthConnection,
     deleteOAuthConnection,
     type Project,
     type ProjectSettings,
@@ -31,7 +30,8 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Eye, Loader2, MoreVertical, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { saveProjectTabParams } from '@/lib/paramsStore';
 
 // Provider configuration for OAuth connections
 const PROVIDER_CONFIG: Record<
@@ -82,6 +82,8 @@ export default function SettingsTab({ httpClient, project }: Props) {
 
     const queryClient = useQueryClient();
     const { toast } = useToast();
+    const navigate = useNavigate();
+    const location = useLocation();
 
     // ─── Remote data ──────────────────────────────────────────────────────────
 
@@ -114,29 +116,14 @@ export default function SettingsTab({ httpClient, project }: Props) {
         projectId: project_id,
     });
 
-    const createConnectionMutation = useMutation({
-        mutationFn: (provider: string) => {
-            if (!project_id) throw new Error('Project not loaded');
-            return createOAuthConnection(httpClient, AUTH_BASE_URL, project_id, {
-                provider,
-                credential_type: 'default',
-            });
-        },
-        onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: ['project', project_id, 'oauth-connections'] });
-            toast({
-                title: 'Connection added',
-                description: `${PROVIDER_CONFIG[data.provider]?.name || data.provider} connection added successfully`,
-            });
-        },
-        onError: (err: any) => {
-            toast({
-                title: 'Add failed',
-                description: err?.message ?? 'Unable to add oauth connection',
-                variant: 'destructive',
-            });
-        },
-    });
+    const createConnectionMutation = {
+        isPending: false,
+    };
+
+    const handleAddConnection = (provider: string) => {
+        if (project_id) saveProjectTabParams(project_id, 'settings', location.search ?? '');
+        navigate(`/projects/${project_id}/social-connections/${provider}/new`);
+    };
 
     const deleteConnectionMutation = useMutation({
         mutationFn: (provider: string) => {
@@ -434,7 +421,7 @@ export default function SettingsTab({ httpClient, project }: Props) {
                                 availableProviders.map((provider) => (
                                     <DropdownMenuItem
                                         key={provider}
-                                        onClick={() => createConnectionMutation.mutate(provider)}
+                                        onClick={() => handleAddConnection(provider)}
                                         disabled={createConnectionMutation.isPending}
                                     >
                                         {PROVIDER_CONFIG[provider]?.name || provider}

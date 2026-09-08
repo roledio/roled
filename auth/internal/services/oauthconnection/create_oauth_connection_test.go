@@ -48,6 +48,13 @@ func TestCreateOAuthConnection_Success(t *testing.T) {
 	// Create connection
 	mockOAuthConnectionRepo.EXPECT().Create(ctx, mock.AnythingOfType("*entities.OAuthConnection")).Return(nil)
 
+	mockRedisService.EXPECT().
+		DeleteManyWithContext(ctx, []string{
+			"oauth_connection:project:proj-123",
+			"oauth_connection:project:proj-123:provider:google",
+		}).
+		Return(nil)
+
 	service := NewOAuthConnectionService(&configs.DefaultConfig{EncryptionMasterKey: "test-key"}, mockRegistry, mockRedisService)
 
 	req := &models.CreateOAuthConnectionRequest{
@@ -184,6 +191,13 @@ func TestCreateOAuthConnection_SystemProject(t *testing.T) {
 	mockProjectRepo.EXPECT().FindByID(ctx, "proj-123").Return(project, nil)
 	mockOAuthConnectionRepo.EXPECT().FindByProjectIDAndProvider(ctx, "proj-123", "google").Return(nil, nil)
 	mockOAuthConnectionRepo.EXPECT().Create(ctx, mock.AnythingOfType("*entities.OAuthConnection")).Return(nil)
+
+	mockRedisService.EXPECT().
+		DeleteManyWithContext(ctx, []string{
+			"oauth_connection:project:proj-123",
+			"oauth_connection:project:proj-123:provider:google",
+		}).
+		Return(nil)
 
 	service := NewOAuthConnectionService(&configs.DefaultConfig{EncryptionMasterKey: "test-key"}, mockRegistry, mockRedisService)
 

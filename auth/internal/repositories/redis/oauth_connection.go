@@ -85,18 +85,12 @@ func (r *oAuthConnectionRepository) FindByProjectIDAndProvider(ctx context.Conte
 		return nil, nil
 	}
 
-	cacheKeys := []string{
-		cacheKey,
-		rediskeys.OAuthConnectionsByProjectID(projectID),
-	}
-	for _, key := range cacheKeys {
-		if setErr := r.redis.SetData(ctx, key, connPtr, r.ttl); setErr != nil {
-			log.WithContext(ctx).Warnw("Failed to cache OAuth connection in redis",
-				"error", setErr,
-				"project_id", projectID,
-				"provider", provider,
-				"cache_key", key)
-		}
+	if setErr := r.redis.SetData(ctx, cacheKey, connPtr, r.ttl); setErr != nil {
+		log.WithContext(ctx).Warnw("Failed to cache OAuth connection in redis",
+			"error", setErr,
+			"project_id", projectID,
+			"provider", provider,
+			"cache_key", cacheKey)
 	}
 
 	return connPtr, nil

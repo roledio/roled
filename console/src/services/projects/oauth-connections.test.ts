@@ -1,7 +1,7 @@
 import type { HttpClient } from '@/services/core/httpClient';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
-  createOAuthConnection,
+  createOAuthConnectionWithCredentials,
   deleteOAuthConnection,
   fetchOAuthConnections,
   type OAuthConnection,
@@ -119,7 +119,7 @@ describe('OAuthConnections Service', () => {
     });
   });
 
-  describe('createOAuthConnection', () => {
+  describe('createOAuthConnectionWithCredentials', () => {
     it('creates oauth connection successfully', async () => {
       const httpClient = createMockHttpClient();
       const mockResponse = {
@@ -130,15 +130,14 @@ describe('OAuthConnections Service', () => {
       };
       vi.mocked(httpClient.instanceRef.post).mockResolvedValueOnce(mockResponse as any);
 
-      const result = await createOAuthConnection(httpClient, BASE_URL, PROJECT_ID, {
-        provider: 'google',
+      const result = await createOAuthConnectionWithCredentials(httpClient, BASE_URL, PROJECT_ID, 'google', {
         credential_type: 'default',
       });
 
       expect(result).toEqual(mockOAuthConnection);
       expect(httpClient.instanceRef.post).toHaveBeenCalledWith(
-        `${BASE_URL}/api/v1/projects/${PROJECT_ID}/oauth-connections`,
-        { provider: 'google', credential_type: 'default' },
+        `${BASE_URL}/api/v1/projects/${PROJECT_ID}/oauth-connections/google`,
+        { credential_type: 'default' },
         expect.objectContaining({
           headers: { 'Content-Type': 'application/json' },
         })
@@ -156,8 +155,8 @@ describe('OAuthConnections Service', () => {
       vi.mocked(httpClient.instanceRef.post).mockResolvedValueOnce(mockResponse as any);
 
       await expect(
-        createOAuthConnection(httpClient, BASE_URL, PROJECT_ID, {
-          provider: 'google',
+        createOAuthConnectionWithCredentials(httpClient, BASE_URL, PROJECT_ID, 'google', {
+          credential_type: 'default',
         })
       ).rejects.toThrow('Provider already exists');
     });
@@ -169,8 +168,8 @@ describe('OAuthConnections Service', () => {
       );
 
       await expect(
-        createOAuthConnection(httpClient, BASE_URL, PROJECT_ID, {
-          provider: 'google',
+        createOAuthConnectionWithCredentials(httpClient, BASE_URL, PROJECT_ID, 'google', {
+          credential_type: 'default',
         })
       ).rejects.toThrow('Network error');
     });

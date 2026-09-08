@@ -656,6 +656,101 @@ export interface ProfileValidationResult {
   isValid: boolean;
 }
 
+// OAuth Connection validation constants
+export const OAUTH_CONNECTION_VALIDATION = {
+  clientId: {
+    maxLength: 200,
+    required: false, // Required only when credential_type is 'custom'
+  },
+  clientSecret: {
+    maxLength: 200,
+    required: false, // Required only when credential_type is 'custom'
+  },
+  scopes: {
+    maxCount: 20,
+    maxLength: 50,
+  },
+} as const;
+
+// OAuth Connection validation types
+export interface OAuthConnectionValidationResult {
+  errors: {
+    clientId?: string;
+    clientSecret?: string;
+    scopes?: string;
+  };
+  isValid: boolean;
+}
+
+/**
+ * Validates client ID
+ */
+export function validateOAuthClientId(clientId: string, credentialType: 'default' | 'custom'): string | undefined {
+  if (credentialType === 'custom' && !clientId.trim()) {
+    return 'Client ID is required for custom credentials';
+  }
+  if (clientId && clientId.length > OAUTH_CONNECTION_VALIDATION.clientId.maxLength) {
+    return `Client ID must be ${OAUTH_CONNECTION_VALIDATION.clientId.maxLength} characters or less`;
+  }
+  return undefined;
+}
+
+/**
+ * Validates client secret
+ */
+export function validateOAuthClientSecret(clientSecret: string, credentialType: 'default' | 'custom'): string | undefined {
+  if (credentialType === 'custom' && !clientSecret.trim()) {
+    return 'Client Secret is required for custom credentials';
+  }
+  if (clientSecret && clientSecret.length > OAUTH_CONNECTION_VALIDATION.clientSecret.maxLength) {
+    return `Client Secret must be ${OAUTH_CONNECTION_VALIDATION.clientSecret.maxLength} characters or less`;
+  }
+  return undefined;
+}
+
+/**
+ * Validates scopes array
+ */
+export function validateOAuthScopes(scopes: string[]): string | undefined {
+  if (scopes.length > OAUTH_CONNECTION_VALIDATION.scopes.maxCount) {
+    return `Maximum ${OAUTH_CONNECTION_VALIDATION.scopes.maxCount} scopes allowed`;
+  }
+  
+  for (const scope of scopes) {
+    if (scope.length > OAUTH_CONNECTION_VALIDATION.scopes.maxLength) {
+      return `Each scope must be ${OAUTH_CONNECTION_VALIDATION.scopes.maxLength} characters or less`;
+    }
+    if (!scope.trim()) {
+      return 'Scope cannot be empty';
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Validates entire OAuth connection form
+ */
+export function validateOAuthConnectionForm(
+  credentialType: 'default' | 'custom',
+  clientId: string,
+  clientSecret: string,
+  scopes: string[]
+): OAuthConnectionValidationResult {
+  const clientIdError = validateOAuthClientId(clientId, credentialType);
+  const clientSecretError = validateOAuthClientSecret(clientSecret, credentialType);
+  const scopesError = validateOAuthScopes(scopes);
+
+  const errors = {
+    clientId: clientIdError,
+    clientSecret: clientSecretError,
+    scopes: scopesError,
+  };
+
+  const isValid = !errors.clientId && !errors.clientSecret && !errors.scopes;
+
+  return { errors, isValid };
+}
+
 /**
  * Validates profile email (always required for profile, no externalUserId dependency)
  */

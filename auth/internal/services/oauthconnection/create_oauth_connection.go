@@ -62,6 +62,9 @@ func (s *oAuthConnectionService) CreateOAuthConnection(ctx context.Context, req 
 		return nil, pkgerrors.ErrSystemError.WithError(err)
 	}
 
+	// Invalidate the oauth connection list for this project
+	shared.InvalidateOAuthConnectionCache(ctx, s.redisService, req.ProjectID, req.Provider)
+
 	now := time.Now().UTC()
 	res := &models.OAuthConnectionDetails{
 		ID:             newConnection.ID,
