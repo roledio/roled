@@ -287,3 +287,21 @@ func InvalidateResourceCache(ctx context.Context, redis infra.RedisService, reso
 		log.WithContext(ctx).Warnw("Failed to invalidate resource cache", "error", err, "resource_id", resource.ID, "keys", keys)
 	}
 }
+
+func InvalidateOAuthConnectionCache(ctx context.Context, redis infra.RedisService, projectID, provider string) {
+	if redis == nil {
+		log.WithContext(ctx).Warnw("Redis service is nil, skipping OAuth connection cache invalidation", "project_id", projectID, "provider", provider)
+		return
+	}
+
+	// Invalidate all OAuth connection cache keys
+	keys := []string{
+		rediskeys.OAuthConnectionsByProjectID(projectID),
+		rediskeys.OAuthConnectionByProjectIDAndProvider(projectID, provider),
+	}
+
+	// Delete all cache keys in a single operation
+	if err := redis.DeleteManyWithContext(ctx, keys); err != nil {
+		log.WithContext(ctx).Warnw("Failed to invalidate OAuth connection cache", "error", err, "project_id", projectID, "provider", provider, "keys", keys)
+	}
+}

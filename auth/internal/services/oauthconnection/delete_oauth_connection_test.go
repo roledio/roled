@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.openly.dev/pointy"
 
 	"github.com/roledio/roled/auth/internal/configs"
 	"github.com/roledio/roled/auth/internal/constants"
@@ -17,7 +16,7 @@ import (
 	servicemocks "github.com/roledio/roled/auth/internal/mocks/services"
 )
 
-func TestGetOAuthConnections_Success(t *testing.T) {
+func TestDeleteOAuthConnection_Success(t *testing.T) {
 	ctx := context.Background()
 
 	account := &entities.Account{
@@ -40,35 +39,28 @@ func TestGetOAuthConnections_Success(t *testing.T) {
 	}
 	mockProjectRepo.EXPECT().FindByID(ctx, "proj-123").Return(project, nil)
 
-	connections := []entities.OAuthConnection{
-		{
-			ID:                    "conn-1",
-			ProjectID:             "proj-123",
-			Provider:              "google",
-			ClientID:              pointy.String("client-1"),
-			ClientSecretEncrypted: pointy.String("secret-1"),
-			Scopes:                pointy.String("openid profile email"),
-			Enabled:               true,
-		},
-	}
-	mockOAuthConnectionRepo.EXPECT().FindByProjectID(ctx, "proj-123").Return(connections, nil)
+	mockOAuthConnectionRepo.EXPECT().Delete(ctx, "proj-123", "google").Return(1, nil)
 
-	service := NewOAuthConnectionService(&configs.DefaultConfig{}, mockRegistry, mockRedisService)
+	mockRedisService.EXPECT().
+		DeleteManyWithContext(ctx, []string{
+			"oauth_connection:project:proj-123",
+			"oauth_connection:project:proj-123:provider:google",
+		}).
+		Return(nil)
 
-	req := &models.GetOAuthConnectionsRequest{
+	service := NewOAuthConnectionService(&configs.DefaultConfig{EncryptionMasterKey: "test-key"}, mockRegistry, mockRedisService)
+
+	req := &models.DeleteOAuthConnectionRequest{
 		ProjectID: "proj-123",
+		Provider:  "google",
 	}
 
-	result, err := service.GetOAuthConnections(ctx, req)
+	err := service.DeleteOAuthConnection(ctx, req)
 
 	assert.NoError(t, err)
-	assert.NotNil(t, result)
-	assert.Len(t, result, 1)
-	assert.Equal(t, "conn-1", result[0].ID)
-	assert.Equal(t, "google", result[0].Provider)
 }
 
-func TestGetOAuthConnections_ProjectNotFound(t *testing.T) {
+func TestDeleteOAuthConnection_ProjectNotFound(t *testing.T) {
 	ctx := context.Background()
 
 	account := &entities.Account{
@@ -86,50 +78,20 @@ func TestGetOAuthConnections_ProjectNotFound(t *testing.T) {
 
 	mockProjectRepo.EXPECT().FindByID(ctx, "proj-123").Return(nil, nil)
 
-	service := NewOAuthConnectionService(&configs.DefaultConfig{}, mockRegistry, mockRedisService)
+	service := NewOAuthConnectionService(&configs.DefaultConfig{EncryptionMasterKey: "test-key"}, mockRegistry, mockRedisService)
 
-	req := &models.GetOAuthConnectionsRequest{
+	req := &models.DeleteOAuthConnectionRequest{
 		ProjectID: "proj-123",
+		Provider:  "google",
 	}
 
-	result, err := service.GetOAuthConnections(ctx, req)
+	err := service.DeleteOAuthConnection(ctx, req)
 
 	assert.Error(t, err)
 	assert.Equal(t, errors.ErrProjectNotFound.Msg, err.Error())
-	assert.Nil(t, result)
 }
 
-func TestGetOAuthConnections_ProjectDBError(t *testing.T) {
-	ctx := context.Background()
-
-	account := &entities.Account{
-		ID:       "acc-123",
-		IsSystem: true,
-		IsActive: true,
-	}
-	ctx = context.WithValue(ctx, constants.CtxAccount, account)
-
-	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockRedisService := servicemocks.NewMockRedisService(t)
-
-	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
-
-	mockProjectRepo.EXPECT().FindByID(ctx, "proj-123").Return(nil, assert.AnError)
-
-	service := NewOAuthConnectionService(&configs.DefaultConfig{}, mockRegistry, mockRedisService)
-
-	req := &models.GetOAuthConnectionsRequest{
-		ProjectID: "proj-123",
-	}
-
-	result, err := service.GetOAuthConnections(ctx, req)
-
-	assert.Error(t, err)
-	assert.Nil(t, result)
-}
-
-func TestGetOAuthConnections_ConnectionsDBError(t *testing.T) {
+func TestDeleteOAuthConnection_ConnectionNotFound(t *testing.T) {
 	ctx := context.Background()
 
 	account := &entities.Account{
@@ -152,21 +114,22 @@ func TestGetOAuthConnections_ConnectionsDBError(t *testing.T) {
 	}
 	mockProjectRepo.EXPECT().FindByID(ctx, "proj-123").Return(project, nil)
 
-	mockOAuthConnectionRepo.EXPECT().FindByProjectID(ctx, "proj-123").Return(nil, assert.AnError)
+	mockOAuthConnectionRepo.EXPECT().Delete(ctx, "proj-123", "google").Return(0, nil)
 
-	service := NewOAuthConnectionService(&configs.DefaultConfig{}, mockRegistry, mockRedisService)
+	service := NewOAuthConnectionService(&configs.DefaultConfig{EncryptionMasterKey: "test-key"}, mockRegistry, mockRedisService)
 
-	req := &models.GetOAuthConnectionsRequest{
+	req := &models.DeleteOAuthConnectionRequest{
 		ProjectID: "proj-123",
+		Provider:  "google",
 	}
 
-	result, err := service.GetOAuthConnections(ctx, req)
+	err := service.DeleteOAuthConnection(ctx, req)
 
 	assert.Error(t, err)
-	assert.Nil(t, result)
+	assert.Equal(t, errors.ErrOAuthConnectionNotFound.Msg, err.Error())
 }
 
-func TestGetOAuthConnections_EmptyList(t *testing.T) {
+func TestDeleteOAuthConnection_DBError(t *testing.T) {
 	ctx := context.Background()
 
 	account := &entities.Account{
@@ -189,18 +152,16 @@ func TestGetOAuthConnections_EmptyList(t *testing.T) {
 	}
 	mockProjectRepo.EXPECT().FindByID(ctx, "proj-123").Return(project, nil)
 
-	connections := []entities.OAuthConnection{}
-	mockOAuthConnectionRepo.EXPECT().FindByProjectID(ctx, "proj-123").Return(connections, nil)
+	mockOAuthConnectionRepo.EXPECT().Delete(ctx, "proj-123", "google").Return(0, assert.AnError)
 
-	service := NewOAuthConnectionService(&configs.DefaultConfig{}, mockRegistry, mockRedisService)
+	service := NewOAuthConnectionService(&configs.DefaultConfig{EncryptionMasterKey: "test-key"}, mockRegistry, mockRedisService)
 
-	req := &models.GetOAuthConnectionsRequest{
+	req := &models.DeleteOAuthConnectionRequest{
 		ProjectID: "proj-123",
+		Provider:  "google",
 	}
 
-	result, err := service.GetOAuthConnections(ctx, req)
+	err := service.DeleteOAuthConnection(ctx, req)
 
-	assert.NoError(t, err)
-	assert.NotNil(t, result)
-	assert.Len(t, result, 0)
+	assert.Error(t, err)
 }

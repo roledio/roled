@@ -7,7 +7,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"go.openly.dev/pointy"
 
+	"github.com/roledio/roled/auth/internal/constants"
 	"github.com/roledio/roled/auth/internal/constants/rediskeys"
 	"github.com/roledio/roled/auth/internal/entities"
 	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
@@ -29,9 +31,10 @@ func TestCachedOAuthConnectionRepository_FindByProjectID_CacheHit(t *testing.T) 
 			ID:                    "conn-1",
 			ProjectID:             "proj-123",
 			Provider:              "google",
-			ClientID:              "client-1",
-			ClientSecretEncrypted: "secret-1",
-			Scopes:                "openid profile email",
+			CredentialType:        constants.OAuthCredentialTypeCustom,
+			ClientID:              pointy.String("client-1"),
+			ClientSecretEncrypted: pointy.String("secret-1"),
+			Scopes:                pointy.String("openid profile email"),
 			Enabled:               true,
 		},
 	}
@@ -59,9 +62,10 @@ func TestCachedOAuthConnectionRepository_FindByProjectID_CacheMiss(t *testing.T)
 			ID:                    "conn-1",
 			ProjectID:             "proj-123",
 			Provider:              "google",
-			ClientID:              "client-1",
-			ClientSecretEncrypted: "secret-1",
-			Scopes:                "openid profile email",
+			CredentialType:        constants.OAuthCredentialTypeCustom,
+			ClientID:              pointy.String("client-1"),
+			ClientSecretEncrypted: pointy.String("secret-1"),
+			Scopes:                pointy.String("openid profile email"),
 			Enabled:               true,
 		},
 	}
@@ -106,18 +110,20 @@ func TestCachedOAuthConnectionRepository_FindByProjectID_CacheMissMultipleConnec
 			ID:                    "conn-1",
 			ProjectID:             "proj-123",
 			Provider:              "google",
-			ClientID:              "client-1",
-			ClientSecretEncrypted: "secret-1",
-			Scopes:                "openid profile email",
+			CredentialType:        constants.OAuthCredentialTypeCustom,
+			ClientID:              pointy.String("client-1"),
+			ClientSecretEncrypted: pointy.String("secret-1"),
+			Scopes:                pointy.String("openid profile email"),
 			Enabled:               true,
 		},
 		{
 			ID:                    "conn-2",
 			ProjectID:             "proj-123",
 			Provider:              "github",
-			ClientID:              "client-2",
-			ClientSecretEncrypted: "secret-2",
-			Scopes:                "read:user user:email",
+			CredentialType:        constants.OAuthCredentialTypeCustom,
+			ClientID:              pointy.String("client-2"),
+			ClientSecretEncrypted: pointy.String("secret-2"),
+			Scopes:                pointy.String("read:user user:email"),
 			Enabled:               true,
 		},
 	}
@@ -166,9 +172,10 @@ func TestCachedOAuthConnectionRepository_FindByProjectID_CacheError(t *testing.T
 			ID:                    "conn-1",
 			ProjectID:             "proj-123",
 			Provider:              "google",
-			ClientID:              "client-1",
-			ClientSecretEncrypted: "secret-1",
-			Scopes:                "openid profile email",
+			CredentialType:        constants.OAuthCredentialTypeCustom,
+			ClientID:              pointy.String("client-1"),
+			ClientSecretEncrypted: pointy.String("secret-1"),
+			Scopes:                pointy.String("openid profile email"),
 			Enabled:               true,
 		},
 	}
@@ -241,9 +248,10 @@ func TestCachedOAuthConnectionRepository_FindByProjectID_NilRedis(t *testing.T) 
 			ID:                    "conn-1",
 			ProjectID:             "proj-123",
 			Provider:              "google",
-			ClientID:              "client-1",
-			ClientSecretEncrypted: "secret-1",
-			Scopes:                "openid profile email",
+			CredentialType:        constants.OAuthCredentialTypeCustom,
+			ClientID:              pointy.String("client-1"),
+			ClientSecretEncrypted: pointy.String("secret-1"),
+			Scopes:                pointy.String("openid profile email"),
 			Enabled:               true,
 		},
 	}

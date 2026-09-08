@@ -118,6 +118,13 @@ var routePermissionsMap = map[string][]string{
 	// Project signup role routes
 	constants.RouteUpdateProjectSignupRole: {constants.PermissionUpdateProjects},
 
+	// OAuth connection routes
+	constants.RouteGetOAuthConnections:   {constants.PermissionReadProjects},
+	constants.RouteGetOAuthConnection:    {constants.PermissionReadProjects},
+	constants.RouteCreateOAuthConnection: {constants.PermissionUpdateProjects},
+	constants.RouteUpdateOAuthConnection: {constants.PermissionUpdateProjects},
+	constants.RouteDeleteOAuthConnection: {constants.PermissionDeleteProjects},
+
 	// Client routes
 	constants.RouteGetProjectClients:       {constants.PermissionReadClients},
 	constants.RouteGetProjectClientDetails: {constants.PermissionReadClients},

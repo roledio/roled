@@ -10,8 +10,9 @@ type OAuthConnection struct {
 	UpdatedAt             time.Time `db:"updated_at"`
 	ProjectID             string    `db:"project_id"`
 	Provider              string    `db:"provider"`
-	ClientID              string    `db:"client_id"`
-	ClientSecretEncrypted string    `db:"client_secret_encrypted"`
-	Scopes                string    `db:"scopes"`
+	CredentialType        string    `db:"credential_type"` // default, custom
+	ClientID              *string   `db:"client_id"`
+	ClientSecretEncrypted *string   `db:"client_secret_encrypted"`
+	Scopes                *string   `db:"scopes"`
 	Enabled               bool      `db:"enabled"`
 }

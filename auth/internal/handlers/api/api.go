@@ -111,7 +111,11 @@ func (h *handler) SetupRoutes() {
 	h.protectedGet("/api/v1/projects/:project_id/settings", constants.RouteGetProjectSettings, h.getProjectSettings)
 	h.protectedPut("/api/v1/projects/:project_id/settings", constants.RouteUpdateProjectSettings, h.updateProjectSettings)
 
-	h.protectedGet("/api/v1/projects/:project_id/oauth-connections", constants.RouteGetProjectOAuthConnections, h.getProjectOAuthConnections)
+	h.protectedGet("/api/v1/projects/:project_id/oauth-connections", constants.RouteGetOAuthConnections, h.getOAuthConnections)
+	h.protectedGet("/api/v1/projects/:project_id/oauth-connections/:provider", constants.RouteGetOAuthConnection, h.getOAuthConnectionDetails)
+	h.protectedPost("/api/v1/projects/:project_id/oauth-connections/:provider", constants.RouteCreateOAuthConnection, h.createOAuthConnection)
+	h.protectedPut("/api/v1/projects/:project_id/oauth-connections/:provider", constants.RouteUpdateOAuthConnection, h.updateOAuthConnection)
+	h.protectedDelete("/api/v1/projects/:project_id/oauth-connections/:provider", constants.RouteDeleteOAuthConnection, h.deleteOAuthConnection)
 
 	h.protectedPatch("/api/v1/projects/:project_id/signup-role", constants.RouteUpdateProjectSignupRole, h.updateProjectSignupRole)
 

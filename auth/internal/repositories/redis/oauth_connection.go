@@ -65,3 +65,51 @@ func (r *oAuthConnectionRepository) FindByProjectID(ctx context.Context, project
 
 	return connections, nil
 }
+
+func (r *oAuthConnectionRepository) FindByProjectIDAndProvider(ctx context.Context, projectID, provider string) (*entities.OAuthConnection, error) {
+	cacheKey := rediskeys.OAuthConnectionByProjectIDAndProvider(projectID, provider)
+
+	var conn entities.OAuthConnection
+	found, err := r.redis.GetData(ctx, cacheKey, &conn)
+	if err != nil {
+		log.WithContext(ctx).Warnw("Failed to get OAuth connection from redis cache, falling back to DB", "error", err, "project_id", projectID, "provider", provider)
+	} else if found {
+		return &conn, nil
+	}
+
+	connPtr, err := r.repo.FindByProjectIDAndProvider(ctx, projectID, provider)
+	if err != nil {
+		return nil, err
+	}
+	if connPtr == nil {
+		return nil, nil
+	}
+
+	cacheKeys := []string{
+		cacheKey,
+		rediskeys.OAuthConnectionsByProjectID(projectID),
+	}
+	for _, key := range cacheKeys {
+		if setErr := r.redis.SetData(ctx, key, connPtr, r.ttl); setErr != nil {
+			log.WithContext(ctx).Warnw("Failed to cache OAuth connection in redis",
+				"error", setErr,
+				"project_id", projectID,
+				"provider", provider,
+				"cache_key", key)
+		}
+	}
+
+	return connPtr, nil
+}
+
+func (r *oAuthConnectionRepository) Create(ctx context.Context, connection *entities.OAuthConnection) error {
+	return r.repo.Create(ctx, connection)
+}
+
+func (r *oAuthConnectionRepository) Update(ctx context.Context, connection *entities.OAuthConnection) (int, error) {
+	return r.repo.Update(ctx, connection)
+}
+
+func (r *oAuthConnectionRepository) Delete(ctx context.Context, projectID, provider string) (int, error) {
+	return r.repo.Delete(ctx, projectID, provider)
+}

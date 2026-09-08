@@ -135,12 +135,12 @@ Roled is a centralized User & Role Management Platform with two main sub-project
 
 ### 2.4 Component Patterns
 
-- **Page components** receive typed props: `{ httpClient: HttpClient }` or `{ httpClient, tokenService }` — service deps are injected, NOT imported directly. Example: [Projects.tsx](file:///home/muhammad/Workspace/github/roledio/roled/console/src/pages/projects/Projects.tsx#L35-L37).
-- **Hooks are thin wrappers** around TanStack Query. Accept options bag with `httpClient` + `baseUrl` + domain IDs, return immutable `{ data, isLoading, error }` or domain-specific shape. Pattern: [useProject](file:///home/muhammad/Workspace/github/roledio/roled/console/src/hooks/projects/index.ts#L7-L18).
+- **Page components** receive typed props: `{ httpClient: HttpClient }` or `{ httpClient, tokenService }` — service deps are injected, NOT imported directly. Example: [Projects.tsx](console/src/pages/projects/Projects.tsx#L35-L37).
+- **Hooks are thin wrappers** around TanStack Query. Accept options bag with `httpClient` + `baseUrl` + domain IDs, return immutable `{ data, isLoading, error }` or domain-specific shape. Pattern: [useProject](console/src/hooks/projects/index.ts#L7-L18).
 - **Query keys**: `['resource', idOrObj]` — tuple first element is string domain key, second is stable identity object/string.
   - Examples: `['projects', { search, filter, pageNum, pageSize, sortBy, sortDir }]`, `['project', projectId]`, `['currentTokenInfo']`.
 - **Mutation lifecycle**: Always invalidate relevant query keys in `onSuccess`. Use `toast` for user feedback on both success and error.
-- **Code splitting**: Secondary tabs are `React.lazy(() => import('./tabs/XxxTab'))` wrapped in `<Suspense>`. See [ProjectDetails.tsx](file:///home/muhammad/Workspace/github/roledio/roled/console/src/pages/projects/details/ProjectDetails.tsx#L11-L15).
+- **Code splitting**: Secondary tabs are `React.lazy(() => import('./tabs/XxxTab'))` wrapped in `<Suspense>`. See [ProjectDetails.tsx](console/src/pages/projects/details/ProjectDetails.tsx#L11-L15).
 - **Stable IDs**: Every interactive element gets a meaningful `aria-label` and often `data-testid` in loading/error states.
 
 ### 2.5 State & URL Synchronization
@@ -149,12 +149,12 @@ Roled is a centralized User & Role Management Platform with two main sub-project
   - Initialize state from `useSearchParams()` on mount via `useEffect(..., [])`.
   - Debounce search input (300 ms) into the "real" search state that drives the query.
   - Any filter change that affects server results → reset `pageNum` to 1.
-  - `saveProjectsParams(location.search)` into `paramsStore` (sessionStorage) so the back-button can restore list state when returning from Details → New → List. See pattern in [Projects.tsx](file:///home/muhammad/Workspace/github/roledio/roled/console/src/pages/projects/Projects.tsx#L60-L92).
+  - `saveProjectsParams(location.search)` into `paramsStore` (sessionStorage) so the back-button can restore list state when returning from Details → New → List. See pattern in [Projects.tsx](console/src/pages/projects/Projects.tsx#L60-L92).
 - **ProjectDetails tabs**: Each tab saves its own params (excluding `tab=`) into `saveProjectTabParams(projectId, tabName, searchStr)` and restores via `getProjectTabParams` on tab switch.
 
 ### 2.6 Services Layer (HTTP)
 
-- Three core services: `HttpClient`, `TokenService`, `ConfigService`, `AuthService` are instantiated once at the root `App.tsx` via `useMemo` and threaded as props. See [App.tsx](file:///home/muhammad/Workspace/github/roledio/roled/console/src/App.tsx#L35-L39).
+- Three core services: `HttpClient`, `TokenService`, `ConfigService`, `AuthService` are instantiated once at the root `App.tsx` via `useMemo` and threaded as props. See [App.tsx](console/src/App.tsx#L35-L39).
 - **Domain service file** (`services/projects/projects.ts`): One async function per HTTP verb/endpoint. Signature convention:
 
   ```ts
@@ -171,7 +171,7 @@ Roled is a centralized User & Role Management Platform with two main sub-project
 
 ### 2.7 Forms & Validation
 
-- Client-side validation: dedicated pure `validateProjectForm(...)` in [lib/validation.ts](file:///home/muhammad/Workspace/github/roledio/roled/console/src/lib/validation.ts) that returns `{ isValid, errors: { name, description, … }, rowErrors? }`.
+- Client-side validation: dedicated pure `validateProjectForm(...)` in [lib/validation.ts](console/src/lib/validation.ts) that returns `{ isValid, errors: { name, description, … }, rowErrors? }`.
 - `*Touched` state toggled `onBlur` + first `onChange`. Only show error visuals when field is touched.
 - Add `aria-invalid`, `aria-describedby` for a11y.
 - Add destructive "confirm by typing name" flow using `ConfirmDialog` + extra `<Input>` when deleting critical resources (projects, clients). See Projects.tsx `removeTarget` + `confirmName`.
@@ -247,10 +247,10 @@ Registry (decorator composition)
 
 - **Request models** in `internal/models/<domain>.go` structs use **three tag types**:
   - `uri:"field"` for path params
-  - `query:"field"` for querystring
+  - `query:"field"` for query string
   - `json:"field"` for JSON body
   - `validate:"required,notblank,max=50,uri,omitempty,dive"` for validator v10
-  - Example: [models/project.go](file:///home/muhammad/Workspace/github/roledio/roled/auth/internal/models/project.go#L9-L66)
+  - Example: [models/project.go](auth/internal/models/project.go#L9-L66)
 - Response DTOs — the same file. Use pointer types for optional fields, slice + struct for nested.
 - Pagination: every list request embeds `models.PageRequest` (which has `SetDefaults()`, `Offset()`, `Limit()`).
 
@@ -260,25 +260,25 @@ Registry (decorator composition)
 - **Soft delete**: Use `UPDATE SET deleted_at = NOW(4)` never `DELETE FROM`. Every SELECT has `WHERE deleted_at IS NULL`.
 - **Naming conventions**: snake_case columns mirror struct fields via `db:` tags.
 - **Write helpers in mariadb package**:
-  - `namedExecOne(ctx, qx, query, struct)` — `sqlx.NamedExecContext` + asserts exactly 1 row affected (panics otherwise for update/delete single).
-  - `execOne(ctx, qx, query, args…)` — positional variant.
+  - Write operation methods in repository implementations should leverage the helper function `exec`, `execOne`, `namedExec`, or `namedExecOne`. Delete and update methods should use `(int, error)` as return type.
+  - `execOne` and `namedExecOne` will assert exactly 1 row affected (error `ErrAffectedGreaterThanOne` will be returned if more than 1 row is affected). Use these methods when it is expected that only one row will be affected.
 - **Squirrel for reads**: Use `sq.SelectBuilder`, `sq.Eq/Like/GtOrEq`, `ToSql()`. For fixed/simple queries prefer raw string + GetContext/SelectContext.
-- **Sort whitelist**: Map sortBy string to allowed DB column; default fallback to `created_at DESC` to avoid SQLi.
+- **Sort whitelist**: Map sortBy string to allowed DB column; default fallback to `created_at DESC` to avoid SQL injection.
 
 ### 3.6 Registry, Transactions & Cache Decorators
 
-- `Registry.Tx(fn)` wraps work in a `*sqlx.Tx` and re-creates the registry with the tx as `QueryExecutor`. Rollback happens if fn returns non-nil. **All multi-entity writes must go through Tx**.
+- `Registry.Tx(fn)` wraps work in a `*sqlx.Tx` and re-creates the registry with the tx as `QueryExecutor`. Rollback happens if fn returns non-nil. **All multi-entity writes must go through Tx** in the service layer. When writing to multiple tables, ensure all writes are part of the same transaction.
 - Cache-aside in redis repos:
-  - Read pattern: try `redis.Get` by key → on miss call underlying mariadb → `redis.Set` with TTL → return.
-  - Write pattern: always write to DB in service, then **always invalidate** via `shared.Invalidate*Cache` (NOT write-through).
-  - TTL comes from `config.CacheDefaultTTLDuration`.
-- Repository lookup in registry: constructor returns `mariadb` instance, then if redis is enabled, wraps in `redis.<Name>CacheRepository`. This is done once per accessor — see [registry.go](file:///home/muhammad/Workspace/github/roledio/roled/auth/internal/repositories/registry.go#L98-L248).
+  - Read pattern: try `redis.Get` by key → on miss call underlying mariadb → `redis.Set` with TTL → return. Also set to redis for other possible lookup keys available for the entity.
+  - Write pattern: always write to DB in service, then **always invalidate** via `shared.Invalidate*Cache` (NOT write-through). No cache invalidation should be done in the repository layer to avoid unexpected cache miss when transaction is rolled back.
+  - Unless mentioned otherwise, TTL comes from `config.CacheDefaultTTLDuration`.
+- Repository lookup in registry: constructor returns `mariadb` instance, then if redis is enabled, wraps in `redis.<Name>Repository`. This is done once per accessor — see [registry.go](auth/internal/repositories/registry.go#L98-L248).
 - **After every service mutation**, explicit `shared.InvalidateXxxCache(ctx, s.redis, entity)`. If you forget, stale data will persist for TTL.
 
 ### 3.7 Error Handling
 
 - **Always** use `pkg/errors.CustomError`. The generic sentinels in `pkg/errors/` are `ErrSystemError`, `ErrInvalidParams`, `ErrInvalidAuthorizationToken`, `ErrInsufficientPermission`, etc. — wrap with `.WithError(err)` to attach cause.
-- Domain-specific errors live in `internal/errors/<domain>.go`. Examples: [errors/project.go](file:///home/muhammad/Workspace/github/roledio/roled/auth/internal/errors/project.go).
+- Domain-specific errors live in `internal/errors/<domain>.go`. Examples: [errors/project.go](auth/internal/errors/project.go).
 - In handlers, never `fmt.Errorf` — use the correct CustomError. `responseutil.SendError(c, err)` matches via `errors.As` and sends the correct HTTP code + JSON shape `{ success: false, error: { code, message, debug? } }`.
 - Logging pattern on error: `log.WithContext(ctx).Errorw("human description of failure", "error", err, "extra_field", value)` — then return the error. This preserves request correlation (request-id, user, etc.) set by RequestLogger middleware keys.
 
