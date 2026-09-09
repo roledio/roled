@@ -22,6 +22,7 @@ func TestAuthorizeService_RenderAuthorize_Success(t *testing.T) {
 	mockProjectSettingRepo := repositorymocks.NewMockProjectSettingRepository(t)
 	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
 	mockRedirectURIRepo := repositorymocks.NewMockRedirectURIRepository(t)
+	mockOAuthConnectionRepo := repositorymocks.NewMockOAuthConnectionRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)
@@ -29,6 +30,8 @@ func TestAuthorizeService_RenderAuthorize_Success(t *testing.T) {
 	mockRegistry.EXPECT().ProjectSettingRepository().Return(mockProjectSettingRepo)
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
 	mockRegistry.EXPECT().RedirectURIRepository().Return(mockRedirectURIRepo)
+	mockRegistry.EXPECT().OAuthConnectionRepository().Return(mockOAuthConnectionRepo)
+
 	// Mock client found
 	client := &entities.Client{
 		ID:        "test-client",
@@ -64,6 +67,9 @@ func TestAuthorizeService_RenderAuthorize_Success(t *testing.T) {
 		IsActive: true,
 	}
 	mockAccountRepo.EXPECT().FindByID(ctx, "test-account").Return(account, nil)
+
+	// Mock oauth connection not found
+	mockOAuthConnectionRepo.EXPECT().FindByProjectID(ctx, "test-project").Return(nil, nil)
 
 	// Create service
 	defaultConfig := configs.DefaultConfig{}
