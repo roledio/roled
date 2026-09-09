@@ -22,21 +22,28 @@ func (r *userIdentityRepository) Create(ctx context.Context, userIdentity *entit
 				id,
 				user_id,
 				provider,
-				provider_user_id
+				provider_user_id,
+				project_id
 			) VALUES (
 				:id,
 				:user_id,
 				:provider,
-				:provider_user_id
+				:provider_user_id,
+				:project_id
 			)`
 	_, err := r.qx.NamedExecContext(ctx, q, userIdentity)
 	return err
 }
 
-func (r *userIdentityRepository) FindByProviderAndProviderUserID(ctx context.Context, provider, providerUserID string) (*entities.UserIdentity, error) {
-	var q = "SELECT * FROM user_identities WHERE provider = ? AND provider_user_id = ? AND deleted_at IS NULL LIMIT 1"
+func (r *userIdentityRepository) FindByProviderAndProviderUserIDAndProjectID(ctx context.Context, provider, providerUserID, projectID string) (*entities.UserIdentity, error) {
+	var q = `SELECT * FROM user_identities 
+		WHERE provider = ? 
+		AND provider_user_id = ? 
+		AND project_id = ? 
+		AND deleted_at IS NULL 
+		LIMIT 1`
 	var userIdentity entities.UserIdentity
-	err := r.qx.GetContext(ctx, &userIdentity, q, provider, providerUserID)
+	err := r.qx.GetContext(ctx, &userIdentity, q, provider, providerUserID, projectID)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, nil
 	}

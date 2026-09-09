@@ -32,8 +32,8 @@ func (r *userIdentityRepository) Create(ctx context.Context, userIdentity *entit
 	return r.repo.Create(ctx, userIdentity)
 }
 
-func (r *userIdentityRepository) FindByProviderAndProviderUserID(ctx context.Context, provider, providerUserID string) (*entities.UserIdentity, error) {
-	cacheKey := rediskeys.UserIdentityByProviderAndProviderUserID(provider, providerUserID)
+func (r *userIdentityRepository) FindByProviderAndProviderUserIDAndProjectID(ctx context.Context, provider, providerUserID, projectID string) (*entities.UserIdentity, error) {
+	cacheKey := rediskeys.UserIdentityByProviderAndProviderUserIDAndProjectID(provider, providerUserID, projectID)
 	var userIdentity entities.UserIdentity
 
 	found, err := r.redis.GetData(ctx, cacheKey, &userIdentity)
@@ -43,7 +43,7 @@ func (r *userIdentityRepository) FindByProviderAndProviderUserID(ctx context.Con
 		return &userIdentity, nil
 	}
 
-	userIdentityPtr, err := r.repo.FindByProviderAndProviderUserID(ctx, provider, providerUserID)
+	userIdentityPtr, err := r.repo.FindByProviderAndProviderUserIDAndProjectID(ctx, provider, providerUserID, projectID)
 	if err != nil {
 		return nil, err
 	}

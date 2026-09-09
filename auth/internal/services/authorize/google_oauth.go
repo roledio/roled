@@ -150,7 +150,8 @@ func (s *authorizeService) HandleGoogleOAuthCallback(ctx context.Context, req *m
 		userRepo := registry.UserRepository()
 
 		// Check if user identity already exists
-		userIdentity, err := userIdentityRepo.FindByProviderAndProviderUserID(ctx, googleProvider, googleUserInfo.Sub)
+		userIdentity, err := userIdentityRepo.FindByProviderAndProviderUserIDAndProjectID(
+			ctx, googleProvider, googleUserInfo.Sub, project.ID)
 		if err != nil {
 			log.WithContext(ctx).Errorw("Failed to find user identity", "error", err)
 			return pkgerrors.ErrSystemError.WithError(err)
@@ -223,6 +224,7 @@ func (s *authorizeService) createOrUpdateUserFromGoogle(ctx context.Context, reg
 			UserID:         existingUser.ID,
 			Provider:       googleProvider,
 			ProviderUserID: googleUserInfo.Sub,
+			ProjectID:      project.ID,
 		}
 		err = userIdentityRepo.Create(ctx, userIdentity)
 		if err != nil {
@@ -295,6 +297,7 @@ func (s *authorizeService) createOrUpdateUserFromGoogle(ctx context.Context, reg
 		UserID:         user.ID,
 		Provider:       googleProvider,
 		ProviderUserID: googleUserInfo.Sub,
+		ProjectID:      project.ID,
 	}
 	err = userIdentityRepo.Create(ctx, userIdentity)
 	if err != nil {

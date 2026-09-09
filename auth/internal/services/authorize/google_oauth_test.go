@@ -585,7 +585,8 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_ExistingIdentity(t *
 		Provider:       "google",
 		ProviderUserID: "google-sub-123",
 	}
-	mockUserIdentityRepo.EXPECT().FindByProviderAndProviderUserID(ctx, "google", "google-sub-123").Return(userIdentity, nil)
+	mockUserIdentityRepo.EXPECT().FindByProviderAndProviderUserIDAndProjectID(
+		ctx, "google", "google-sub-123", "test-project").Return(userIdentity, nil)
 
 	user := &entities.User{
 		ID:        "user-1",
@@ -739,7 +740,8 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_NewUser_SystemProjec
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
 
 	// User identity not found
-	mockUserIdentityRepo.EXPECT().FindByProviderAndProviderUserID(ctx, "google", "google-sub-456").Return(nil, nil)
+	mockUserIdentityRepo.EXPECT().FindByProviderAndProviderUserIDAndProjectID(
+		ctx, "google", "google-sub-456", "system-project").Return(nil, nil)
 	// User by email not found
 	mockUserRepo.EXPECT().FindByProjectIDAndEmail(ctx, "system-project", "newgoogleuser@gmail.com").Return(nil, nil)
 	// Create account for system project
@@ -900,7 +902,8 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_NewUser_NonSystemPro
 	mockRegistry.EXPECT().AuthCodeRepository().Return(mockAuthCodeRepo)
 
 	// User identity not found
-	mockUserIdentityRepo.EXPECT().FindByProviderAndProviderUserID(ctx, "google", "google-sub-non-system").Return(nil, nil)
+	mockUserIdentityRepo.EXPECT().FindByProviderAndProviderUserIDAndProjectID(
+		ctx, "google", "google-sub-non-system", "project-1").Return(nil, nil)
 	// User by email not found
 	mockUserRepo.EXPECT().FindByProjectIDAndEmail(ctx, "project-1", "nonsystemuser@gmail.com").Return(nil, nil)
 	// Find project account
@@ -1048,7 +1051,8 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_UserExistsByEmail(t 
 	mockRegistry.EXPECT().AuthCodeRepository().Return(mockAuthCodeRepo)
 
 	// User identity not found
-	mockUserIdentityRepo.EXPECT().FindByProviderAndProviderUserID(ctx, "google", "google-sub-789").Return(nil, nil)
+	mockUserIdentityRepo.EXPECT().FindByProviderAndProviderUserIDAndProjectID(
+		ctx, "google", "google-sub-789", "test-project").Return(nil, nil)
 
 	// User found by email
 	existingUser := &entities.User{
@@ -1421,7 +1425,8 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_UserInactive(t *testing.T) {
 		Provider:       "google",
 		ProviderUserID: "google-sub-123",
 	}
-	mockUserIdentityRepo.EXPECT().FindByProviderAndProviderUserID(ctx, "google", "google-sub-123").Return(userIdentity, nil)
+	mockUserIdentityRepo.EXPECT().FindByProviderAndProviderUserIDAndProjectID(
+		ctx, "google", "google-sub-123", "test-project").Return(userIdentity, nil)
 
 	user := &entities.User{
 		ID:        "user-1",

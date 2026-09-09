@@ -9,6 +9,7 @@ type UserIdentity struct {
 	CreatedAt      time.Time  `db:"created_at"`
 	UpdatedAt      time.Time  `db:"updated_at"`
 	DeletedAt      *time.Time `db:"deleted_at"`
+	ProjectID      string     `db:"project_id"`
 	UserID         string     `db:"user_id"`
 	Provider       string     `db:"provider"`
 	ProviderUserID string     `db:"provider_user_id"`
