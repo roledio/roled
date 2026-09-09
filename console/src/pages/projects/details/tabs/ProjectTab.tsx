@@ -21,6 +21,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { useProject, useProjectClients } from '@/hooks/projects';
 import { useToast } from '@/hooks/use-toast';
+import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard';
 import { formatDate } from '@/lib/date';
 import logger from '@/lib/logger';
 import { saveProjectTabParams } from '@/lib/paramsStore';
@@ -96,25 +97,7 @@ export default function ProjectTab({ httpClient, project: projectProp }: Props) 
     const [showUploadDialog, setShowUploadDialog] = useState(false);
     const [selectedLogoFile, setSelectedLogoFile] = useState<File | null>(null);
     const { toast } = useToast();
-    const [copiedId, setCopiedId] = useState<string | null>(null);
-
-    const handleCopy = async (id: string) => {
-        try {
-            await navigator.clipboard.writeText(id);
-            setCopiedId(id);
-            toast({
-                title: 'Copied',
-                description: 'Client ID copied to clipboard',
-            });
-            setTimeout(() => setCopiedId(null), 1500);
-        } catch (err) {
-            toast({
-                title: 'Copy failed',
-                description: 'Failed to copy client ID to clipboard',
-                variant: 'destructive',
-            });
-        }
-    };
+    const { copiedId, handleCopy } = useCopyToClipboard();
     const inputUploadRef = React.useRef<HTMLInputElement | null>(null);
     const [logoUrl, setLogoUrl] = useState<string | null>(null);
     const [removeClient, setRemoveClient] = useState<any | null>(null);
@@ -654,10 +637,10 @@ export default function ProjectTab({ httpClient, project: projectProp }: Props) 
                                                         size="sm"
                                                         variant="ghost"
                                                         className="h-6 w-6 p-0 hover:bg-muted shrink-0"
-                                                        onClick={() => handleCopy(c.id)}
+                                                        onClick={() => handleCopy(c.id, 'Client ID')}
                                                         aria-label={`Copy client ID for ${c.name}`}
                                                     >
-                                                        {copiedId === c.id ? (
+                                                        {copiedId === 'Client ID' ? (
                                                             <Check className="h-3.5 w-3.5 text-green-500 animate-in fade-in zoom-in duration-200" />
                                                         ) : (
                                                             <Copy className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />

@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard';
 import { getProjectTabParams } from '@/lib/paramsStore';
 import { cn } from '@/lib/utils';
 import {
@@ -23,7 +24,7 @@ import {
   updateOAuthConnection,
 } from '@/services/projects';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AlertCircle, ArrowLeft, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Copy, Check, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
@@ -162,6 +163,8 @@ export default function SocialConnectionDetails({ httpClient }: Props) {
   const [clientIdTouched, setClientIdTouched] = useState(false);
   const [clientSecretTouched, setClientSecretTouched] = useState(false);
   const [scopesTouched, setScopesTouched] = useState(false);
+
+  const { copiedId, handleCopy } = useCopyToClipboard();
 
   // Populate form once connection data arrives
   useEffect(() => {
@@ -496,6 +499,37 @@ export default function SocialConnectionDetails({ httpClient }: Props) {
                     {validation.errors.scopes}
                   </p>
                 )}
+              </div>
+
+              {/* Redirect URI */}
+              <div className="col-span-4 flex flex-col justify-center">
+                <Label htmlFor="oauth-redirect-uri">Redirect URI</Label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Add this URL to your {providerConfig.name} OAuth application settings.
+                </p>
+              </div>
+              <div className="col-span-8">
+                <div className="relative">
+                  <Input
+                    id="oauth-redirect-uri"
+                    value={`${AUTH_BASE_URL}/oauth/google/callback`}
+                    readOnly
+                    className="select-text pr-10"
+                    onFocus={(e) => e.target.select()}
+                  />
+                  <button
+                    type="button"
+                    aria-label="Copy redirect URI"
+                    onClick={() => handleCopy(`${AUTH_BASE_URL}/oauth/google/callback`, 'Redirect URI')}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded text-sm text-muted-foreground hover:bg-muted/5 transition-colors"
+                  >
+                    {copiedId === 'Redirect URI' ? (
+                      <Check className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
               </div>
             </>
           )}

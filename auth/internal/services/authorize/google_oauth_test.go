@@ -17,17 +17,28 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"go.openly.dev/pointy"
 	"golang.org/x/oauth2"
 
 	"github.com/roledio/roled/auth/internal/configs"
+	"github.com/roledio/roled/auth/internal/constants"
 	"github.com/roledio/roled/auth/internal/entities"
 	autherrors "github.com/roledio/roled/auth/internal/errors"
 	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
 	servicemocks "github.com/roledio/roled/auth/internal/mocks/services"
 	"github.com/roledio/roled/auth/internal/models"
 	"github.com/roledio/roled/auth/internal/repositories"
+	"github.com/roledio/roled/auth/pkg/utils/encryptionutil"
 )
+
+// Helper function to encrypt a client secret for testing
+func encryptClientSecret(t *testing.T, secret string, masterKey string) string {
+	purpose := constants.KeyPurposeOAuthClientSecret
+	derivedKey, err := encryptionutil.DeriveKey([]byte(masterKey), purpose)
+	assert.NoError(t, err)
+	encrypted, err := encryptionutil.EncryptAES(secret, derivedKey, purpose)
+	assert.NoError(t, err)
+	return encrypted
+}
 
 func createMockOIDCServer(t *testing.T, privateKey *rsa.PrivateKey) string {
 	var server *httptest.Server
@@ -254,6 +265,7 @@ func TestAuthorizeService_InitiateGoogleOAuth_Success(t *testing.T) {
 	mockProjectSettingRepo := repositorymocks.NewMockProjectSettingRepository(t)
 	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
 	mockRedirectURIRepo := repositorymocks.NewMockRedirectURIRepository(t)
+	mockOAuthConnRepo := repositorymocks.NewMockOAuthConnectionRepository(t)
 	mockRedisService := servicemocks.NewMockRedisService(t)
 
 	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)
@@ -261,6 +273,7 @@ func TestAuthorizeService_InitiateGoogleOAuth_Success(t *testing.T) {
 	mockRegistry.EXPECT().ProjectSettingRepository().Return(mockProjectSettingRepo)
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
 	mockRegistry.EXPECT().RedirectURIRepository().Return(mockRedirectURIRepo)
+	mockRegistry.EXPECT().OAuthConnectionRepository().Return(mockOAuthConnRepo)
 
 	client := &entities.Client{
 		ID:        "test-client",
@@ -293,15 +306,24 @@ func TestAuthorizeService_InitiateGoogleOAuth_Success(t *testing.T) {
 	}
 	mockAccountRepo.EXPECT().FindByID(ctx, "test-account").Return(account, nil)
 
+	oauthConn := &entities.OAuthConnection{
+		ProjectID:             "test-project",
+		Provider:              "google",
+		Enabled:               true,
+		ClientID:              new("google-client-id"),
+		ClientSecretEncrypted: new(encryptClientSecret(t, "google-client-secret", "test-master-key-32-bytes-long!!")),
+		Scopes:                new("openid email profile"),
+		CredentialType:        "custom",
+	}
+	mockOAuthConnRepo.EXPECT().FindByProjectIDAndProvider(ctx, "test-project", "google").Return(oauthConn, nil)
+
 	mockRedisService.EXPECT().SetData(ctx, mock.MatchedBy(func(key string) bool {
 		return len(key) > 0
 	}), mock.AnythingOfType("*models.GoogleOAuthTransaction"), 10*time.Minute).Return(nil)
 
 	defaultConfig := configs.DefaultConfig{}
-	defaultConfig.GoogleOAuth.ClientID = "google-client-id"
-	defaultConfig.GoogleOAuth.ClientSecret = "google-client-secret"
-	defaultConfig.GoogleOAuth.RedirectURI = "http://localhost:8082/oauth/google/callback"
-
+	defaultConfig.BaseURL = "http://localhost:3000"
+	defaultConfig.EncryptionMasterKey = "test-master-key-32-bytes-long!!"
 	service := NewAuthorizeService(&defaultConfig, mockRegistry, mockRedisService, nil)
 
 	req := &models.GoogleOAuthRequest{
@@ -361,6 +383,7 @@ func TestAuthorizeService_InitiateGoogleOAuth_RedisError(t *testing.T) {
 	mockProjectSettingRepo := repositorymocks.NewMockProjectSettingRepository(t)
 	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
 	mockRedirectURIRepo := repositorymocks.NewMockRedirectURIRepository(t)
+	mockOAuthConnRepo := repositorymocks.NewMockOAuthConnectionRepository(t)
 	mockRedisService := servicemocks.NewMockRedisService(t)
 
 	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)
@@ -368,6 +391,7 @@ func TestAuthorizeService_InitiateGoogleOAuth_RedisError(t *testing.T) {
 	mockRegistry.EXPECT().ProjectSettingRepository().Return(mockProjectSettingRepo)
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
 	mockRegistry.EXPECT().RedirectURIRepository().Return(mockRedirectURIRepo)
+	mockRegistry.EXPECT().OAuthConnectionRepository().Return(mockOAuthConnRepo)
 
 	client := &entities.Client{
 		ID:        "test-client",
@@ -400,9 +424,22 @@ func TestAuthorizeService_InitiateGoogleOAuth_RedisError(t *testing.T) {
 	}
 	mockAccountRepo.EXPECT().FindByID(ctx, "test-account").Return(account, nil)
 
+	oauthConn := &entities.OAuthConnection{
+		ProjectID:             "test-project",
+		Provider:              "google",
+		Enabled:               true,
+		ClientID:              new("google-client-id"),
+		ClientSecretEncrypted: new(encryptClientSecret(t, "google-client-secret", "test-master-key-32-bytes-long!!")),
+		Scopes:                new("openid email profile"),
+		CredentialType:        "custom",
+	}
+	mockOAuthConnRepo.EXPECT().FindByProjectIDAndProvider(ctx, "test-project", "google").Return(oauthConn, nil)
+
 	mockRedisService.EXPECT().SetData(ctx, mock.Anything, mock.Anything, 10*time.Minute).Return(assert.AnError)
 
 	defaultConfig := configs.DefaultConfig{}
+	defaultConfig.BaseURL = "http://localhost:3000"
+	defaultConfig.EncryptionMasterKey = "test-master-key-32-bytes-long!!"
 	service := NewAuthorizeService(&defaultConfig, mockRegistry, mockRedisService, nil)
 
 	req := &models.GoogleOAuthRequest{
@@ -432,6 +469,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_ExistingIdentity(t *
 	mockProjectSettingRepo := repositorymocks.NewMockProjectSettingRepository(t)
 	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
 	mockRedirectURIRepo := repositorymocks.NewMockRedirectURIRepository(t)
+	mockOAuthConnRepo := repositorymocks.NewMockOAuthConnectionRepository(t)
 	mockUserIdentityRepo := repositorymocks.NewMockUserIdentityRepository(t)
 	mockUserRepo := repositorymocks.NewMockUserRepository(t)
 	mockAuthCodeRepo := repositorymocks.NewMockAuthCodeRepository(t)
@@ -487,6 +525,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_ExistingIdentity(t *
 	mockRegistry.EXPECT().ProjectSettingRepository().Return(mockProjectSettingRepo)
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
 	mockRegistry.EXPECT().RedirectURIRepository().Return(mockRedirectURIRepo)
+	mockRegistry.EXPECT().OAuthConnectionRepository().Return(mockOAuthConnRepo)
 
 	client := &entities.Client{
 		ID:        "test-client",
@@ -519,6 +558,17 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_ExistingIdentity(t *
 	}
 	mockAccountRepo.EXPECT().FindByID(ctx, "test-account").Return(account, nil)
 
+	oauthConn := &entities.OAuthConnection{
+		ProjectID:             "test-project",
+		Provider:              "google",
+		Enabled:               true,
+		ClientID:              new("google-client-id"),
+		ClientSecretEncrypted: new(encryptClientSecret(t, "google-client-secret", "test-master-key-32-bytes-long!!")),
+		Scopes:                new("openid email profile"),
+		CredentialType:        "custom",
+	}
+	mockOAuthConnRepo.EXPECT().FindByProjectIDAndProvider(ctx, "test-project", "google").Return(oauthConn, nil)
+
 	mockRegistry.EXPECT().Tx(mock.AnythingOfType("func(repositories.Registry) error")).RunAndReturn(func(fn func(repositories.Registry) error) error {
 		return fn(mockRegistry)
 	})
@@ -538,7 +588,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_ExistingIdentity(t *
 	user := &entities.User{
 		ID:        "user-1",
 		AccountID: "test-account",
-		Email:     pointy.String("testuser@gmail.com"),
+		Email:     new("testuser@gmail.com"),
 		IsActive:  true,
 	}
 	mockUserRepo.EXPECT().FindByID(ctx, "user-1").Return(user, nil)
@@ -546,6 +596,8 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_ExistingIdentity(t *
 
 	defaultConfig := configs.DefaultConfig{}
 	defaultConfig.JWT.AuthCodeExpiryDuration = "1m"
+	defaultConfig.BaseURL = "http://localhost:3000"
+	defaultConfig.EncryptionMasterKey = "test-master-key-32-bytes-long!!"
 	service := NewAuthorizeService(&defaultConfig, mockRegistry, mockRedisService, nil)
 
 	req := &models.GoogleOAuthCallbackRequest{
@@ -570,6 +622,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_NewUser_SystemProjec
 	mockProjectSettingRepo := repositorymocks.NewMockProjectSettingRepository(t)
 	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
 	mockRedirectURIRepo := repositorymocks.NewMockRedirectURIRepository(t)
+	mockOAuthConnRepo := repositorymocks.NewMockOAuthConnectionRepository(t)
 	mockUserIdentityRepo := repositorymocks.NewMockUserIdentityRepository(t)
 	mockUserRepo := repositorymocks.NewMockUserRepository(t)
 	mockUserRoleRepo := repositorymocks.NewMockUserRoleRepository(t)
@@ -624,6 +677,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_NewUser_SystemProjec
 	mockRegistry.EXPECT().ProjectSettingRepository().Return(mockProjectSettingRepo)
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
 	mockRegistry.EXPECT().RedirectURIRepository().Return(mockRedirectURIRepo)
+	mockRegistry.EXPECT().OAuthConnectionRepository().Return(mockOAuthConnRepo)
 
 	client := &entities.Client{
 		ID:        "test-client",
@@ -660,6 +714,17 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_NewUser_SystemProjec
 	}
 	mockAccountRepo.EXPECT().FindByID(ctx, "system-account").Return(account, nil)
 
+	oauthConn := &entities.OAuthConnection{
+		ProjectID:             "system-project",
+		Provider:              "google",
+		Enabled:               true,
+		ClientID:              new("google-client-id"),
+		ClientSecretEncrypted: new(encryptClientSecret(t, "google-client-secret", "test-master-key-32-bytes-long!!")),
+		Scopes:                new("openid email profile"),
+		CredentialType:        "custom",
+	}
+	mockOAuthConnRepo.EXPECT().FindByProjectIDAndProvider(ctx, "system-project", "google").Return(oauthConn, nil)
+
 	mockRegistry.EXPECT().Tx(mock.AnythingOfType("func(repositories.Registry) error")).RunAndReturn(func(fn func(repositories.Registry) error) error {
 		return fn(mockRegistry)
 	})
@@ -669,6 +734,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_NewUser_SystemProjec
 	mockRegistry.EXPECT().UserRoleRepository().Return(mockUserRoleRepo)
 	mockRegistry.EXPECT().MemberRepository().Return(mockMemberRepo)
 	mockRegistry.EXPECT().AuthCodeRepository().Return(mockAuthCodeRepo)
+	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
 
 	// User identity not found
 	mockUserIdentityRepo.EXPECT().FindByProviderAndProviderUserID(ctx, "google", "google-sub-456").Return(nil, nil)
@@ -689,6 +755,8 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_NewUser_SystemProjec
 
 	defaultConfig := configs.DefaultConfig{}
 	defaultConfig.JWT.AuthCodeExpiryDuration = "1m"
+	defaultConfig.BaseURL = "http://localhost:3000"
+	defaultConfig.EncryptionMasterKey = "test-master-key-32-bytes-long!!"
 	service := NewAuthorizeService(&defaultConfig, mockRegistry, mockRedisService, nil)
 
 	req := &models.GoogleOAuthCallbackRequest{
@@ -713,6 +781,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_NewUser_NonSystemPro
 	mockProjectSettingRepo := repositorymocks.NewMockProjectSettingRepository(t)
 	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
 	mockRedirectURIRepo := repositorymocks.NewMockRedirectURIRepository(t)
+	mockOAuthConnRepo := repositorymocks.NewMockOAuthConnectionRepository(t)
 	mockUserIdentityRepo := repositorymocks.NewMockUserIdentityRepository(t)
 	mockUserRepo := repositorymocks.NewMockUserRepository(t)
 	mockUserRoleRepo := repositorymocks.NewMockUserRoleRepository(t)
@@ -767,6 +836,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_NewUser_NonSystemPro
 	mockRegistry.EXPECT().ProjectSettingRepository().Return(mockProjectSettingRepo)
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
 	mockRegistry.EXPECT().RedirectURIRepository().Return(mockRedirectURIRepo)
+	mockRegistry.EXPECT().OAuthConnectionRepository().Return(mockOAuthConnRepo)
 
 	client := &entities.Client{
 		ID:        "test-client",
@@ -805,6 +875,17 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_NewUser_NonSystemPro
 	}
 	mockAccountRepo.EXPECT().FindByID(ctx, "account-1").Return(account, nil)
 
+	oauthConn := &entities.OAuthConnection{
+		ProjectID:             "project-1",
+		Provider:              "google",
+		Enabled:               true,
+		ClientID:              new("google-client-id"),
+		ClientSecretEncrypted: new(encryptClientSecret(t, "google-client-secret", "test-master-key-32-bytes-long!!")),
+		Scopes:                new("openid email profile"),
+		CredentialType:        "custom",
+	}
+	mockOAuthConnRepo.EXPECT().FindByProjectIDAndProvider(ctx, "project-1", "google").Return(oauthConn, nil)
+
 	mockRegistry.EXPECT().Tx(mock.AnythingOfType("func(repositories.Registry) error")).RunAndReturn(func(fn func(repositories.Registry) error) error {
 		return fn(mockRegistry)
 	})
@@ -835,6 +916,8 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_NewUser_NonSystemPro
 
 	defaultConfig := configs.DefaultConfig{}
 	defaultConfig.JWT.AuthCodeExpiryDuration = "1m"
+	defaultConfig.BaseURL = "http://localhost:3000"
+	defaultConfig.EncryptionMasterKey = "test-master-key-32-bytes-long!!"
 	service := NewAuthorizeService(&defaultConfig, mockRegistry, mockRedisService, nil)
 
 	req := &models.GoogleOAuthCallbackRequest{
@@ -859,6 +942,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_UserExistsByEmail(t 
 	mockProjectSettingRepo := repositorymocks.NewMockProjectSettingRepository(t)
 	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
 	mockRedirectURIRepo := repositorymocks.NewMockRedirectURIRepository(t)
+	mockOAuthConnRepo := repositorymocks.NewMockOAuthConnectionRepository(t)
 	mockUserIdentityRepo := repositorymocks.NewMockUserIdentityRepository(t)
 	mockUserRepo := repositorymocks.NewMockUserRepository(t)
 	mockAuthCodeRepo := repositorymocks.NewMockAuthCodeRepository(t)
@@ -909,6 +993,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_UserExistsByEmail(t 
 	mockRegistry.EXPECT().ProjectSettingRepository().Return(mockProjectSettingRepo)
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
 	mockRegistry.EXPECT().RedirectURIRepository().Return(mockRedirectURIRepo)
+	mockRegistry.EXPECT().OAuthConnectionRepository().Return(mockOAuthConnRepo)
 
 	client := &entities.Client{
 		ID:        "test-client",
@@ -941,6 +1026,17 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_UserExistsByEmail(t 
 	}
 	mockAccountRepo.EXPECT().FindByID(ctx, "test-account").Return(account, nil)
 
+	oauthConn := &entities.OAuthConnection{
+		ProjectID:             "test-project",
+		Provider:              "google",
+		Enabled:               true,
+		ClientID:              new("google-client-id"),
+		ClientSecretEncrypted: new(encryptClientSecret(t, "google-client-secret", "test-master-key-32-bytes-long!!")),
+		Scopes:                new("openid email profile"),
+		CredentialType:        "custom",
+	}
+	mockOAuthConnRepo.EXPECT().FindByProjectIDAndProvider(ctx, "test-project", "google").Return(oauthConn, nil)
+
 	mockRegistry.EXPECT().Tx(mock.AnythingOfType("func(repositories.Registry) error")).RunAndReturn(func(fn func(repositories.Registry) error) error {
 		return fn(mockRegistry)
 	})
@@ -956,7 +1052,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_UserExistsByEmail(t 
 	existingUser := &entities.User{
 		ID:        "existing-user-id",
 		AccountID: "test-account",
-		Email:     pointy.String("existinguser@gmail.com"),
+		Email:     new("existinguser@gmail.com"),
 		IsActive:  true,
 	}
 	mockUserRepo.EXPECT().FindByProjectIDAndEmail(ctx, "test-project", "existinguser@gmail.com").Return(existingUser, nil)
@@ -968,6 +1064,8 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_UserExistsByEmail(t 
 
 	defaultConfig := configs.DefaultConfig{}
 	defaultConfig.JWT.AuthCodeExpiryDuration = "1m"
+	defaultConfig.BaseURL = "http://localhost:3000"
+	defaultConfig.EncryptionMasterKey = "test-master-key-32-bytes-long!!"
 	service := NewAuthorizeService(&defaultConfig, mockRegistry, mockRedisService, nil)
 
 	req := &models.GoogleOAuthCallbackRequest{
@@ -1008,6 +1106,13 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_TransactionNotFound(t *testi
 func TestAuthorizeService_HandleGoogleOAuthCallback_TokenExchangeFailed(t *testing.T) {
 	ctx := context.Background()
 
+	mockRegistry := repositorymocks.NewMockRegistry(t)
+	mockClientRepo := repositorymocks.NewMockClientRepository(t)
+	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
+	mockProjectSettingRepo := repositorymocks.NewMockProjectSettingRepository(t)
+	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
+	mockRedirectURIRepo := repositorymocks.NewMockRedirectURIRepository(t)
+	mockOAuthConnRepo := repositorymocks.NewMockOAuthConnectionRepository(t)
 	mockRedisService := servicemocks.NewMockRedisService(t)
 
 	transaction := models.GoogleOAuthTransaction{
@@ -1024,6 +1129,56 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_TokenExchangeFailed(t *testi
 	)
 	mockRedisService.EXPECT().DeleteManyWithContext(ctx, mock.Anything).Return(nil)
 
+	// Setup mocks for validateAuthorizeRequest
+	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)
+	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
+	mockRegistry.EXPECT().ProjectSettingRepository().Return(mockProjectSettingRepo)
+	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
+	mockRegistry.EXPECT().RedirectURIRepository().Return(mockRedirectURIRepo)
+	mockRegistry.EXPECT().OAuthConnectionRepository().Return(mockOAuthConnRepo)
+
+	client := &entities.Client{
+		ID:        "test-client",
+		ProjectID: "test-project",
+		AccountID: "test-account",
+		IsActive:  true,
+	}
+	mockClientRepo.EXPECT().FindByID(ctx, "test-client").Return(client, nil)
+
+	project := &entities.Project{
+		ID:       "test-project",
+		IsActive: true,
+	}
+	mockProjectRepo.EXPECT().FindByID(ctx, "test-project").Return(project, nil)
+
+	redirectURI := &entities.RedirectURI{
+		ProjectID:   "test-project",
+		RedirectURI: "http://example.com/callback",
+	}
+	mockRedirectURIRepo.EXPECT().FindByProjectIDAndRedirectURI(ctx, "test-project", "http://example.com/callback").Return(redirectURI, nil)
+
+	projectSetting := &entities.ProjectSetting{
+		ProjectID: "test-project",
+	}
+	mockProjectSettingRepo.EXPECT().FindByProjectID(ctx, "test-project").Return(projectSetting, nil)
+
+	account := &entities.Account{
+		ID:       "test-account",
+		IsActive: true,
+	}
+	mockAccountRepo.EXPECT().FindByID(ctx, "test-account").Return(account, nil)
+
+	oauthConn := &entities.OAuthConnection{
+		ProjectID:             "test-project",
+		Provider:              "google",
+		Enabled:               true,
+		ClientID:              new("google-client-id"),
+		ClientSecretEncrypted: new(encryptClientSecret(t, "google-client-secret", "test-master-key-32-bytes-long!!")),
+		Scopes:                new("openid email profile"),
+		CredentialType:        "custom",
+	}
+	mockOAuthConnRepo.EXPECT().FindByProjectIDAndProvider(ctx, "test-project", "google").Return(oauthConn, nil)
+
 	origExchanger := exchangeGoogleAuthCode
 	t.Cleanup(func() { exchangeGoogleAuthCode = origExchanger })
 
@@ -1032,7 +1187,9 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_TokenExchangeFailed(t *testi
 	}
 
 	defaultConfig := configs.DefaultConfig{}
-	service := NewAuthorizeService(&defaultConfig, nil, mockRedisService, nil)
+	defaultConfig.BaseURL = "http://localhost:3000"
+	defaultConfig.EncryptionMasterKey = "test-master-key-32-bytes-long!!"
+	service := NewAuthorizeService(&defaultConfig, mockRegistry, mockRedisService, nil)
 
 	req := &models.GoogleOAuthCallbackRequest{
 		Code:  "bad-code",
@@ -1050,6 +1207,13 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_TokenExchangeFailed(t *testi
 func TestAuthorizeService_HandleGoogleOAuthCallback_IDTokenMissing(t *testing.T) {
 	ctx := context.Background()
 
+	mockRegistry := repositorymocks.NewMockRegistry(t)
+	mockClientRepo := repositorymocks.NewMockClientRepository(t)
+	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
+	mockProjectSettingRepo := repositorymocks.NewMockProjectSettingRepository(t)
+	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
+	mockRedirectURIRepo := repositorymocks.NewMockRedirectURIRepository(t)
+	mockOAuthConnRepo := repositorymocks.NewMockOAuthConnectionRepository(t)
 	mockRedisService := servicemocks.NewMockRedisService(t)
 
 	transaction := models.GoogleOAuthTransaction{
@@ -1066,6 +1230,56 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_IDTokenMissing(t *testing.T)
 	)
 	mockRedisService.EXPECT().DeleteManyWithContext(ctx, mock.Anything).Return(nil)
 
+	// Setup mocks for validateAuthorizeRequest
+	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)
+	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
+	mockRegistry.EXPECT().ProjectSettingRepository().Return(mockProjectSettingRepo)
+	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
+	mockRegistry.EXPECT().RedirectURIRepository().Return(mockRedirectURIRepo)
+	mockRegistry.EXPECT().OAuthConnectionRepository().Return(mockOAuthConnRepo)
+
+	client := &entities.Client{
+		ID:        "test-client",
+		ProjectID: "test-project",
+		AccountID: "test-account",
+		IsActive:  true,
+	}
+	mockClientRepo.EXPECT().FindByID(ctx, "test-client").Return(client, nil)
+
+	project := &entities.Project{
+		ID:       "test-project",
+		IsActive: true,
+	}
+	mockProjectRepo.EXPECT().FindByID(ctx, "test-project").Return(project, nil)
+
+	redirectURI := &entities.RedirectURI{
+		ProjectID:   "test-project",
+		RedirectURI: "http://example.com/callback",
+	}
+	mockRedirectURIRepo.EXPECT().FindByProjectIDAndRedirectURI(ctx, "test-project", "http://example.com/callback").Return(redirectURI, nil)
+
+	projectSetting := &entities.ProjectSetting{
+		ProjectID: "test-project",
+	}
+	mockProjectSettingRepo.EXPECT().FindByProjectID(ctx, "test-project").Return(projectSetting, nil)
+
+	account := &entities.Account{
+		ID:       "test-account",
+		IsActive: true,
+	}
+	mockAccountRepo.EXPECT().FindByID(ctx, "test-account").Return(account, nil)
+
+	oauthConn := &entities.OAuthConnection{
+		ProjectID:             "test-project",
+		Provider:              "google",
+		Enabled:               true,
+		ClientID:              new("google-client-id"),
+		ClientSecretEncrypted: new(encryptClientSecret(t, "google-client-secret", "test-master-key-32-bytes-long!!")),
+		Scopes:                new("openid email profile"),
+		CredentialType:        "custom",
+	}
+	mockOAuthConnRepo.EXPECT().FindByProjectIDAndProvider(ctx, "test-project", "google").Return(oauthConn, nil)
+
 	origExchanger := exchangeGoogleAuthCode
 	t.Cleanup(func() { exchangeGoogleAuthCode = origExchanger })
 
@@ -1075,7 +1289,9 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_IDTokenMissing(t *testing.T)
 	}
 
 	defaultConfig := configs.DefaultConfig{}
-	service := NewAuthorizeService(&defaultConfig, nil, mockRedisService, nil)
+	defaultConfig.BaseURL = "http://localhost:3000"
+	defaultConfig.EncryptionMasterKey = "test-master-key-32-bytes-long!!"
+	service := NewAuthorizeService(&defaultConfig, mockRegistry, mockRedisService, nil)
 
 	req := &models.GoogleOAuthCallbackRequest{
 		Code:  "code",
@@ -1099,6 +1315,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_UserInactive(t *testing.T) {
 	mockProjectSettingRepo := repositorymocks.NewMockProjectSettingRepository(t)
 	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
 	mockRedirectURIRepo := repositorymocks.NewMockRedirectURIRepository(t)
+	mockOAuthConnRepo := repositorymocks.NewMockOAuthConnectionRepository(t)
 	mockUserIdentityRepo := repositorymocks.NewMockUserIdentityRepository(t)
 	mockUserRepo := repositorymocks.NewMockUserRepository(t)
 	mockRedisService := servicemocks.NewMockRedisService(t)
@@ -1145,6 +1362,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_UserInactive(t *testing.T) {
 	mockRegistry.EXPECT().ProjectSettingRepository().Return(mockProjectSettingRepo)
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
 	mockRegistry.EXPECT().RedirectURIRepository().Return(mockRedirectURIRepo)
+	mockRegistry.EXPECT().OAuthConnectionRepository().Return(mockOAuthConnRepo)
 
 	client := &entities.Client{
 		ID:        "test-client",
@@ -1177,6 +1395,17 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_UserInactive(t *testing.T) {
 	}
 	mockAccountRepo.EXPECT().FindByID(ctx, "test-account").Return(account, nil)
 
+	oauthConn := &entities.OAuthConnection{
+		ProjectID:             "test-project",
+		Provider:              "google",
+		Enabled:               true,
+		ClientID:              new("google-client-id"),
+		ClientSecretEncrypted: new(encryptClientSecret(t, "google-client-secret", "test-master-key-32-bytes-long!!")),
+		Scopes:                new("openid email profile"),
+		CredentialType:        "custom",
+	}
+	mockOAuthConnRepo.EXPECT().FindByProjectIDAndProvider(ctx, "test-project", "google").Return(oauthConn, nil)
+
 	mockRegistry.EXPECT().Tx(mock.AnythingOfType("func(repositories.Registry) error")).RunAndReturn(func(fn func(repositories.Registry) error) error {
 		return fn(mockRegistry)
 	})
@@ -1195,12 +1424,14 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_UserInactive(t *testing.T) {
 	user := &entities.User{
 		ID:        "user-1",
 		AccountID: "test-account",
-		Email:     pointy.String("inactive@gmail.com"),
+		Email:     new("inactive@gmail.com"),
 		IsActive:  false, // Inactive user
 	}
 	mockUserRepo.EXPECT().FindByID(ctx, "user-1").Return(user, nil)
 
 	defaultConfig := configs.DefaultConfig{}
+	defaultConfig.BaseURL = "http://localhost:3000"
+	defaultConfig.EncryptionMasterKey = "test-master-key-32-bytes-long!!"
 	service := NewAuthorizeService(&defaultConfig, mockRegistry, mockRedisService, nil)
 
 	req := &models.GoogleOAuthCallbackRequest{

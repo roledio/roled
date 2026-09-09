@@ -8,13 +8,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard';
 import { getProjectTabParams } from '@/lib/paramsStore';
 import { CLIENT_VALIDATION, truncateToMaxLength, validateClientForm, type ClientValidationResult } from '@/lib/validation';
 import type { HttpClient } from '@/services/core/httpClient';
 import { deleteClient, fetchClientById, fetchProjectById, fetchProjectResources, updateClient } from '@/services/projects';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { telemetry } from '@/lib/telemetry';
-import { AlertCircle, ArrowLeft, Eye, EyeOff, Loader2, Search } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Copy, Check, Eye, EyeOff, Loader2, Search } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
@@ -63,6 +64,8 @@ export default function ClientDetails({ httpClient }: Props) {
   const [showSecret, setShowSecret] = useState(false);
   const [selectedPermissionIds, setSelectedPermissionIds] = useState<string[]>([]);
   const [isActive, setIsActive] = useState<boolean | undefined>(undefined);
+
+  const { copiedId, handleCopy } = useCopyToClipboard();
 
   const clientQuery = useQuery<any, Error>({
     queryKey: ['client', projectId ?? project_id, clientId || client_id],
@@ -249,13 +252,27 @@ export default function ClientDetails({ httpClient }: Props) {
             {/* Client ID - Left side (4 cols) */}
             <div className="col-span-4 space-y-2">
               <Label htmlFor="client-id" className="font-medium text-blue-800">Client ID</Label>
-              <Input
-                id="client-id"
-                value={clientId}
-                readOnly
-                className="bg-white select-text"
-                onFocus={(e) => e.target.select()}
-              />
+              <div className="relative">
+                <Input
+                  id="client-id"
+                  value={clientId}
+                  readOnly
+                  className="bg-white select-text pr-10"
+                  onFocus={(e) => e.target.select()}
+                />
+                <button
+                  type="button"
+                  aria-label="Copy client ID"
+                  onClick={() => handleCopy(clientId, 'Client ID')}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded text-sm text-muted-foreground hover:bg-muted/5 transition-colors"
+                >
+                  {copiedId === 'Client ID' ? (
+                    <Check className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
             </div>
 
             {/* Client Secret - Right side (8 cols) */}
@@ -264,7 +281,7 @@ export default function ClientDetails({ httpClient }: Props) {
               <div className="relative">
                 <Input
                   id="client-secret"
-                  className="pr-10 bg-white select-text"
+                  className="pr-16 bg-white select-text"
                   type={showSecret ? 'text' : 'password'}
                   value={secret}
                   readOnly
@@ -273,10 +290,22 @@ export default function ClientDetails({ httpClient }: Props) {
                 <button
                   aria-label={showSecret ? 'Hide secret' : 'Show secret'}
                   onClick={() => setShowSecret(s => !s)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded text-sm text-muted-foreground hover:bg-muted/5"
+                  className="absolute right-9 top-1/2 -translate-y-1/2 p-1 rounded text-sm text-muted-foreground hover:bg-muted/5"
                   type="button"
                 >
                   {showSecret ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                </button>
+                <button
+                  type="button"
+                  aria-label="Copy client secret"
+                  onClick={() => handleCopy(secret, 'Client Secret')}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded text-sm text-muted-foreground hover:bg-muted/5 transition-colors"
+                >
+                  {copiedId === 'Client Secret' ? (
+                    <Check className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
                 </button>
               </div>
             </div>

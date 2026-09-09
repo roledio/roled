@@ -77,12 +77,6 @@ type DefaultConfig struct {
 			Endpoint  string `mapstructure:"endpoint"`
 		} `mapstructure:"s3"`
 	} `mapstructure:"upload"`
-	GoogleOAuth struct {
-		Enabled      bool   `mapstructure:"enabled"`
-		ClientID     string `mapstructure:"client_id"`
-		ClientSecret string `mapstructure:"client_secret"`
-		RedirectURI  string `mapstructure:"redirect_uri"`
-	} `mapstructure:"google_oauth"`
 }
 
 func (d *DefaultConfig) IsEnvProd() bool {

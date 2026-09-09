@@ -3,20 +3,34 @@ package authorize
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/coreos/go-oidc"
 	"github.com/gofiber/fiber/v3/log"
+	"github.com/roledio/roled/auth/internal/constants"
 	"github.com/roledio/roled/auth/internal/constants/rediskeys"
 	"github.com/roledio/roled/auth/internal/entities"
-	autherrors "github.com/roledio/roled/auth/internal/errors"
+	"github.com/roledio/roled/auth/internal/errors"
 	"github.com/roledio/roled/auth/internal/models"
 	"github.com/roledio/roled/auth/internal/repositories"
 	pkgerrors "github.com/roledio/roled/auth/pkg/errors"
+	"github.com/roledio/roled/auth/pkg/utils/encryptionutil"
 	"github.com/roledio/roled/auth/pkg/utils/idutil"
 	"github.com/roledio/roled/auth/pkg/utils/randstrutil"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
+)
+
+type googleIDTokenValidator func(ctx context.Context, rawIDToken, clientID string) (*models.GoogleUserInfo, error)
+type googleTokenExchanger func(ctx context.Context, config *oauth2.Config, code string) (*oauth2.Token, error)
+
+var (
+	validateGoogleIDToken  googleIDTokenValidator = defaultValidateGoogleIDToken
+	exchangeGoogleAuthCode googleTokenExchanger   = func(ctx context.Context,
+		config *oauth2.Config, code string) (*oauth2.Token, error) {
+		return config.Exchange(ctx, code)
+	}
 )
 
 const (
@@ -28,6 +42,11 @@ const (
 func (s *authorizeService) InitiateGoogleOAuth(ctx context.Context, req *models.GoogleOAuthRequest) (string, error) {
 	// Validate the authorization request first
 	project, _, _, err := s.validateAuthorizeRequest(ctx, &req.RenderAuthorizeRequest)
+	if err != nil {
+		return "", err
+	}
+
+	googleOAuthConfig, err := s.validateGoogleOAuthConnection(ctx, project)
 	if err != nil {
 		return "", err
 	}
@@ -53,9 +72,6 @@ func (s *authorizeService) InitiateGoogleOAuth(ctx context.Context, req *models.
 		return "", pkgerrors.ErrSystemError.WithError(err)
 	}
 
-	// Create Google OAuth config
-	googleOAuthConfig := s.getGoogleOAuthConfig()
-
 	// Generate the authorization URL
 	authURL := googleOAuthConfig.AuthCodeURL(googleState, oauth2.AccessTypeOffline)
 
@@ -76,37 +92,16 @@ func (s *authorizeService) HandleGoogleOAuthCallback(ctx context.Context, req *m
 	}
 	if !found {
 		log.WithContext(ctx).Errorw("Google OAuth transaction not found or expired", "state", req.State)
-		return "", autherrors.ErrInvalidGoogleState
+		return "", errors.ErrInvalidGoogleState
 	}
 
-	// Delete the transaction to prevent reuse (single-use)
-	err = s.rediService.DeleteManyWithContext(ctx, []string{cacheKey})
-	if err != nil {
-		log.WithContext(ctx).Warnw("Failed to delete Google OAuth transaction from Redis", "error", err)
-	}
-
-	// Create Google OAuth config
-	googleOAuthConfig := s.getGoogleOAuthConfig()
-
-	// Exchange the authorization code for tokens
-	token, err := exchangeGoogleAuthCode(ctx, googleOAuthConfig, req.Code)
-	if err != nil {
-		log.WithContext(ctx).Errorw("Failed to exchange Google authorization code", "error", err)
-		return "", autherrors.ErrGoogleTokenExchangeFailed
-	}
-
-	// Extract and validate the ID token
-	idToken, ok := token.Extra("id_token").(string)
-	if !ok {
-		log.WithContext(ctx).Errorw("No ID token in Google OAuth response")
-		return "", autherrors.ErrGoogleIDTokenMissing
-	}
-
-	googleUserInfo, err := validateGoogleIDToken(ctx, idToken, s.defaultConfig.GoogleOAuth.ClientID)
-	if err != nil {
-		log.WithContext(ctx).Errorw("Failed to validate Google ID token", "error", err)
-		return "", err
-	}
+	// Ensure transaction is deleted to prevent reuse (single-use)
+	defer func() {
+		err = s.rediService.DeleteManyWithContext(ctx, []string{cacheKey})
+		if err != nil {
+			log.WithContext(ctx).Warnw("Failed to delete Google OAuth transaction from Redis", "error", err)
+		}
+	}()
 
 	// Validate the authorization request again (security check)
 	renderReq := &models.RenderAuthorizeRequest{
@@ -120,6 +115,31 @@ func (s *authorizeService) HandleGoogleOAuthCallback(ctx context.Context, req *m
 	}
 	project, _, projectSetting, err := s.validateAuthorizeRequest(ctx, renderReq)
 	if err != nil {
+		return "", err
+	}
+
+	googleOAuthConfig, err := s.validateGoogleOAuthConnection(ctx, project)
+	if err != nil {
+		return "", err
+	}
+
+	// Exchange the authorization code for tokens
+	token, err := exchangeGoogleAuthCode(ctx, googleOAuthConfig, req.Code)
+	if err != nil {
+		log.WithContext(ctx).Errorw("Failed to exchange Google authorization code", "error", err)
+		return "", errors.ErrGoogleTokenExchangeFailed
+	}
+
+	// Extract and validate the ID token
+	idToken, ok := token.Extra("id_token").(string)
+	if !ok {
+		log.WithContext(ctx).Errorw("No ID token in Google OAuth response")
+		return "", errors.ErrGoogleIDTokenMissing
+	}
+
+	googleUserInfo, err := validateGoogleIDToken(ctx, idToken, googleOAuthConfig.ClientID)
+	if err != nil {
+		log.WithContext(ctx).Errorw("Failed to validate Google ID token", "error", err)
 		return "", err
 	}
 
@@ -150,7 +170,7 @@ func (s *authorizeService) HandleGoogleOAuthCallback(ctx context.Context, req *m
 			}
 			if !user.IsActive {
 				log.WithContext(ctx).Errorw("User is not active", "user_id", user.ID)
-				return autherrors.ErrInvalidUserCredentials
+				return errors.ErrInvalidUserCredentials
 			}
 		} else {
 			// New user identity, create user
@@ -214,7 +234,7 @@ func (s *authorizeService) createOrUpdateUserFromGoogle(ctx context.Context, reg
 
 	if !projectSetting.IsSignupEnabled {
 		log.WithContext(ctx).Errorw("Unable to continue signup with google oauth, signup is disabled for project", "project_id", project.ID)
-		return nil, autherrors.ErrUnableToProcessSignup.WithDebugMessage("Signup not enabled for project")
+		return nil, errors.ErrUnableToProcessSignup.WithDebugMessage("Signup not enabled for project")
 	}
 
 	// Create new user
@@ -315,25 +335,84 @@ func (s *authorizeService) createOrUpdateUserFromGoogle(ctx context.Context, reg
 	return user, nil
 }
 
-func (s *authorizeService) getGoogleOAuthConfig() *oauth2.Config {
-	return &oauth2.Config{
-		ClientID:     s.defaultConfig.GoogleOAuth.ClientID,
-		ClientSecret: s.defaultConfig.GoogleOAuth.ClientSecret,
-		RedirectURL:  s.defaultConfig.GoogleOAuth.RedirectURI,
-		Scopes:       []string{"openid", "email", "profile"},
-		Endpoint:     google.Endpoint,
+func (s *authorizeService) validateGoogleOAuthConnection(ctx context.Context, project *entities.Project) (*oauth2.Config, error) {
+	provider := constants.OAuthProviderGoogle
+	oauthConn, err := s.registry.OAuthConnectionRepository().FindByProjectIDAndProvider(ctx, project.ID, provider)
+	if err != nil {
+		log.WithContext(ctx).Errorw("Failed to find Google OAuth connection", "project_id", project.ID, "error", err)
+		return nil, pkgerrors.ErrSystemError.WithError(err)
 	}
+	if oauthConn == nil {
+		log.WithContext(ctx).Errorw("Google OAuth not configured for project", "project_id", project.ID)
+		return nil, errors.ErrProviderOAuthConnectionNotFound(provider)
+	}
+	if !oauthConn.Enabled {
+		log.WithContext(ctx).Errorw("Google OAuth is disabled for project", "project_id", project.ID)
+		return nil, errors.ErrProviderOAuthConnectionDisabled(provider)
+	}
+
+	googleOAuthConfig := &oauth2.Config{
+		RedirectURL: s.defaultConfig.BaseURL + "/oauth/google/callback",
+		Endpoint:    google.Endpoint,
+	}
+
+	if oauthConn.CredentialType == constants.OAuthCredentialTypeCustom {
+		clientSecret, err := s.decryptOAuthClientSecret(ctx, *oauthConn.ClientSecretEncrypted)
+		if err != nil {
+			return nil, pkgerrors.ErrSystemError.WithError(err)
+		}
+		googleOAuthConfig.ClientID = *oauthConn.ClientID
+		googleOAuthConfig.ClientSecret = clientSecret
+		googleOAuthConfig.Scopes = strings.Fields(*oauthConn.Scopes)
+	} else {
+		// If default credential type, use the system project's Google OAuth config
+		systemProject, err := s.registry.ProjectRepository().FindSystem(ctx)
+		if err != nil {
+			log.WithContext(ctx).Errorw("Failed to find system project", "error", err)
+			return nil, pkgerrors.ErrSystemError.WithError(err)
+		}
+		if systemProject == nil { // Should never happen
+			log.WithContext(ctx).Errorw("System project not found")
+			return nil, pkgerrors.ErrSystemError.WithDebugMessage("System project not found")
+		}
+		defaultOauthConn, err := s.registry.OAuthConnectionRepository().FindByProjectIDAndProvider(ctx, systemProject.ID, constants.OAuthProviderGoogle)
+		if err != nil {
+			log.WithContext(ctx).Errorw("Failed to find Google OAuth connection for system project", "error", err)
+			return nil, pkgerrors.ErrSystemError.WithError(err)
+		}
+		if defaultOauthConn == nil {
+			log.WithContext(ctx).Errorw("Google OAuth not configured for system project")
+			return nil, errors.ErrProviderOAuthConnectionNotFound(provider)
+		}
+		if !defaultOauthConn.Enabled {
+			log.WithContext(ctx).Errorw("Google OAuth is disabled for system project")
+			return nil, errors.ErrProviderOAuthConnectionDisabled(provider)
+		}
+		clientSecret, err := s.decryptOAuthClientSecret(ctx, *defaultOauthConn.ClientSecretEncrypted)
+		if err != nil {
+			return nil, pkgerrors.ErrSystemError.WithError(err)
+		}
+		googleOAuthConfig.ClientID = *defaultOauthConn.ClientID
+		googleOAuthConfig.ClientSecret = clientSecret
+		googleOAuthConfig.Scopes = strings.Fields(*defaultOauthConn.Scopes)
+	}
+	return googleOAuthConfig, nil
 }
 
-type googleTokenExchanger func(ctx context.Context, config *oauth2.Config, code string) (*oauth2.Token, error)
-
-var exchangeGoogleAuthCode googleTokenExchanger = func(ctx context.Context, config *oauth2.Config, code string) (*oauth2.Token, error) {
-	return config.Exchange(ctx, code)
+func (s *authorizeService) decryptOAuthClientSecret(ctx context.Context, encrypted string) (string, error) {
+	purpose := constants.KeyPurposeOAuthClientSecret
+	derivedKey, err := encryptionutil.DeriveKey([]byte(s.defaultConfig.EncryptionMasterKey), purpose)
+	if err != nil {
+		log.WithContext(ctx).Errorw("Failed to derive key for client secret encryption", "error", err)
+		return "", pkgerrors.ErrSystemError.WithError(err)
+	}
+	decrypted, err := encryptionutil.DecryptAES(encrypted, derivedKey, purpose)
+	if err != nil {
+		log.WithContext(ctx).Errorw("Failed to decrypt client secret", "error", err)
+		return "", pkgerrors.ErrSystemError.WithError(err)
+	}
+	return decrypted, nil
 }
-
-type googleIDTokenValidator func(ctx context.Context, rawIDToken, clientID string) (*models.GoogleUserInfo, error)
-
-var validateGoogleIDToken googleIDTokenValidator = defaultValidateGoogleIDToken
 
 func defaultValidateGoogleIDToken(ctx context.Context, rawIDToken, clientID string) (*models.GoogleUserInfo, error) {
 	return validateGoogleIDTokenWithIssuer(ctx, rawIDToken, clientID, "https://accounts.google.com")
@@ -343,7 +422,7 @@ func defaultValidateGoogleIDToken(ctx context.Context, rawIDToken, clientID stri
 func validateGoogleIDTokenWithIssuer(ctx context.Context, rawIDToken, clientID, issuerURL string) (*models.GoogleUserInfo, error) {
 	provider, err := oidc.NewProvider(ctx, issuerURL)
 	if err != nil {
-		return nil, autherrors.ErrGoogleIDTokenInvalid.WithError(err)
+		return nil, errors.ErrGoogleIDTokenInvalid.WithError(err)
 	}
 
 	verifier := provider.Verifier(&oidc.Config{
@@ -352,14 +431,14 @@ func validateGoogleIDTokenWithIssuer(ctx context.Context, rawIDToken, clientID, 
 
 	idToken, err := verifier.Verify(ctx, rawIDToken)
 	if err != nil {
-		return nil, autherrors.ErrGoogleIDTokenInvalid.WithError(err)
+		return nil, errors.ErrGoogleIDTokenInvalid.WithError(err)
 	}
 
 	// Extract claims
 	var userInfo models.GoogleUserInfo
 	err = idToken.Claims(&userInfo)
 	if err != nil {
-		return nil, autherrors.ErrGoogleIDTokenInvalid.WithError(err)
+		return nil, errors.ErrGoogleIDTokenInvalid.WithError(err)
 	}
 
 	return &userInfo, nil
