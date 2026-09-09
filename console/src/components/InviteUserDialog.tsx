@@ -16,8 +16,8 @@ import { useState } from 'react';
 interface Props {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    roles: any[];
-    redirectUris: any[];
+    roles: Array<{ id: string; name: string }>;
+    redirectUris: Array<{ redirect_uri: string; login_url?: string }>;
     onInvite: (data: { email: string; roleId?: string; redirectUri?: string }) => Promise<void>;
     isPending?: boolean;
 }
@@ -62,8 +62,9 @@ export default function InviteUserDialog({
             setSelectedRole('none');
             setSelectedRedirectUri('none');
             onOpenChange(false);
-        } catch (err: any) {
-            setError(err.message || 'Failed to send invitation');
+        } catch (err) {
+            const error = err as Error;
+            setError(error.message || 'Failed to send invitation');
         }
     };
 

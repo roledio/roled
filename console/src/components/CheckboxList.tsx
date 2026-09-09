@@ -26,7 +26,7 @@ export function CheckboxList({ items, selectedIds, onToggle, isFetching }: Check
             <span>Loading…</span>
           </div>
         ) : (
-          items.map((p: any) => {
+          items.map((p: CheckboxListItem) => {
             const isSelected = selectedIds.includes(p.id);
             return (
               <div

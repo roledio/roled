@@ -36,9 +36,19 @@ function createMockHttpClient(tokenService: TokenService): HttpClient {
   } as unknown as HttpClient;
 }
 
+interface MockTokenInfo {
+  id: string;
+  client?: { id: string };
+  user?: { display_name: string; email: string };
+}
+
+interface MockMember {
+  [key: string]: unknown;
+}
+
 function createMockTokenService(): TokenService {
-  let cachedToken: any = null;
-  let cachedMember: any = undefined;
+  let cachedToken: MockTokenInfo | null = null;
+  let cachedMember: MockMember | undefined = undefined;
   return {
     clear: vi.fn(),
     getRefreshToken: vi.fn().mockReturnValue('refresh123'),
@@ -106,7 +116,7 @@ describe('DashboardLayout Component', () => {
       user: { display_name: 'John Doe', email: 'john@doe.com' },
     };
 
-    vi.mocked(authService.fetchCurrentTokenInfo).mockResolvedValue(mockInfo as any);
+    vi.mocked(authService.fetchCurrentTokenInfo).mockResolvedValue(mockInfo as MockTokenInfo);
 
     render(
       <MemoryRouter>
@@ -138,7 +148,7 @@ describe('DashboardLayout Component', () => {
       user: { display_name: 'Jane Smith', email: 'jane@smith.com' },
     };
 
-    vi.mocked(authService.fetchCurrentTokenInfo).mockResolvedValue(mockInfo as any);
+    vi.mocked(authService.fetchCurrentTokenInfo).mockResolvedValue(mockInfo as MockTokenInfo);
     vi.mocked(authService.revokeCurrentToken).mockResolvedValue(undefined);
 
     render(

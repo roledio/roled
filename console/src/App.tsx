@@ -141,7 +141,7 @@ function RouteAuthWatcher({ tokenService }: { tokenService: TokenService }) {
       tokenService.clear();
       navigate('/signin', { replace: true, state: location.state });
     }
-  }, [location.pathname, tokenService, navigate]);
+  }, [location.pathname, location.state, tokenService, navigate]);
 
   return null;
 }
