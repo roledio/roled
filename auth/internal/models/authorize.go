@@ -16,8 +16,15 @@ type RenderAuthorizeRequest struct {
 }
 
 type RenderAuthorizeResult struct {
-	Project        *entities.Project
-	ProjectSetting *entities.ProjectSetting
+	Project               *entities.Project
+	ProjectSetting        *entities.ProjectSetting
+	ForgotPasswordURLPath string
+	OAuthConnections      []OAuthConnection
+}
+
+type OAuthConnection struct {
+	Provider string
+	URLPath  string
 }
 
 type SubmitAuthorizeRequest struct {

@@ -507,7 +507,10 @@ export default function SettingsTab({ httpClient, project }: Props) {
 
                                                 {/* Status Column */}
                                                 <td className="px-4 py-3 align-middle">
-                                                    <StatusBadge active={connection.enabled} />
+                                                    <StatusBadge 
+                                                        text={connection.enabled ? "Enabled" : "Disabled"} 
+                                                        style={connection.enabled ? "success" : "muted"} 
+                                                    />
                                                 </td>
 
                                                 {/* Actions Column */}

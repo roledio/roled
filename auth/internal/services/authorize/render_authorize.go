@@ -2,8 +2,11 @@ package authorize
 
 import (
 	"context"
+	"fmt"
+	"net/url"
 
 	"github.com/gofiber/fiber/v3/log"
+	"github.com/roledio/roled/auth/internal/constants"
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/errors"
 	"github.com/roledio/roled/auth/internal/models"
@@ -15,13 +18,26 @@ func (s *authorizeService) RenderAuthorize(ctx context.Context, req *models.Rend
 	if err != nil {
 		return nil, err
 	}
-	return &models.RenderAuthorizeResult{
+	res := models.RenderAuthorizeResult{
 		Project:        project,
 		ProjectSetting: projectSetting,
-	}, nil
+	}
+	if projectSetting.IsForgotPasswordEnabled {
+		// Build forgot password URL when enabled
+		res.ForgotPasswordURLPath = s.buildForgotPasswordPath(req)
+	}
+	conns, err := s.registry.OAuthConnectionRepository().FindByProjectID(ctx, project.ID)
+	if err != nil {
+		log.WithContext(ctx).Errorw("Failed to find OAuth connections by project ID", "project_id", project.ID, "error", err)
+		return &res, nil
+	}
+	// Build oauth connection URLs when enabled
+	s.buildOAuthConnections(conns, req, &res)
+	return &res, nil
 }
 
-func (s *authorizeService) validateAuthorizeRequest(ctx context.Context, req *models.RenderAuthorizeRequest) (*entities.Project, *entities.RedirectURI, *entities.ProjectSetting, error) {
+func (s *authorizeService) validateAuthorizeRequest(ctx context.Context, req *models.RenderAuthorizeRequest) (
+	*entities.Project, *entities.RedirectURI, *entities.ProjectSetting, error) {
 	clientRepo := s.registry.ClientRepository()
 	client, err := clientRepo.FindByID(ctx, req.ClientID)
 	if err != nil {
@@ -80,4 +96,41 @@ func (s *authorizeService) validateAuthorizeRequest(ctx context.Context, req *mo
 		return nil, nil, nil, pkgerrors.ErrSystemError.WithError(err)
 	}
 	return project, redirectURI, projectSetting, nil
+}
+
+func (s *authorizeService) buildOAuthConnections(
+	conns []entities.OAuthConnection,
+	req *models.RenderAuthorizeRequest,
+	res *models.RenderAuthorizeResult) {
+	for _, conn := range conns {
+		if !conn.Enabled {
+			continue
+		}
+		soc := models.OAuthConnection{
+			Provider: conn.Provider,
+		}
+		switch conn.Provider {
+		case constants.OAuthProviderGoogle:
+			soc.URLPath = s.buildGoogleOAuthPath(req)
+		}
+		res.OAuthConnections = append(res.OAuthConnections, soc)
+	}
+}
+
+func (s *authorizeService) buildGoogleOAuthPath(req *models.RenderAuthorizeRequest) string {
+	query := url.Values{}
+	query.Set("client_id", req.ClientID)
+	query.Set("redirect_uri", req.RedirectURI)
+	query.Set("response_type", req.ResponseType)
+	query.Set("code_challenge", req.CodeChallenge)
+	query.Set("code_challenge_method", req.CodeChallengeMethod)
+	query.Set("state", req.State)
+	return fmt.Sprintf("/oauth/google?%s", query.Encode())
+}
+
+func (s *authorizeService) buildForgotPasswordPath(req *models.RenderAuthorizeRequest) string {
+	query := url.Values{}
+	query.Set("client_id", req.ClientID)
+	query.Set("redirect_uri", req.RedirectURI)
+	return fmt.Sprintf("/password/forgot?%s", query.Encode())
 }
