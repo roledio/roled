@@ -116,25 +116,25 @@ Here are some screenshots of the Roled Console for you to take a look at so you 
 
 <table border="0" cellspacing="10" cellpadding="10">
   <tr>
-    <td align="center" width="50%">
-      <img src="docs/images/project-list.png" alt="Project List" /><br/>
+    <td align="left" valign="top" width="50%">
+      <img src="docs/images/project-list.png" alt="Project List" height="200" /><br/>
       <strong>Project List</strong><br/>
       Overview of all projects with quick access and project creation.
     </td>
-    <td align="center" width="50%">
-      <img src="docs/images/user-list.png" alt="User Management" /><br/>
+    <td align="left" valign="top" width="50%">
+      <img src="docs/images/user-list.png" alt="User Management" height="200" /><br/>
       <strong>User Management</strong><br/>
       Manage project users, including invitations, email verification, password resets, and role assignments.
     </td>
   </tr>
   <tr>
-    <td align="center" width="50%">
-      <img src="docs/images/project-settings.png" alt="Project Settings" /><br/>
+    <td align="left" valign="top" width="50%">
+      <img src="docs/images/project-settings.png" alt="Project Settings" height="200" /><br/>
       <strong>Project Settings</strong><br/>
       Configure authentication flows, default sign-up roles, and security policies.
     </td>
-    <td align="center" width="50%">
-      <img src="docs/images/signin.png" alt="Sign In Page" /><br/>
+    <td align="left" valign="top" width="50%">
+      <img src="docs/images/signin.png" alt="Sign In Page" height="200" /><br/>
       <strong>Sign In Page</strong><br/>
       Clean sign-in and authentication screen for your project users.
     </td>
