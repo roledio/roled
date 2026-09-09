@@ -31,7 +31,9 @@ import (
 )
 
 // Helper function to encrypt a client secret for testing
-func encryptClientSecret(t *testing.T, secret string, masterKey string) string {
+func encryptClientSecret(t *testing.T) string {
+	secret := "google-client-secret"
+	masterKey := "test-master-key-32-bytes-long!!"
 	purpose := constants.KeyPurposeOAuthClientSecret
 	derivedKey, err := encryptionutil.DeriveKey([]byte(masterKey), purpose)
 	assert.NoError(t, err)
@@ -311,7 +313,7 @@ func TestAuthorizeService_InitiateGoogleOAuth_Success(t *testing.T) {
 		Provider:              "google",
 		Enabled:               true,
 		ClientID:              new("google-client-id"),
-		ClientSecretEncrypted: new(encryptClientSecret(t, "google-client-secret", "test-master-key-32-bytes-long!!")),
+		ClientSecretEncrypted: new(encryptClientSecret(t)),
 		Scopes:                new("openid email profile"),
 		CredentialType:        "custom",
 	}
@@ -429,7 +431,7 @@ func TestAuthorizeService_InitiateGoogleOAuth_RedisError(t *testing.T) {
 		Provider:              "google",
 		Enabled:               true,
 		ClientID:              new("google-client-id"),
-		ClientSecretEncrypted: new(encryptClientSecret(t, "google-client-secret", "test-master-key-32-bytes-long!!")),
+		ClientSecretEncrypted: new(encryptClientSecret(t)),
 		Scopes:                new("openid email profile"),
 		CredentialType:        "custom",
 	}
@@ -563,7 +565,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_ExistingIdentity(t *
 		Provider:              "google",
 		Enabled:               true,
 		ClientID:              new("google-client-id"),
-		ClientSecretEncrypted: new(encryptClientSecret(t, "google-client-secret", "test-master-key-32-bytes-long!!")),
+		ClientSecretEncrypted: new(encryptClientSecret(t)),
 		Scopes:                new("openid email profile"),
 		CredentialType:        "custom",
 	}
@@ -719,7 +721,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_NewUser_SystemProjec
 		Provider:              "google",
 		Enabled:               true,
 		ClientID:              new("google-client-id"),
-		ClientSecretEncrypted: new(encryptClientSecret(t, "google-client-secret", "test-master-key-32-bytes-long!!")),
+		ClientSecretEncrypted: new(encryptClientSecret(t)),
 		Scopes:                new("openid email profile"),
 		CredentialType:        "custom",
 	}
@@ -880,7 +882,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_NewUser_NonSystemPro
 		Provider:              "google",
 		Enabled:               true,
 		ClientID:              new("google-client-id"),
-		ClientSecretEncrypted: new(encryptClientSecret(t, "google-client-secret", "test-master-key-32-bytes-long!!")),
+		ClientSecretEncrypted: new(encryptClientSecret(t)),
 		Scopes:                new("openid email profile"),
 		CredentialType:        "custom",
 	}
@@ -1031,7 +1033,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_UserExistsByEmail(t 
 		Provider:              "google",
 		Enabled:               true,
 		ClientID:              new("google-client-id"),
-		ClientSecretEncrypted: new(encryptClientSecret(t, "google-client-secret", "test-master-key-32-bytes-long!!")),
+		ClientSecretEncrypted: new(encryptClientSecret(t)),
 		Scopes:                new("openid email profile"),
 		CredentialType:        "custom",
 	}
@@ -1173,7 +1175,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_TokenExchangeFailed(t *testi
 		Provider:              "google",
 		Enabled:               true,
 		ClientID:              new("google-client-id"),
-		ClientSecretEncrypted: new(encryptClientSecret(t, "google-client-secret", "test-master-key-32-bytes-long!!")),
+		ClientSecretEncrypted: new(encryptClientSecret(t)),
 		Scopes:                new("openid email profile"),
 		CredentialType:        "custom",
 	}
@@ -1274,7 +1276,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_IDTokenMissing(t *testing.T)
 		Provider:              "google",
 		Enabled:               true,
 		ClientID:              new("google-client-id"),
-		ClientSecretEncrypted: new(encryptClientSecret(t, "google-client-secret", "test-master-key-32-bytes-long!!")),
+		ClientSecretEncrypted: new(encryptClientSecret(t)),
 		Scopes:                new("openid email profile"),
 		CredentialType:        "custom",
 	}
@@ -1400,7 +1402,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_UserInactive(t *testing.T) {
 		Provider:              "google",
 		Enabled:               true,
 		ClientID:              new("google-client-id"),
-		ClientSecretEncrypted: new(encryptClientSecret(t, "google-client-secret", "test-master-key-32-bytes-long!!")),
+		ClientSecretEncrypted: new(encryptClientSecret(t)),
 		Scopes:                new("openid email profile"),
 		CredentialType:        "custom",
 	}
