@@ -109,8 +109,7 @@ func (s *authorizeService) buildOAuthConnections(
 		soc := models.OAuthConnection{
 			Provider: conn.Provider,
 		}
-		switch conn.Provider {
-		case constants.OAuthProviderGoogle:
+		if conn.Provider == constants.OAuthProviderGoogle {
 			soc.URLPath = s.buildGoogleOAuthPath(req)
 		}
 		res.OAuthConnections = append(res.OAuthConnections, soc)
