@@ -26,12 +26,12 @@ type AccessTokenJoinResult struct {
 
 	ProjectID          string  `db:"project_id"`
 	ProjectName        string  `db:"project_name"`
-	ProjectDescription string  `db:"project_description"`
+	ProjectDescription *string `db:"project_description"`
 	ProjectLogoURL     *string `db:"project_logo_url"`
 
-	ClientID          string `db:"client_id"`
-	ClientName        string `db:"client_name"`
-	ClientDescription string `db:"client_description"`
+	ClientID          string  `db:"client_id"`
+	ClientName        string  `db:"client_name"`
+	ClientDescription *string `db:"client_description"`
 
 	UserID             *string `db:"user_id"`
 	UserDisplayName    *string `db:"user_display_name"`

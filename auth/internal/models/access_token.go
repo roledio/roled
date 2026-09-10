@@ -64,7 +64,7 @@ type ExchangeTokenResponse struct {
 type AccessTokenProject struct {
 	ID          string  `json:"id"`
 	Name        string  `json:"name"`
-	Description string  `json:"description"`
+	Description *string `json:"description"`
 	LogoURL     *string `json:"logo_url"`
 }
 
