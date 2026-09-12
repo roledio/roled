@@ -1,4 +1,4 @@
-[![GitHub Release](https://img.shields.io/github/v/release/roledio/roled)](https://github.com/roledio/roled/releases)
+[![GitHub Release](https://img.shields.io/badge/dynamic/json?url=https://api.github.com/repos/roledio/roled/releases/latest&query=$.name&label=release)](https://github.com/roledio/roled/releases)
 [![CI](https://github.com/roledio/roled/actions/workflows/ci.yml/badge.svg)](https://github.com/roledio/roled/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/roledio/roled)](https://github.com/roledio/roled/blob/main/LICENSE)
 
@@ -161,10 +161,10 @@ Roled is open source and contributions are welcome! The project is under active 
 ### Upcoming Features
 
 - **Official SDKs**: Faster integration with Roled for various programming languages.
-- **Social Logins**: Google, Microsoft, GitHub, Facebook, and more.
-- **Audit Logs**: Track and monitor all your projects' user activities.
-- **Login Layouts**: Ready-to-use login page templates for quick project integration.
-- **User Groups**: Define reusable sets of default users for quick assignment to new projects.
-- **Users View**: Inverse management view, assign a user to multiple projects from a central user list without navigating project-by-project.
+- **More social logins**: ~~Google~~, Microsoft, GitHub, Facebook, and more.
+- **Audit logs**: Track and monitor all your projects' user activities.
+- **Login layouts**: Ready-to-use login page templates for quick project integration.
+- **User groups**: Define reusable sets of default users for quick assignment to new projects.
+- **Users view**: Inverse management view, assign a user to multiple projects from a central user list without navigating project-by-project.
 - And many more!
 
