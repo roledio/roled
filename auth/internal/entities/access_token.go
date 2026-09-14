@@ -21,3 +21,11 @@ type AccessToken struct {
 	IssuedAt       *time.Time `db:"issued_at"`
 	RevokedAt      *time.Time `db:"revoked_at"`
 }
+
+func (a *AccessToken) IsClientToken() bool {
+	return a.UserID == nil
+}
+
+func (a *AccessToken) IsUserToken() bool {
+	return a.UserID != nil
+}

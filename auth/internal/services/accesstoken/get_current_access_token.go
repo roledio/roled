@@ -62,14 +62,16 @@ func (s *accessTokenService) GetCurrentAccessToken(ctx context.Context) (*models
 
 	var permissions []interfaces.PermissionResource
 	permissionsRepo := s.registry.PermissionRepository()
-	if accessToken.UserID != nil && result.RoleID != nil {
-		// Check user role permissions
-		results, err := permissionsRepo.FindByRoleID(ctx, *result.RoleID)
-		if err != nil {
-			log.WithContext(ctx).Errorw("Failed to find permissions by user ID", "error", err)
-			return nil, pkgerrors.ErrSystemError.WithError(err)
+	if accessToken.IsUserToken() {
+		if result.RoleID != nil {
+			// Check user role permissions
+			results, err := permissionsRepo.FindByRoleID(ctx, *result.RoleID)
+			if err != nil {
+				log.WithContext(ctx).Errorw("Failed to find permissions by role ID", "error", err)
+				return nil, pkgerrors.ErrSystemError.WithError(err)
+			}
+			permissions = results
 		}
-		permissions = results
 	} else {
 		// Check client permissions
 		results, err := permissionsRepo.FindByClientID(ctx, accessToken.ClientID)
