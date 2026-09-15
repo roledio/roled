@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"github.com/roledio/roled/auth/internal/constants/rediskeys"
-	"github.com/roledio/roled/auth/internal/models"
 	servicemocks "github.com/roledio/roled/auth/internal/mocks/services"
+	"github.com/roledio/roled/auth/internal/models"
 	"github.com/roledio/roled/auth/internal/repositories/redis"
 )
 
