@@ -166,7 +166,7 @@ jobs:
             -Dsonar.organization=roledio
             -Dsonar.sources=auth
             -Dsonar.go.coverage.reportPaths=coverage.out
-            -Dsonar.exclusions=auth/**/*_mock.go,auth/mocks/**,auth/cmd/**,auth/configs/**,auth/constants/**,auth/entities/**,auth/errors/**,auth/models/**,auth/views/**,auth/migrations/**,auth/databases/**,auth/types/**,auth/testutil/**
+            -Dsonar.exclusions=auth/**/*_mock.go,auth/mocks/**,auth/cmd/**,auth/configs/**,auth/constants/**,auth/entities/**,auth/errors/**,auth/models/**,auth/views/**,auth/migrations/**,auth/databases/**,auth/types/**,auth/internal/repositories/mariadb/testutil/**
             -Dsonar.test.inclusions=auth/**/*_test.go
 
   sonarcloud-console:
