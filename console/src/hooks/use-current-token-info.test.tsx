@@ -1,6 +1,8 @@
 import { TooltipProvider } from '@/components/ui/tooltip';
 import type { HttpClient } from '@/services/core/httpClient';
 import type { TokenService } from '@/services/core/tokenService';
+import type { CurrentTokenInfo } from '@/services/core/authService';
+import type { Member } from '@/services/members';
 import * as authService from '@/services/core/authService';
 import * as memberService from '@/services/members';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -21,8 +23,8 @@ vi.mock('@/services/members', () => ({
 }));
 
 function createMockTokenService(): TokenService {
-  let cachedToken: any = null;
-  let cachedMember: any = undefined;
+  let cachedToken: CurrentTokenInfo | null = null;
+  let cachedMember: Member | undefined = undefined;
   return {
     clear: vi.fn(),
     getRefreshToken: vi.fn().mockReturnValue('refresh123'),
@@ -76,12 +78,18 @@ describe('useCurrentTokenInfo & useRevokeToken hooks', () => {
 
   it('fetches and renders current token user info', async () => {
     const httpClient = createMockHttpClient();
-    const mockInfo = {
+    const mockInfo: CurrentTokenInfo = {
       id: 'token123',
-      user: { display_name: 'Test Admin', email: 'admin@local.id' },
+      issued_at: new Date().toISOString(),
+      expires_at: new Date(Date.now() + 3600000).toISOString(),
+      project: { id: 'proj1', name: 'Test Project', description: 'Test', logo_url: '' },
+      client: { id: 'client1', name: 'Test Client' },
+      user: { id: 'user123', display_name: 'Test Admin', email: 'admin@local.id' },
+      role: { id: 'role1', code: 'admin', name: 'Admin', description: 'Admin role' },
+      permissions: [],
     };
 
-    vi.mocked(authService.fetchCurrentTokenInfo).mockResolvedValue(mockInfo as any);
+    vi.mocked(authService.fetchCurrentTokenInfo).mockResolvedValue(mockInfo);
 
     render(<TokenInfoComp httpClient={httpClient} authBaseUrl="http://localhost:8082" />, { wrapper: createWrapper() });
 
@@ -121,15 +129,21 @@ describe('useCurrentTokenInfo & useRevokeToken hooks', () => {
   it('fetches and renders combined token and member info', async () => {
     const tokenService = createMockTokenService();
     const httpClient = createMockHttpClient(tokenService);
-    const mockInfo = {
+    const mockInfo: CurrentTokenInfo = {
       id: 'token123',
-      user: { display_name: 'Test Admin', email: 'admin@local.id' },
+      issued_at: new Date().toISOString(),
+      expires_at: new Date(Date.now() + 3600000).toISOString(),
+      project: { id: 'proj1', name: 'Test Project', description: 'Test', logo_url: '' },
+      client: { id: 'client1', name: 'Test Client' },
+      user: { id: 'user123', display_name: 'Test Admin', email: 'admin@local.id' },
+      role: { id: 'role1', code: 'admin', name: 'Admin', description: 'Admin role' },
+      permissions: [],
     };
-    const mockMembers = [
+    const mockMembers: Member[] = [
       { id: 'mem123', email: 'admin@local.id', display_name: 'Test Admin', is_admin: true, is_active: true, is_verified: true, created_at: '', updated_at: '' }
     ];
 
-    vi.mocked(authService.fetchCurrentTokenInfo).mockResolvedValue(mockInfo as any);
+    vi.mocked(authService.fetchCurrentTokenInfo).mockResolvedValue(mockInfo);
     vi.mocked(memberService.fetchMembers).mockResolvedValue({ data: mockMembers });
 
     function CombinedComp() {

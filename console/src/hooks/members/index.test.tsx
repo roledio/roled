@@ -1,5 +1,6 @@
 import { TooltipProvider } from '@/components/ui/tooltip';
 import type { HttpClient } from '@/services/core/httpClient';
+import type { Member } from '@/services/members';
 import * as memberService from '@/services/members';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
@@ -43,7 +44,7 @@ function MembersList({ httpClient, baseUrl, accountId }: { httpClient: HttpClien
   if (q.isLoading) return <div>loading-members</div>;
   return (
     <div>
-      {(q.data?.data ?? []).map((m: any) => (
+      {(q.data?.data ?? []).map((m: Member) => (
         <div key={m.id}>{m.display_name ?? m.email}</div>
       ))}
     </div>
@@ -90,7 +91,7 @@ describe('use-members hook', () => {
       );
     }
 
-    vi.mocked(memberService.inviteMember).mockResolvedValue({ id: 'm2', email: 'new@example.com' } as any);
+    vi.mocked(memberService.inviteMember).mockResolvedValue({ id: 'm2', email: 'new@example.com', display_name: '', is_active: true, is_verified: false, is_admin: false, created_at: '', updated_at: '' });
 
     render(<InviteComp />, { wrapper: createWrapper() });
 

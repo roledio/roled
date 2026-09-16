@@ -104,7 +104,7 @@ export default function Projects({ httpClient }: ProjectsProps) {
       }
       return fetchProjects(httpClient, AUTH_BASE_URL, params);
     },
-    keepPreviousData: true,
+    placeholderData: (previousData) => previousData,
   } as any) as UseQueryResult<ProjectsQueryResult, Error>;
 
   const serverPagination = projectsQuery.data?.pagination ?? null;

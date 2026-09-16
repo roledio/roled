@@ -1,18 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import type { UseQueryResult } from '@tanstack/react-query';
 import type { HttpClient } from '@/services/core/httpClient';
-import { fetchProjectClients } from '@/services/projects';
-
-type Client = {
-  id: string;
-  created_at: string;
-  updated_at: string;
-  code: string;
-  name: string;
-  project_id: string;
-  is_default: boolean;
-  is_active: boolean;
-};
+import { fetchProjectClients, type ProjectClient } from '@/services/projects';
 
 type Pagination = {
   page_num: number;
@@ -40,12 +29,12 @@ export function useProjectClients({ httpClient, baseUrl, projectId, pageNum = 1,
     queryKey: ['project', projectId ?? 'unknown', 'clients', pageNum, pageSize, search || '', isActive ?? 'all', sortBy ?? '', sortDir ?? ''],
     queryFn: () => fetchProjectClients(httpClient, baseUrl, projectId!, pageNum, pageSize, sortBy ?? '', sortDir ?? '', search ?? '', isActiveBool),
     enabled,
-    keepPreviousData: true,
+    placeholderData: (previousData) => previousData,
     retry: 1,
-  } as any) as UseQueryResult<{ data: Client[]; pagination?: Pagination }, Error>;
+  }) as UseQueryResult<{ data: ProjectClient[]; pagination?: Pagination }, Error>;
 
   return {
-    clients: query.data?.data ?? [] as Client[],
+    clients: query.data?.data ?? [],
     pagination: query.data?.pagination ?? null,
     isLoading: query.isLoading,
     error: query.error,

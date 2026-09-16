@@ -1,20 +1,20 @@
 const isProduction = import.meta.env.PROD;
 
 const logger = {
-    debug: (...args: any) => {
+    debug: (...args: unknown[]) => {
         if (!isProduction) {
             console.debug(...args);
         }
     },
-    info: (...args: any) => {
+    info: (...args: unknown[]) => {
         if (!isProduction) {
             console.info(...args);
         }
     },
-    warn: (...args: any) => {
+    warn: (...args: unknown[]) => {
         console.warn(...args); // Warnings might be useful in production
     },
-    error: (...args: any) => {
+    error: (...args: unknown[]) => {
         console.error(...args); // Errors should always be logged
     },
 };

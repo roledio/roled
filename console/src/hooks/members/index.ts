@@ -34,7 +34,7 @@ export function useMembers({
   const query = useQuery({
     queryKey: ['account', accountId, 'members', pageNum, pageSize, search, isVerified, isActive, isAdmin, sortBy, sortDir],
     queryFn: () => {
-      const params: Record<string, any> = { page_size: pageSize, page_num: pageNum };
+      const params: Record<string, string | number | boolean | null | undefined> = { page_size: pageSize, page_num: pageNum };
       if (search) params.search = search;
       params.is_verified = isVerified === null ? null : (isVerified === 'true');
       params.is_active = isActive === null ? null : (isActive === 'true');
