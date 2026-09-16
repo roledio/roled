@@ -6,7 +6,7 @@ interface CheckboxListItem {
   id: string;
   itemLabel: string;
   itemDescription?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface CheckboxListProps {
