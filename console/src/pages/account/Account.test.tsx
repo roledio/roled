@@ -2,6 +2,8 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import * as accountService from '@/services/accounts';
 import type { HttpClient } from '@/services/core/httpClient';
 import type { TokenService } from '@/services/core/tokenService';
+import type { CurrentTokenInfo } from '@/services/core/authService';
+import type { Member } from '@/services/members';
 import * as memberService from '@/services/members';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
@@ -25,11 +27,11 @@ vi.mock('@/services/members', () => ({
 
 // Mock the DropdownMenu components to render inline for testing
 vi.mock('@/components/ui/dropdown-menu', () => ({
-    DropdownMenu: ({ children }: any) => <div>{children}</div>,
-    DropdownMenuTrigger: ({ children, asChild }: any) => asChild ? children : <button>{children}</button>,
-    DropdownMenuContent: ({ children }: any) => <div data-testid="dropdown-menu-content">{children}</div>,
-    DropdownMenuItem: ({ children, onSelect }: any) => (
-        <button onClick={() => onSelect && onSelect({} as any)}>{children}</button>
+    DropdownMenu: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+    DropdownMenuTrigger: ({ children, asChild }: { children: React.ReactNode; asChild?: boolean }) => asChild ? children : <button>{children}</button>,
+    DropdownMenuContent: ({ children }: { children: React.ReactNode }) => <div data-testid="dropdown-menu-content">{children}</div>,
+    DropdownMenuItem: ({ children, onSelect }: { children: React.ReactNode; onSelect?: (event: Event) => void }) => (
+        <button onClick={() => onSelect && onSelect(new Event('click'))}>{children}</button>
     ),
 }));
 
@@ -55,8 +57,8 @@ const mockAccountData: accountService.Account = {
 };
 
 function createMockTokenService(): TokenService {
-    let cachedToken: any = null;
-    let cachedMember: any = undefined;
+    let cachedToken: CurrentTokenInfo | null = null;
+    let cachedMember: Member | undefined = undefined;
     return {
         clear: vi.fn(),
         getRefreshToken: vi.fn().mockReturnValue('refresh123'),
@@ -104,7 +106,7 @@ function createWrapper() {
 }
 
 describe('Account Page', () => {
-    let mockMembersList: any[] = [];
+    let mockMembersList: Member[] = [];
     let currentUserIsAdmin = true;
 
     beforeEach(() => {
@@ -263,8 +265,8 @@ describe('Account Page', () => {
 
     it('updates account on save', async () => {
         vi.mocked(accountService.fetchCurrentAccount).mockResolvedValue(mockAccountData);
-        const updated = { ...mockAccountData, name: 'New Name', description: 'New desc' };
-        vi.mocked(accountService.updateAccount).mockResolvedValue(updated as any);
+        const updated: accountService.Account = { ...mockAccountData, name: 'New Name', description: 'New desc' };
+        vi.mocked(accountService.updateAccount).mockResolvedValue(updated);
 
         const tokenService = createMockTokenService();
         const httpClient = createMockHttpClient(tokenService);
@@ -380,7 +382,7 @@ describe('Account Page', () => {
 
         vi.mocked(memberService.inviteMember).mockImplementation(async () => {
             mockMembersList = after;
-            return after[1] as any;
+            return after[1];
         });
 
         const tokenService = createMockTokenService();
@@ -419,7 +421,7 @@ describe('Account Page', () => {
 
         vi.mocked(memberService.deleteMember).mockImplementation(async () => {
             mockMembersList = after;
-            return undefined as any;
+            return undefined;
         });
 
         const tokenService = createMockTokenService();

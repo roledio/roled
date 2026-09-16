@@ -377,7 +377,27 @@ go test ./...          # All tests including integration (requires DB/Redis or u
 
 ---
 
-## 6. Common Refactors / Anti-Patterns to Avoid
+## 6. Quality Gate & Type Safety
+
+### Console Frontend Type Safety Rules
+
+- **ESLint Configuration**: `console/eslint.config.js` has `@typescript-eslint/no-explicit-any: "warn"` globally
+- **Purpose**: Warns about `any` types but doesn't block builds, allowing gradual improvement while maintaining awareness
+- **When adding new code**:
+  - **Always avoid `any` in**: New utility functions (`src/lib/*`), new service functions (`src/services/*`), new hooks, new components
+  - **Use proper types**: Import existing types from service files, define interfaces for new data structures
+  - **Fallback patterns**: Use `unknown` instead of `any` when the type is truly unknown, then type-check with guards
+- **Common anti-patterns to avoid**:
+  - ❌ `const data: any = await response.json()`
+  - ✅ `const data: ApiResponse<DataType> = await response.json()`
+  - ❌ `function handleEvent(e: any) { ... }`
+  - ✅ `function handleEvent(e: React.MouseEvent) { ... }`
+  - ❌ `params: Record<string, any> = {}`
+  - ✅ `params: Record<string, string | number | boolean> = {}`
+- **Verification**: GitHub Actions CI runs `npm run lint` - warnings will appear in logs but won't block builds. When adding new code, aim for zero `any` warnings in your changes.
+
+
+### Common Refactors / Anti-Patterns to Avoid
 
 - **Don't** inline SQL into services. Use repositories.
 - **Don't** forget `shared.InvalidateXxxCache` after writes.
