@@ -14,10 +14,10 @@ import (
 )
 
 type memberRepository struct {
-	qx interfaces.QueryExecutor
+	qx repositories.QueryExecutor
 }
 
-func NewMemberRepository(qx interfaces.QueryExecutor) interfaces.MemberRepository {
+func NewMemberRepository(qx repositories.QueryExecutor) interfaces.MemberRepository {
 	return &memberRepository{qx: qx}
 }
 
@@ -160,7 +160,7 @@ func (r *memberRepository) Delete(ctx context.Context, member *entities.Member) 
 				deleted_at = NOW(4),
 				updated_at = NOW(4)
 			WHERE id = ? AND deleted_at IS NULL`
-	return execOne(ctx, r.qx, q, member.ID)
+	return repositories.ExecOne(ctx, r.qx, q, member.ID)
 }
 
 func (r *memberRepository) Update(ctx context.Context, member *entities.Member) (int, error) {
@@ -168,7 +168,7 @@ func (r *memberRepository) Update(ctx context.Context, member *entities.Member) 
 				is_admin = ?,
 				updated_at = NOW(4)
 			WHERE id = ? AND deleted_at IS NULL`
-	return execOne(ctx, r.qx, q, member.IsAdmin, member.ID)
+	return repositories.ExecOne(ctx, r.qx, q, member.IsAdmin, member.ID)
 }
 
 func (r *memberRepository) CountByAccountID(ctx context.Context, accountID string, isAdmin *bool) (int, error) {
@@ -193,7 +193,7 @@ func (r *memberRepository) DeleteByAccountID(ctx context.Context, accountID stri
 				deleted_at = NOW(4),
 				updated_at = NOW(4)
 			WHERE account_id = ? AND deleted_at IS NULL`
-	return exec(ctx, r.qx, q, accountID)
+	return repositories.Exec(ctx, r.qx, q, accountID)
 }
 
 func (r *memberRepository) FindByIDJoinUser(ctx context.Context, id string) (*interfaces.MemberUser, error) {

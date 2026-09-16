@@ -8,13 +8,14 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/repositories/interfaces"
+	"github.com/roledio/roled/auth/pkg/repositories"
 )
 
 type redirectURIRepository struct {
-	qx interfaces.QueryExecutor
+	qx repositories.QueryExecutor
 }
 
-func NewRedirectURIRepository(qx interfaces.QueryExecutor) interfaces.RedirectURIRepository {
+func NewRedirectURIRepository(qx repositories.QueryExecutor) interfaces.RedirectURIRepository {
 	return &redirectURIRepository{qx: qx}
 }
 
@@ -57,11 +58,11 @@ func (r *redirectURIRepository) Create(ctx context.Context, redirectURIs []entit
 		return err
 	}
 
-	_, err = exec(ctx, r.qx, query, args...)
+	_, err = repositories.Exec(ctx, r.qx, query, args...)
 	return err
 }
 
 func (r *redirectURIRepository) DeleteByProjectID(ctx context.Context, projectID string) (int, error) {
 	q := `DELETE FROM redirect_uris WHERE project_id = ?`
-	return exec(ctx, r.qx, q, projectID)
+	return repositories.Exec(ctx, r.qx, q, projectID)
 }

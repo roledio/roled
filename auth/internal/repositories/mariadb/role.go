@@ -14,10 +14,10 @@ import (
 )
 
 type roleRepository struct {
-	qx interfaces.QueryExecutor
+	qx repositories.QueryExecutor
 }
 
-func NewRoleRepository(qx interfaces.QueryExecutor) interfaces.RoleRepository {
+func NewRoleRepository(qx repositories.QueryExecutor) interfaces.RoleRepository {
 	return &roleRepository{qx: qx}
 }
 
@@ -111,7 +111,7 @@ func (r *roleRepository) Create(ctx context.Context, role *entities.Role) error 
 			:name, 
 			:description
 		)`
-	_, err := namedExecOne(ctx, r.qx, q, role)
+	_, err := repositories.NamedExecOne(ctx, r.qx, q, role)
 	return err
 }
 
@@ -142,7 +142,7 @@ func (r *roleRepository) Update(ctx context.Context, role *entities.Role) (int, 
 			description = :description,
 			updated_at = NOW(4)
 		WHERE id = :id AND deleted_at IS NULL`
-	return namedExecOne(ctx, r.qx, q, role)
+	return repositories.NamedExecOne(ctx, r.qx, q, role)
 }
 
 func (r *roleRepository) DeleteByID(ctx context.Context, id string) (int, error) {
@@ -150,7 +150,7 @@ func (r *roleRepository) DeleteByID(ctx context.Context, id string) (int, error)
 			deleted_at = NOW(4),
 			updated_at = NOW(4)
 		WHERE id = ? AND deleted_at IS NULL`
-	return execOne(ctx, r.qx, q, id)
+	return repositories.ExecOne(ctx, r.qx, q, id)
 }
 
 func (r *roleRepository) FindByUserID(ctx context.Context, userID string) (*entities.Role, error) {

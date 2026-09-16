@@ -14,10 +14,10 @@ import (
 )
 
 type accountRepository struct {
-	qx interfaces.QueryExecutor
+	qx repositories.QueryExecutor
 }
 
-func NewAccountRepository(qx interfaces.QueryExecutor) interfaces.AccountRepository {
+func NewAccountRepository(qx repositories.QueryExecutor) interfaces.AccountRepository {
 	return &accountRepository{qx: qx}
 }
 
@@ -120,7 +120,7 @@ func (r *accountRepository) Update(ctx context.Context, account *entities.Accoun
 				is_active = :is_active,
 				updated_at = :updated_at
 			WHERE id = :id AND deleted_at IS NULL`
-	return namedExecOne(ctx, r.qx, q, account)
+	return repositories.NamedExecOne(ctx, r.qx, q, account)
 }
 
 func (r *accountRepository) DeleteByID(ctx context.Context, id string) (int, error) {
@@ -128,5 +128,5 @@ func (r *accountRepository) DeleteByID(ctx context.Context, id string) (int, err
 				deleted_at = NOW(4), 
 				updated_at = NOW(4) 
 			WHERE id = ? AND deleted_at IS NULL`
-	return execOne(ctx, r.qx, q, id)
+	return repositories.ExecOne(ctx, r.qx, q, id)
 }

@@ -14,10 +14,10 @@ import (
 )
 
 type clientRepository struct {
-	qx interfaces.QueryExecutor
+	qx repositories.QueryExecutor
 }
 
-func NewClientRepository(qx interfaces.QueryExecutor) interfaces.ClientRepository {
+func NewClientRepository(qx repositories.QueryExecutor) interfaces.ClientRepository {
 	return &clientRepository{qx: qx}
 }
 
@@ -61,7 +61,7 @@ func (r *clientRepository) Create(ctx context.Context, client *entities.Client) 
 			:is_active, 
 			:is_default
 		)`
-	_, err := namedExecOne(ctx, r.qx, q, client)
+	_, err := repositories.NamedExecOne(ctx, r.qx, q, client)
 	return err
 }
 
@@ -70,7 +70,7 @@ func (r *clientRepository) DeleteByProjectID(ctx context.Context, projectID stri
 			deleted_at = NOW(4),
 			updated_at = NOW(4)
 		WHERE project_id = ? AND deleted_at IS NULL`
-	return exec(ctx, r.qx, q, projectID)
+	return repositories.Exec(ctx, r.qx, q, projectID)
 }
 
 func (r *clientRepository) Count(ctx context.Context, req *models.GetClientsRequest) (int, error) {
@@ -161,7 +161,7 @@ func (r *clientRepository) Update(ctx context.Context, client *entities.Client) 
 			is_active = :is_active,
 			updated_at = NOW(4)
 		WHERE id = :id AND deleted_at IS NULL`
-	return namedExecOne(ctx, r.qx, q, client)
+	return repositories.NamedExecOne(ctx, r.qx, q, client)
 }
 
 func (r *clientRepository) Delete(ctx context.Context, client *entities.Client) (int, error) {
@@ -169,5 +169,5 @@ func (r *clientRepository) Delete(ctx context.Context, client *entities.Client) 
 			deleted_at = NOW(4),
 			updated_at = NOW(4)
 		WHERE id = ? AND deleted_at IS NULL`
-	return execOne(ctx, r.qx, q, client.ID)
+	return repositories.ExecOne(ctx, r.qx, q, client.ID)
 }

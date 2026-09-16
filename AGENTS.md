@@ -34,7 +34,7 @@ Roled is a centralized User & Role Management Platform with two main sub-project
 │   │   ├── queues/                   # Redis-backed queue: Publisher / Handler / Worker / Message / Registry
 │   │   ├── repositories/
 │   │   │   ├── interfaces/           # Repository interfaces (one file per aggregate)
-│   │   │   ├── mariadb/              # MariaDB/sqlx impl; namedExecOne/execOne helpers; testutil/ with testcontainers
+│   │   │   ├── mariadb/              # MariaDB/sqlx impl; testutil/ with testcontainers
 │   │   │   ├── redis/                # Redis cache decorator wrapping mariadb impl
 │   │   │   └── registry.go           # Registry interface + Tx(fn) + decorator composition
 │   │   ├── services/
@@ -260,8 +260,8 @@ Registry (decorator composition)
 - **Soft delete**: Use `UPDATE SET deleted_at = NOW(4)` never `DELETE FROM`. Every SELECT has `WHERE deleted_at IS NULL`.
 - **Naming conventions**: snake_case columns mirror struct fields via `db:` tags.
 - **Write helpers in mariadb package**:
-  - Write operation methods in repository implementations should leverage the helper function `exec`, `execOne`, `namedExec`, or `namedExecOne`. Delete and update methods should use `(int, error)` as return type.
-  - `execOne` and `namedExecOne` will assert exactly 1 row affected (error `ErrAffectedGreaterThanOne` will be returned if more than 1 row is affected). Use these methods when it is expected that only one row will be affected.
+  - Write operation methods in repository implementations should leverage the [repositories/helper.go](auth/pkg/repositories/helper.go) functions: `repositories.Exec`, `repositories.ExecOne`, `repositories.NamedExec`, or `repositories.NamedExecOne`. Delete and update methods should use `(int, error)` as return type.
+  - `repositories.ExecOne` and `repositories.NamedExecOne` will assert exactly 1 row affected (error `repositories.ErrAffectedGreaterThanOne` will be returned if more than 1 row is affected). Use these methods when it is expected that only one row will be affected.
 - **Squirrel for reads**: Use `sq.SelectBuilder`, `sq.Eq/Like/GtOrEq`, `ToSql()`. For fixed/simple queries prefer raw string + GetContext/SelectContext.
 - **Sort whitelist**: Map sortBy string to allowed DB column; default fallback to `created_at DESC` to avoid SQL injection.
 

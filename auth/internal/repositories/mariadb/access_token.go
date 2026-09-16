@@ -8,13 +8,14 @@ import (
 	"github.com/roledio/roled/auth/internal/constants"
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/repositories/interfaces"
+	"github.com/roledio/roled/auth/pkg/repositories"
 )
 
 type accessTokenRepository struct {
-	qx interfaces.QueryExecutor
+	qx repositories.QueryExecutor
 }
 
-func NewAccessTokenRepository(qx interfaces.QueryExecutor) interfaces.AccessTokenRepository {
+func NewAccessTokenRepository(qx repositories.QueryExecutor) interfaces.AccessTokenRepository {
 	return &accessTokenRepository{qx: qx}
 }
 
@@ -70,7 +71,7 @@ func (r *accessTokenRepository) UpdateAsIssued(ctx context.Context, token *entit
 			refresh_token_id = :refresh_token_id
 		WHERE id = :id AND deleted_at IS NULL
 	`
-	return namedExecOne(ctx, r.qx, q, token)
+	return repositories.NamedExecOne(ctx, r.qx, q, token)
 }
 
 func (r *accessTokenRepository) UpdateAsRevoked(ctx context.Context, id string) (int, error) {
@@ -81,7 +82,7 @@ func (r *accessTokenRepository) UpdateAsRevoked(ctx context.Context, id string) 
 			status = ?
 		WHERE id = ? AND deleted_at IS NULL
 	`
-	return execOne(ctx, r.qx, q, constants.AccessTokenStatusRevoked, id)
+	return repositories.ExecOne(ctx, r.qx, q, constants.AccessTokenStatusRevoked, id)
 }
 
 func (r *accessTokenRepository) DeleteByAccountID(ctx context.Context, accountID string) (int, error) {
@@ -91,7 +92,7 @@ func (r *accessTokenRepository) DeleteByAccountID(ctx context.Context, accountID
 			updated_at = NOW(4)
 		WHERE account_id = ? AND deleted_at IS NULL
 	`
-	return exec(ctx, r.qx, q, accountID)
+	return repositories.Exec(ctx, r.qx, q, accountID)
 }
 
 func (r *accessTokenRepository) DeleteByUserID(ctx context.Context, userID string) (int, error) {
@@ -101,7 +102,7 @@ func (r *accessTokenRepository) DeleteByUserID(ctx context.Context, userID strin
 			updated_at = NOW(4)
 		WHERE user_id = ? AND deleted_at IS NULL
 	`
-	return exec(ctx, r.qx, q, userID)
+	return repositories.Exec(ctx, r.qx, q, userID)
 }
 
 func (r *accessTokenRepository) DeleteByProjectID(ctx context.Context, projectID string) (int, error) {
@@ -111,7 +112,7 @@ func (r *accessTokenRepository) DeleteByProjectID(ctx context.Context, projectID
 			updated_at = NOW(4)
 		WHERE project_id = ? AND deleted_at IS NULL
 	`
-	return exec(ctx, r.qx, q, projectID)
+	return repositories.Exec(ctx, r.qx, q, projectID)
 }
 
 func (r *accessTokenRepository) DeleteByClientID(ctx context.Context, clientID string) (int, error) {
@@ -121,7 +122,7 @@ func (r *accessTokenRepository) DeleteByClientID(ctx context.Context, clientID s
 			updated_at = NOW(4)
 		WHERE client_id = ? AND deleted_at IS NULL
 	`
-	return exec(ctx, r.qx, q, clientID)
+	return repositories.Exec(ctx, r.qx, q, clientID)
 }
 
 func (r *accessTokenRepository) FindByIDJoin(ctx context.Context, id string) (*interfaces.AccessTokenJoinResult, error) {

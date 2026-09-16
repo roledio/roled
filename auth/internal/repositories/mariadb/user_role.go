@@ -5,13 +5,14 @@ import (
 
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/repositories/interfaces"
+	"github.com/roledio/roled/auth/pkg/repositories"
 )
 
 type userRoleRepository struct {
-	qx interfaces.QueryExecutor
+	qx repositories.QueryExecutor
 }
 
-func NewUserRoleRepository(qx interfaces.QueryExecutor) interfaces.UserRoleRepository {
+func NewUserRoleRepository(qx repositories.QueryExecutor) interfaces.UserRoleRepository {
 	return &userRoleRepository{qx: qx}
 }
 
@@ -29,7 +30,7 @@ func (r *userRoleRepository) Create(ctx context.Context, userRole *entities.User
 
 func (r *userRoleRepository) DeleteByUserID(ctx context.Context, userID string) (int, error) {
 	var q = `DELETE FROM user_roles WHERE user_id = ?`
-	return exec(ctx, r.qx, q, userID)
+	return repositories.Exec(ctx, r.qx, q, userID)
 }
 
 func (r *userRoleRepository) FindUserIDsByRoleID(ctx context.Context, roleID string) ([]string, error) {

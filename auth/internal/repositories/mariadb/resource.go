@@ -14,10 +14,10 @@ import (
 )
 
 type resourceRepository struct {
-	qx interfaces.QueryExecutor
+	qx repositories.QueryExecutor
 }
 
-func NewResourceRepository(qx interfaces.QueryExecutor) interfaces.ResourceRepository {
+func NewResourceRepository(qx repositories.QueryExecutor) interfaces.ResourceRepository {
 	return &resourceRepository{qx: qx}
 }
 
@@ -54,7 +54,7 @@ func (r *resourceRepository) Create(ctx context.Context, resources []entities.Re
 		return 0, err
 	}
 
-	return exec(ctx, r.qx, query, args...)
+	return repositories.Exec(ctx, r.qx, query, args...)
 }
 
 func (r *resourceRepository) Count(ctx context.Context, req *models.GetResourcesRequest) (int, error) {
@@ -159,10 +159,10 @@ func (r *resourceRepository) Update(ctx context.Context, resource *entities.Reso
 			description = :description,
 			updated_at = NOW(4) 
 		WHERE id = :id AND project_id = :project_id`
-	return namedExecOne(ctx, r.qx, q, resource)
+	return repositories.NamedExecOne(ctx, r.qx, q, resource)
 }
 
 func (r *resourceRepository) Delete(ctx context.Context, resource *entities.Resource) (int, error) {
 	q := `DELETE FROM resources WHERE id = ?`
-	return execOne(ctx, r.qx, q, resource.ID)
+	return repositories.ExecOne(ctx, r.qx, q, resource.ID)
 }

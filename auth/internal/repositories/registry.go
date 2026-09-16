@@ -13,6 +13,7 @@ import (
 	"github.com/roledio/roled/auth/internal/repositories/mariadb"
 	"github.com/roledio/roled/auth/internal/repositories/redis"
 	"github.com/roledio/roled/auth/internal/services/infra"
+	"github.com/roledio/roled/auth/pkg/repositories"
 )
 
 type Registry interface {
@@ -40,7 +41,7 @@ type Registry interface {
 
 type registry struct {
 	defaultConfig *configs.DefaultConfig
-	qx            interfaces.QueryExecutor
+	qx            repositories.QueryExecutor
 	redisService  infra.RedisService
 }
 

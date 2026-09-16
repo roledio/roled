@@ -7,13 +7,14 @@ import (
 
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/repositories/interfaces"
+	"github.com/roledio/roled/auth/pkg/repositories"
 )
 
 type authCodeRepository struct {
-	qx interfaces.QueryExecutor
+	qx repositories.QueryExecutor
 }
 
-func NewAuthCodeRepository(qx interfaces.QueryExecutor) interfaces.AuthCodeRepository {
+func NewAuthCodeRepository(qx repositories.QueryExecutor) interfaces.AuthCodeRepository {
 	return &authCodeRepository{qx: qx}
 }
 
@@ -61,5 +62,5 @@ func (r *authCodeRepository) FindByClientIDAndCodeHash(ctx context.Context, clie
 
 func (r *authCodeRepository) UpdateUsedAuthCode(ctx context.Context, authCode *entities.AuthCode) (int, error) {
 	var q = `UPDATE auth_codes SET used_at = NOW(4), updated_at = NOW(4) WHERE id = ?`
-	return execOne(ctx, r.qx, q, authCode.ID)
+	return repositories.ExecOne(ctx, r.qx, q, authCode.ID)
 }

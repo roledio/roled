@@ -8,13 +8,14 @@ import (
 	"github.com/roledio/roled/auth/internal/constants"
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/repositories/interfaces"
+	"github.com/roledio/roled/auth/pkg/repositories"
 )
 
 type refreshTokenRepository struct {
-	qx interfaces.QueryExecutor
+	qx repositories.QueryExecutor
 }
 
-func NewRefreshTokenRepository(qx interfaces.QueryExecutor) interfaces.RefreshTokenRepository {
+func NewRefreshTokenRepository(qx repositories.QueryExecutor) interfaces.RefreshTokenRepository {
 	return &refreshTokenRepository{qx: qx}
 }
 
@@ -30,12 +31,12 @@ func (r *refreshTokenRepository) FindByClientIDAndRefreshTokenHash(ctx context.C
 
 func (r *refreshTokenRepository) UpdateUsedRefreshToken(ctx context.Context, refreshToken *entities.RefreshToken) (int, error) {
 	var q = "UPDATE refresh_tokens SET status = ?, used_at = NOW(4), updated_at = NOW(4) WHERE id = ?"
-	return execOne(ctx, r.qx, q, constants.RefreshTokenStatusUsed, refreshToken.ID)
+	return repositories.ExecOne(ctx, r.qx, q, constants.RefreshTokenStatusUsed, refreshToken.ID)
 }
 
 func (r *refreshTokenRepository) UpdateAsRevoked(ctx context.Context, refreshToken *entities.RefreshToken) (int, error) {
 	var q = "UPDATE refresh_tokens SET status = ?, revoked_at = NOW(4), updated_at = NOW(4) WHERE id = ?"
-	return execOne(ctx, r.qx, q, constants.RefreshTokenStatusRevoked, refreshToken.ID)
+	return repositories.ExecOne(ctx, r.qx, q, constants.RefreshTokenStatusRevoked, refreshToken.ID)
 }
 
 func (r *refreshTokenRepository) Create(ctx context.Context, refreshToken *entities.RefreshToken) error {

@@ -8,14 +8,15 @@ import (
 
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/repositories/interfaces"
+	"github.com/roledio/roled/auth/pkg/repositories"
 )
 
 type oAuthConnectionRepository struct {
 	tableName string
-	qx        interfaces.QueryExecutor
+	qx        repositories.QueryExecutor
 }
 
-func NewOAuthConnectionRepository(qx interfaces.QueryExecutor) interfaces.OAuthConnectionRepository {
+func NewOAuthConnectionRepository(qx repositories.QueryExecutor) interfaces.OAuthConnectionRepository {
 	return &oAuthConnectionRepository{
 		tableName: "oauth_connections",
 		qx:        qx,
@@ -65,7 +66,7 @@ func (r *oAuthConnectionRepository) Create(ctx context.Context, connection *enti
 		:scopes, 
 		:enabled
 	)`, r.tableName)
-	_, err := namedExecOne(ctx, r.qx, q, connection)
+	_, err := repositories.NamedExecOne(ctx, r.qx, q, connection)
 	return err
 }
 
@@ -77,10 +78,10 @@ func (r *oAuthConnectionRepository) Update(ctx context.Context, connection *enti
 		enabled = :enabled,
 		credential_type = :credential_type
 		WHERE project_id = :project_id AND provider = :provider`, r.tableName)
-	return namedExecOne(ctx, r.qx, q, connection)
+	return repositories.NamedExecOne(ctx, r.qx, q, connection)
 }
 
 func (r *oAuthConnectionRepository) Delete(ctx context.Context, projectID, provider string) (int, error) {
 	q := fmt.Sprintf("DELETE FROM %s WHERE project_id = ? AND provider = ?", r.tableName)
-	return execOne(ctx, r.qx, q, projectID, provider)
+	return repositories.ExecOne(ctx, r.qx, q, projectID, provider)
 }

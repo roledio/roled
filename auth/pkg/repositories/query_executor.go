@@ -1,4 +1,4 @@
-package interfaces
+package repositories
 
 import (
 	"context"
@@ -7,6 +7,8 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+// QueryExecutor is a wrapper interface around sqlx.DB and sqlx.Tx so that the methods can
+// be used interchangeably with or without db transaction.
 type QueryExecutor interface {
 	BindNamed(query string, arg any) (string, []any, error)
 	DriverName() string

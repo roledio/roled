@@ -14,10 +14,10 @@ import (
 )
 
 type userRepository struct {
-	qx interfaces.QueryExecutor
+	qx repositories.QueryExecutor
 }
 
-func NewUserRepository(qx interfaces.QueryExecutor) interfaces.UserRepository {
+func NewUserRepository(qx repositories.QueryExecutor) interfaces.UserRepository {
 	return &userRepository{qx: qx}
 }
 
@@ -203,12 +203,12 @@ func (r *userRepository) SetEmailVerified(ctx context.Context, userID string) (i
 			WHERE id = ? 
 			AND deleted_at IS NULL 
 			AND email_verified_at IS NULL`
-	return execOne(ctx, r.qx, q, userID)
+	return repositories.ExecOne(ctx, r.qx, q, userID)
 }
 
 func (r *userRepository) UpdatePassword(ctx context.Context, userID, passwordHash string) (int, error) {
 	var q = "UPDATE users SET password_hash = ?, updated_at = NOW(4) WHERE id = ? AND deleted_at IS NULL"
-	return execOne(ctx, r.qx, q, passwordHash, userID)
+	return repositories.ExecOne(ctx, r.qx, q, passwordHash, userID)
 }
 
 func (r *userRepository) Update(ctx context.Context, user *entities.User) (int, error) {
@@ -224,7 +224,7 @@ func (r *userRepository) Update(ctx context.Context, user *entities.User) (int, 
 				avatar_url = :avatar_url,
 				updated_at = NOW(4)
 			WHERE id = :id AND deleted_at IS NULL`
-	return namedExecOne(ctx, r.qx, q, user)
+	return repositories.NamedExecOne(ctx, r.qx, q, user)
 }
 
 func (r *userRepository) DeleteByID(ctx context.Context, userID string) (int, error) {
@@ -232,7 +232,7 @@ func (r *userRepository) DeleteByID(ctx context.Context, userID string) (int, er
 				deleted_at = NOW(4),
 				updated_at = NOW(4)
 			WHERE id = ? AND deleted_at IS NULL`
-	return execOne(ctx, r.qx, q, userID)
+	return repositories.ExecOne(ctx, r.qx, q, userID)
 }
 
 func (r *userRepository) DeleteByAccountID(ctx context.Context, accountID string) (int, error) {
@@ -240,7 +240,7 @@ func (r *userRepository) DeleteByAccountID(ctx context.Context, accountID string
 				deleted_at = NOW(4),
 				updated_at = NOW(4)
 			WHERE account_id = ? AND deleted_at IS NULL`
-	return exec(ctx, r.qx, q, accountID)
+	return repositories.Exec(ctx, r.qx, q, accountID)
 }
 
 func (r *userRepository) DeleteByProjectID(ctx context.Context, projectID string) (int, error) {
@@ -248,5 +248,5 @@ func (r *userRepository) DeleteByProjectID(ctx context.Context, projectID string
 				deleted_at = NOW(4),
 				updated_at = NOW(4)
 			WHERE project_id = ? AND deleted_at IS NULL`
-	return exec(ctx, r.qx, q, projectID)
+	return repositories.Exec(ctx, r.qx, q, projectID)
 }

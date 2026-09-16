@@ -14,10 +14,10 @@ import (
 )
 
 type projectRepository struct {
-	qx interfaces.QueryExecutor
+	qx repositories.QueryExecutor
 }
 
-func NewProjectRepository(qx interfaces.QueryExecutor) interfaces.ProjectRepository {
+func NewProjectRepository(qx repositories.QueryExecutor) interfaces.ProjectRepository {
 	return &projectRepository{qx: qx}
 }
 
@@ -141,7 +141,7 @@ func (r *projectRepository) Create(ctx context.Context, project *entities.Projec
 			:is_active, 
 			:is_system
 		)`
-	_, err := namedExecOne(ctx, r.qx, q, project)
+	_, err := repositories.NamedExecOne(ctx, r.qx, q, project)
 	return err
 }
 
@@ -153,7 +153,7 @@ func (r *projectRepository) Update(ctx context.Context, project *entities.Projec
 			is_active = :is_active,
 			updated_at = NOW(4)
 		WHERE id = :id AND deleted_at IS NULL`
-	return namedExecOne(ctx, r.qx, q, project)
+	return repositories.NamedExecOne(ctx, r.qx, q, project)
 }
 
 func (r *projectRepository) Delete(ctx context.Context, project *entities.Project) (int, error) {
@@ -161,5 +161,5 @@ func (r *projectRepository) Delete(ctx context.Context, project *entities.Projec
 				deleted_at = NOW(4),
 				updated_at = NOW(4)
 			WHERE id = ? AND deleted_at IS NULL`
-	return execOne(ctx, r.qx, q, project.ID)
+	return repositories.ExecOne(ctx, r.qx, q, project.ID)
 }

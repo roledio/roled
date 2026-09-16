@@ -13,10 +13,10 @@ import (
 )
 
 type permissionRepository struct {
-	qx interfaces.QueryExecutor
+	qx repositories.QueryExecutor
 }
 
-func NewPermissionRepository(qx interfaces.QueryExecutor) interfaces.PermissionRepository {
+func NewPermissionRepository(qx repositories.QueryExecutor) interfaces.PermissionRepository {
 	return &permissionRepository{qx: qx}
 }
 
@@ -91,7 +91,7 @@ func (r *permissionRepository) Create(ctx context.Context, permissions []entitie
 		return 0, err
 	}
 
-	return exec(ctx, r.qx, query, args...)
+	return repositories.Exec(ctx, r.qx, query, args...)
 }
 
 func (r *permissionRepository) FindByIDs(ctx context.Context, ids []string) ([]interfaces.PermissionResource, error) {
@@ -115,7 +115,7 @@ func (r *permissionRepository) FindByIDs(ctx context.Context, ids []string) ([]i
 
 func (r *permissionRepository) DeleteByResourceID(ctx context.Context, resourceID string) (int, error) {
 	q := `DELETE FROM permissions WHERE resource_id = ?`
-	return exec(ctx, r.qx, q, resourceID)
+	return repositories.Exec(ctx, r.qx, q, resourceID)
 }
 
 func (r *permissionRepository) FindAll(ctx context.Context, req *models.GetPermissionsRequest) ([]interfaces.PermissionResource, error) {

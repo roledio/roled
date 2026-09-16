@@ -6,13 +6,14 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/repositories/interfaces"
+	"github.com/roledio/roled/auth/pkg/repositories"
 )
 
 type rolePermissionRepository struct {
-	qx interfaces.QueryExecutor
+	qx repositories.QueryExecutor
 }
 
-func NewRolePermissionRepository(qx interfaces.QueryExecutor) interfaces.RolePermissionRepository {
+func NewRolePermissionRepository(qx repositories.QueryExecutor) interfaces.RolePermissionRepository {
 	return &rolePermissionRepository{qx: qx}
 }
 
@@ -37,11 +38,11 @@ func (r *rolePermissionRepository) Create(ctx context.Context, rolePermissions [
 		return err
 	}
 
-	_, err = exec(ctx, r.qx, query, args...)
+	_, err = repositories.Exec(ctx, r.qx, query, args...)
 	return err
 }
 
 func (r *rolePermissionRepository) DeleteByRoleID(ctx context.Context, roleID string) (int, error) {
 	q := `DELETE FROM role_permissions WHERE role_id = ?`
-	return exec(ctx, r.qx, q, roleID)
+	return repositories.Exec(ctx, r.qx, q, roleID)
 }

@@ -7,13 +7,14 @@ import (
 
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/repositories/interfaces"
+	"github.com/roledio/roled/auth/pkg/repositories"
 )
 
 type projectSettingRepository struct {
-	qx interfaces.QueryExecutor
+	qx repositories.QueryExecutor
 }
 
-func NewProjectSettingRepository(qx interfaces.QueryExecutor) interfaces.ProjectSettingRepository {
+func NewProjectSettingRepository(qx repositories.QueryExecutor) interfaces.ProjectSettingRepository {
 	return &projectSettingRepository{qx: qx}
 }
 
@@ -58,5 +59,5 @@ func (r *projectSettingRepository) Update(ctx context.Context, projectSetting *e
 			is_allow_temp_email = :is_allow_temp_email,
 			updated_at = NOW(4)
 		WHERE project_id = :project_id`
-	return namedExecOne(ctx, r.qx, q, projectSetting)
+	return repositories.NamedExecOne(ctx, r.qx, q, projectSetting)
 }

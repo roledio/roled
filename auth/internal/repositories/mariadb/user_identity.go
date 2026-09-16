@@ -7,13 +7,14 @@ import (
 
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/repositories/interfaces"
+	"github.com/roledio/roled/auth/pkg/repositories"
 )
 
 type userIdentityRepository struct {
-	qx interfaces.QueryExecutor
+	qx repositories.QueryExecutor
 }
 
-func NewUserIdentityRepository(qx interfaces.QueryExecutor) interfaces.UserIdentityRepository {
+func NewUserIdentityRepository(qx repositories.QueryExecutor) interfaces.UserIdentityRepository {
 	return &userIdentityRepository{qx: qx}
 }
 
@@ -65,5 +66,5 @@ func (r *userIdentityRepository) DeleteByID(ctx context.Context, id string) (int
 				deleted_at = NOW(4),
 				updated_at = NOW(4)
 			WHERE id = ? AND deleted_at IS NULL`
-	return execOne(ctx, r.qx, q, id)
+	return repositories.ExecOne(ctx, r.qx, q, id)
 }
