@@ -18,17 +18,18 @@ import (
 	"github.com/roledio/roled/auth/internal/queues"
 	"github.com/roledio/roled/auth/internal/queues/payloads"
 	"github.com/roledio/roled/auth/internal/services/infra"
+	"github.com/roledio/roled/auth/pkg/email"
 	"github.com/roledio/roled/auth/pkg/utils/idutil"
 	"github.com/shomali11/util/xhashes"
 )
 
 type emailHandler struct {
 	defaultConfig *configs.DefaultConfig
-	emailService  infra.EmailService
+	emailService  email.Service
 	redisService  infra.RedisService
 }
 
-func NewEmailHandler(defaultConfig *configs.DefaultConfig, emailService infra.EmailService, redisService infra.RedisService) queues.Handler {
+func NewEmailHandler(defaultConfig *configs.DefaultConfig, emailService email.Service, redisService infra.RedisService) queues.Handler {
 	return emailHandler{
 		defaultConfig: defaultConfig,
 		emailService:  emailService,

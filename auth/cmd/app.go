@@ -24,6 +24,7 @@ import (
 	"github.com/roledio/roled/auth/internal/services/project"
 	"github.com/roledio/roled/auth/internal/services/upload"
 	"github.com/roledio/roled/auth/internal/services/user"
+	"github.com/roledio/roled/auth/pkg/email"
 	"github.com/roledio/roled/auth/pkg/utils/cacheutil"
 )
 
@@ -31,7 +32,7 @@ type App struct {
 	config           *configs.DefaultConfig
 	db               *sqlx.DB
 	redisService     infra.RedisService
-	emailService     infra.EmailService
+	emailService     email.Service
 	authorizeService authorize.AuthorizeService
 	projectService   project.ProjectService
 	tokenService     accesstoken.AccessTokenService
@@ -65,8 +66,13 @@ func NewApp(config *configs.DefaultConfig) (*App, error) {
 
 	// Setup registry and services
 	redisService := infra.NewRedisService(config)
-	emailService := infra.NewEmailService(config)
 	registry := repositories.NewRegistry(config, db, redisService)
+	emailService := email.NewService(&email.SMTPConfig{
+		Host:     config.Email.SMTP.Host,
+		Port:     int(config.Email.SMTP.Port),
+		Username: config.Email.SMTP.Username,
+		Password: config.Email.SMTP.Password,
+	})
 
 	// Set cache service
 	cacheutil.SetService(redisService)
@@ -79,7 +85,7 @@ func NewApp(config *configs.DefaultConfig) (*App, error) {
 		EmailHandler: handlers.NewEmailHandler(config, emailService, redisService),
 	}
 
-	services := setupServices(config, registry, queuePublishers, redisService, emailService)
+	services := setupServices(config, registry, queuePublishers, redisService)
 
 	// Setup Fiber app
 	app := setupFiberApp(config, newrelicService.GetApplication(), registry, redisService, services)

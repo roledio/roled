@@ -59,7 +59,7 @@ type Services struct {
 	PermissionService      permission.PermissionService
 }
 
-func setupServices(config *configs.DefaultConfig, registry repositories.Registry, publishers QueuePublishers, redis infra.RedisService, _ infra.EmailService) *Services {
+func setupServices(config *configs.DefaultConfig, registry repositories.Registry, publishers QueuePublishers, redis infra.RedisService) *Services {
 	uploadService := upload.NewUploadService(config)
 	return &Services{
 		AuthorizeService:       authorize.NewAuthorizeService(config, registry, redis, publishers.EmailPublisher),

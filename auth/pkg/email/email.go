@@ -1,37 +1,41 @@
-package infra
+package email
 
 import (
 	"context"
 
 	strip "github.com/grokify/html-strip-tags-go"
-	"github.com/roledio/roled/auth/internal/configs"
 	"github.com/roledio/roled/auth/internal/models"
 	"gopkg.in/gomail.v2"
 )
 
-type EmailService interface {
+type Service interface {
 	Send(ctx context.Context, req models.SendEmailRequest) error
 }
 
-type emailService struct {
-	defaultConfig *configs.DefaultConfig
-	dialer        *gomail.Dialer
+type service struct {
+	dialer *gomail.Dialer
 }
 
-func NewEmailService(defaultConfig *configs.DefaultConfig) EmailService {
+type SMTPConfig struct {
+	Host     string
+	Port     int
+	Username string
+	Password string
+}
+
+func NewService(config *SMTPConfig) Service {
 	gomail.SetPartEncoding(gomail.QuotedPrintable)
 	dialer := gomail.NewDialer(
-		defaultConfig.Email.SMTP.Host,
-		int(defaultConfig.Email.SMTP.Port),
-		defaultConfig.Email.SMTP.Username,
-		defaultConfig.Email.SMTP.Password)
-	return &emailService{
-		defaultConfig: defaultConfig,
-		dialer:        dialer,
+		config.Host,
+		config.Port,
+		config.Username,
+		config.Password)
+	return &service{
+		dialer: dialer,
 	}
 }
 
-func (s *emailService) Send(ctx context.Context, req models.SendEmailRequest) error {
+func (s *service) Send(ctx context.Context, req models.SendEmailRequest) error {
 	m := gomail.NewMessage()
 
 	if req.Sender != "" {
