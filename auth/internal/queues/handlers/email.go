@@ -174,7 +174,7 @@ func (h emailHandler) handleInviteUser(ctx context.Context, payload payloads.Ema
 }
 
 func (h emailHandler) send(ctx context.Context, from, to, subject, body string) error {
-	req := models.SendEmailRequest{
+	req := email.Request{
 		From:    from,
 		To:      []string{to},
 		Subject: h.appendEnv(subject),

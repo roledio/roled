@@ -4,16 +4,26 @@ import (
 	"context"
 
 	strip "github.com/grokify/html-strip-tags-go"
-	"github.com/roledio/roled/auth/internal/models"
 	"gopkg.in/gomail.v2"
 )
 
 type Service interface {
-	Send(ctx context.Context, req models.SendEmailRequest) error
+	Send(ctx context.Context, req Request) error
 }
 
 type service struct {
 	dialer *gomail.Dialer
+}
+
+type Request struct {
+	To      []string
+	CC      []string
+	BCC     []string
+	From    string
+	Subject string
+	Body    string
+	IsHTML  bool
+	Sender  string // Optional Sender header to set in the email
 }
 
 type SMTPConfig struct {
@@ -35,7 +45,7 @@ func NewService(config *SMTPConfig) Service {
 	}
 }
 
-func (s *service) Send(ctx context.Context, req models.SendEmailRequest) error {
+func (s *service) Send(ctx context.Context, req Request) error {
 	m := gomail.NewMessage()
 
 	if req.Sender != "" {
