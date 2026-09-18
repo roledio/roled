@@ -9,9 +9,9 @@ import (
 	"github.com/roledio/roled/auth/internal/constants"
 	"github.com/roledio/roled/auth/internal/models"
 	"github.com/roledio/roled/auth/internal/repositories"
-	"github.com/roledio/roled/auth/internal/services/infra"
 	"github.com/roledio/roled/auth/internal/services/upload"
 	"github.com/roledio/roled/auth/pkg/errors"
+	pkgredis "github.com/roledio/roled/auth/pkg/redis"
 	"golang.org/x/sync/singleflight"
 )
 
@@ -32,14 +32,14 @@ type projectService struct {
 	registry      repositories.Registry
 	uploadService upload.UploadService
 	uploadBaseURL string
-	redis         infra.RedisService
+	redis         pkgredis.Service
 
 	// sfGroup is a zero-value singleflight.Group. In Go, singleflight.Group zero-value is immediately
 	// valid and thread-safe, so it does not need to be explicitly initialized in NewProjectService.
 	sfGroup singleflight.Group
 }
 
-func NewProjectService(defaultConfig *configs.DefaultConfig, registry repositories.Registry, uploadService upload.UploadService, redis infra.RedisService) ProjectService {
+func NewProjectService(defaultConfig *configs.DefaultConfig, registry repositories.Registry, uploadService upload.UploadService, redis pkgredis.Service) ProjectService {
 	var uploadBaseURL string
 	switch defaultConfig.Upload.Driver {
 	case constants.UploadDriverLocal:

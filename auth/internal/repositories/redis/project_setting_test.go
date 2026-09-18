@@ -12,13 +12,13 @@ import (
 	"github.com/roledio/roled/auth/internal/entities"
 	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
 	"github.com/roledio/roled/auth/internal/repositories/redis"
-	redismocks "github.com/roledio/roled/auth/internal/services/infra/mocks"
+	redismocks "github.com/roledio/roled/auth/pkg/redis/mocks"
 )
 
 func TestCachedProjectSettingRepository_FindByProjectID_CacheHit(t *testing.T) {
 	ctx := context.Background()
 	mockDBRepo := interfacemocks.NewMockProjectSettingRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewProjectSettingRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -54,7 +54,7 @@ func TestCachedProjectSettingRepository_FindByProjectID_CacheMiss(t *testing.T) 
 	}
 
 	mockDBRepo := interfacemocks.NewMockProjectSettingRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewProjectSettingRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -91,7 +91,7 @@ func TestCachedProjectSettingRepository_Create(t *testing.T) {
 	}
 
 	mockDBRepo := interfacemocks.NewMockProjectSettingRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewProjectSettingRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -113,7 +113,7 @@ func TestCachedProjectSettingRepository_Update(t *testing.T) {
 	}
 
 	mockDBRepo := interfacemocks.NewMockProjectSettingRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewProjectSettingRepository(mockDBRepo, mockRedis, 24*time.Hour)
 

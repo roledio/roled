@@ -5,7 +5,7 @@ import (
 
 	"github.com/roledio/roled/auth/internal/models"
 	"github.com/roledio/roled/auth/internal/repositories"
-	"github.com/roledio/roled/auth/internal/services/infra"
+	pkgredis "github.com/roledio/roled/auth/pkg/redis"
 )
 
 type ResourceService interface {
@@ -18,10 +18,10 @@ type ResourceService interface {
 
 type resourceService struct {
 	registry     repositories.Registry
-	redisService infra.RedisService
+	redisService pkgredis.Service
 }
 
-func NewResourceService(registry repositories.Registry, redisService infra.RedisService) ResourceService {
+func NewResourceService(registry repositories.Registry, redisService pkgredis.Service) ResourceService {
 	return &resourceService{
 		registry:     registry,
 		redisService: redisService,

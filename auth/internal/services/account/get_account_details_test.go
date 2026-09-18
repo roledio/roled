@@ -11,8 +11,8 @@ import (
 	"github.com/roledio/roled/auth/internal/models"
 	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
 	repositorymocks "github.com/roledio/roled/auth/internal/repositories/mocks"
-	redismocks "github.com/roledio/roled/auth/internal/services/infra/mocks"
 	pkgerrors "github.com/roledio/roled/auth/pkg/errors"
+	redismocks "github.com/roledio/roled/auth/pkg/redis/mocks"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -31,7 +31,7 @@ func TestAccountService_GetAccountDetails_Success_SelfAccount(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	// Create service
 	service := NewAccountService(mockRegistry, mockRedis)
@@ -61,7 +61,7 @@ func TestAccountService_GetAccountDetails_Success_SystemAccountAccessOther(t *te
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
 
 	// Mock registry to return repositories
@@ -103,7 +103,7 @@ func TestAccountService_GetAccountDetails_AccountNotInContext(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	// Create service
 	service := NewAccountService(mockRegistry, mockRedis)
@@ -132,7 +132,7 @@ func TestAccountService_GetAccountDetails_NonSystemAccessOtherAccount(t *testing
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	// Create service
 	service := NewAccountService(mockRegistry, mockRedis)
@@ -161,7 +161,7 @@ func TestAccountService_GetAccountDetails_SystemAccountOtherNotFound(t *testing.
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
 
 	// Mock registry to return repositories
@@ -197,7 +197,7 @@ func TestAccountService_GetAccountDetails_SystemAccountOtherRepoError(t *testing
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
 
 	// Mock registry to return repositories

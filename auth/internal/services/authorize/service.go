@@ -11,7 +11,7 @@ import (
 	"github.com/roledio/roled/auth/internal/models"
 	"github.com/roledio/roled/auth/internal/queues"
 	"github.com/roledio/roled/auth/internal/repositories"
-	"github.com/roledio/roled/auth/internal/services/infra"
+	pkgredis "github.com/roledio/roled/auth/pkg/redis"
 	"github.com/roledio/roled/auth/pkg/utils/idutil"
 	"github.com/shomali11/util/xhashes"
 )
@@ -26,11 +26,11 @@ type AuthorizeService interface {
 type authorizeService struct {
 	defaultConfig  *configs.DefaultConfig
 	registry       repositories.Registry
-	rediService    infra.RedisService
+	rediService    pkgredis.Service
 	emailPublisher queues.Publisher
 }
 
-func NewAuthorizeService(defaultConfig *configs.DefaultConfig, registry repositories.Registry, redisService infra.RedisService,
+func NewAuthorizeService(defaultConfig *configs.DefaultConfig, registry repositories.Registry, redisService pkgredis.Service,
 	emailPublisher queues.Publisher) AuthorizeService {
 	return &authorizeService{
 		defaultConfig:  defaultConfig,

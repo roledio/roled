@@ -7,16 +7,19 @@ import (
 	"github.com/gofiber/fiber/v3/log"
 	"github.com/roledio/roled/auth/internal/constants/rediskeys"
 	"github.com/roledio/roled/auth/internal/models"
-	"github.com/roledio/roled/auth/internal/services/infra"
+	pkgredis "github.com/roledio/roled/auth/pkg/redis"
 )
 
 // GoogleOAuthTransactionRepository handles storing and retrieving Google OAuth transactions from Redis
 type GoogleOAuthTransactionRepository struct {
-	redis infra.RedisService
+	redis pkgredis.Service
 	ttl   time.Duration
 }
 
-func NewGoogleOAuthTransactionRepository(redis infra.RedisService, ttl time.Duration) *GoogleOAuthTransactionRepository {
+func NewGoogleOAuthTransactionRepository(redis pkgredis.Service, ttl time.Duration) *GoogleOAuthTransactionRepository {
+	if redis == nil {
+		return nil
+	}
 	return &GoogleOAuthTransactionRepository{
 		redis: redis,
 		ttl:   ttl,

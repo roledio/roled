@@ -11,9 +11,9 @@ import (
 	"github.com/roledio/roled/auth/internal/models"
 	"github.com/roledio/roled/auth/internal/queues"
 	"github.com/roledio/roled/auth/internal/repositories"
-	"github.com/roledio/roled/auth/internal/services/infra"
 	"github.com/roledio/roled/auth/internal/utils/contextutil"
 	pkgerrors "github.com/roledio/roled/auth/pkg/errors"
+	pkgredis "github.com/roledio/roled/auth/pkg/redis"
 )
 
 // MemberService defines the member service interface.
@@ -42,11 +42,11 @@ type memberService struct {
 	defaultConfig  *configs.DefaultConfig
 	registry       repositories.Registry
 	emailPublisher queues.Publisher
-	redisService   infra.RedisService
+	redisService   pkgredis.Service
 }
 
 func NewMemberService(defaultConfig *configs.DefaultConfig, registry repositories.Registry,
-	emailPublisher queues.Publisher, redisService infra.RedisService) MemberService {
+	emailPublisher queues.Publisher, redisService pkgredis.Service) MemberService {
 	return &memberService{
 		defaultConfig:  defaultConfig,
 		registry:       registry,

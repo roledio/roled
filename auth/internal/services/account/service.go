@@ -5,7 +5,7 @@ import (
 
 	"github.com/roledio/roled/auth/internal/models"
 	"github.com/roledio/roled/auth/internal/repositories"
-	"github.com/roledio/roled/auth/internal/services/infra"
+	pkgredis "github.com/roledio/roled/auth/pkg/redis"
 )
 
 type AccountService interface {
@@ -17,10 +17,10 @@ type AccountService interface {
 
 type accountService struct {
 	registry repositories.Registry
-	redis    infra.RedisService
+	redis    pkgredis.Service
 }
 
-func NewAccountService(registry repositories.Registry, redis infra.RedisService) AccountService {
+func NewAccountService(registry repositories.Registry, redis pkgredis.Service) AccountService {
 	return &accountService{
 		registry: registry,
 		redis:    redis,

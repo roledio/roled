@@ -8,16 +8,16 @@ import (
 	"github.com/roledio/roled/auth/internal/constants/rediskeys"
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/repositories/interfaces"
-	"github.com/roledio/roled/auth/internal/services/infra"
+	pkgredis "github.com/roledio/roled/auth/pkg/redis"
 )
 
 type redirectURIRepository struct {
 	repo  interfaces.RedirectURIRepository
-	redis infra.RedisService
+	redis pkgredis.Service
 	ttl   time.Duration
 }
 
-func NewRedirectURIRepository(repo interfaces.RedirectURIRepository, redis infra.RedisService,
+func NewRedirectURIRepository(repo interfaces.RedirectURIRepository, redis pkgredis.Service,
 	ttl time.Duration) interfaces.RedirectURIRepository {
 	if redis == nil {
 		return repo

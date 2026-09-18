@@ -13,13 +13,13 @@ import (
 	"github.com/roledio/roled/auth/internal/entities"
 	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
 	"github.com/roledio/roled/auth/internal/repositories/redis"
-	redismocks "github.com/roledio/roled/auth/internal/services/infra/mocks"
+	redismocks "github.com/roledio/roled/auth/pkg/redis/mocks"
 )
 
 func TestCachedRefreshTokenRepository_FindByClientIDAndRefreshTokenHash_CacheHit(t *testing.T) {
 	ctx := context.Background()
 	mockDBRepo := interfacemocks.NewMockRefreshTokenRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewRefreshTokenRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -67,7 +67,7 @@ func TestCachedRefreshTokenRepository_FindByClientIDAndRefreshTokenHash_CacheMis
 	}
 
 	mockDBRepo := interfacemocks.NewMockRefreshTokenRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewRefreshTokenRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -111,7 +111,7 @@ func TestCachedRefreshTokenRepository_Create(t *testing.T) {
 	}
 
 	mockDBRepo := interfacemocks.NewMockRefreshTokenRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewRefreshTokenRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -139,7 +139,7 @@ func TestCachedRefreshTokenRepository_UpdateUsedRefreshToken(t *testing.T) {
 	}
 
 	mockDBRepo := interfacemocks.NewMockRefreshTokenRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewRefreshTokenRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -160,7 +160,7 @@ func TestCachedRefreshTokenRepository_UpdateAsRevoked(t *testing.T) {
 	refreshTokenHash := "refreshtokenhash-123"
 
 	mockDBRepo := interfacemocks.NewMockRefreshTokenRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewRefreshTokenRepository(mockDBRepo, mockRedis, 24*time.Hour)
 

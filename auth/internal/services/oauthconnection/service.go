@@ -8,7 +8,7 @@ import (
 	"github.com/roledio/roled/auth/internal/constants"
 	"github.com/roledio/roled/auth/internal/models"
 	"github.com/roledio/roled/auth/internal/repositories"
-	"github.com/roledio/roled/auth/internal/services/infra"
+	pkgredis "github.com/roledio/roled/auth/pkg/redis"
 	"github.com/roledio/roled/auth/pkg/utils/encryptionutil"
 )
 
@@ -23,10 +23,10 @@ type OAuthConnectionService interface {
 type oAuthConnectionService struct {
 	defaultConfig *configs.DefaultConfig
 	registry      repositories.Registry
-	redisService  infra.RedisService
+	redisService  pkgredis.Service
 }
 
-func NewOAuthConnectionService(defaultConfig *configs.DefaultConfig, registry repositories.Registry, redisService infra.RedisService) OAuthConnectionService {
+func NewOAuthConnectionService(defaultConfig *configs.DefaultConfig, registry repositories.Registry, redisService pkgredis.Service) OAuthConnectionService {
 	return &oAuthConnectionService{
 		defaultConfig: defaultConfig,
 		registry:      registry,

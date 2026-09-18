@@ -4,10 +4,10 @@ import (
 	"github.com/roledio/roled/auth/internal/handlers/api"
 	"github.com/roledio/roled/auth/internal/handlers/web"
 	"github.com/roledio/roled/auth/internal/repositories"
-	"github.com/roledio/roled/auth/internal/services/infra"
+	"github.com/roledio/roled/auth/pkg/redis"
 )
 
-func newApiHandlerDeps(registry repositories.Registry, redis infra.RedisService, services *Services) *api.Dependencies {
+func newApiHandlerDeps(registry repositories.Registry, redis redis.Service, services *Services) *api.Dependencies {
 	return &api.Dependencies{
 		Registry:               registry,
 		Redis:                  redis,
@@ -25,7 +25,7 @@ func newApiHandlerDeps(registry repositories.Registry, redis infra.RedisService,
 	}
 }
 
-func newWebHandlerDeps(registry repositories.Registry, redis infra.RedisService, services *Services) *web.Dependencies {
+func newWebHandlerDeps(registry repositories.Registry, redis redis.Service, services *Services) *web.Dependencies {
 	return &web.Dependencies{
 		Registry:         registry,
 		Redis:            redis,

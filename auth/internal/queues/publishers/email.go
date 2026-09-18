@@ -6,7 +6,7 @@ import (
 
 	"github.com/redis/go-redis/v9"
 	"github.com/roledio/roled/auth/internal/queues"
-	"github.com/roledio/roled/auth/internal/services/infra"
+	pkgredis "github.com/roledio/roled/auth/pkg/redis"
 )
 
 type emailPublisher struct {
@@ -15,7 +15,7 @@ type emailPublisher struct {
 	dlqStream string
 }
 
-func NewEmailPublisher(redisService infra.RedisService, stream, dlqStream string) queues.Publisher {
+func NewEmailPublisher(redisService pkgredis.Service, stream, dlqStream string) queues.Publisher {
 	return &emailPublisher{
 		rdb:       redisService.Client(),
 		stream:    redisService.KeyWithPrefix(stream),

@@ -25,15 +25,15 @@ import (
 	"github.com/roledio/roled/auth/internal/middlewares"
 	"github.com/roledio/roled/auth/internal/models"
 	"github.com/roledio/roled/auth/internal/repositories"
-	"github.com/roledio/roled/auth/internal/services/infra"
 	"github.com/roledio/roled/auth/internal/views"
 	pkgconstants "github.com/roledio/roled/auth/pkg/constants"
+	"github.com/roledio/roled/auth/pkg/redis"
 	"github.com/roledio/roled/auth/pkg/utils/encryptionutil"
 	"github.com/roledio/roled/auth/pkg/utils/idutil"
 	"github.com/roledio/roled/auth/pkg/utils/responseutil"
 )
 
-func setupFiberApp(defaultConfig *configs.DefaultConfig, nrapp *newrelic.Application, registry repositories.Registry, redis infra.RedisService, services *Services) *fiber.App {
+func setupFiberApp(defaultConfig *configs.DefaultConfig, nrapp *newrelic.Application, registry repositories.Registry, redis redis.Service, services *Services) *fiber.App {
 	buildInfo := models.GetCurrentBuildInfo(defaultConfig)
 	engine := html.NewFileSystem(http.FS(views.TemplatesFS), ".html")
 	engine.AddFunc("getenv", os.Getenv)

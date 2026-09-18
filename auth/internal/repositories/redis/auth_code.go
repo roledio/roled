@@ -8,16 +8,16 @@ import (
 	"github.com/roledio/roled/auth/internal/constants/rediskeys"
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/repositories/interfaces"
-	"github.com/roledio/roled/auth/internal/services/infra"
+	pkgredis "github.com/roledio/roled/auth/pkg/redis"
 )
 
 type authCodeRepository struct {
 	repo  interfaces.AuthCodeRepository
-	redis infra.RedisService
+	redis pkgredis.Service
 	ttl   time.Duration
 }
 
-func NewAuthCodeRepository(repo interfaces.AuthCodeRepository, redis infra.RedisService,
+func NewAuthCodeRepository(repo interfaces.AuthCodeRepository, redis pkgredis.Service,
 	ttl time.Duration) interfaces.AuthCodeRepository {
 	if redis == nil {
 		return repo

@@ -12,15 +12,15 @@ import (
 	customerrors "github.com/roledio/roled/auth/internal/errors"
 	"github.com/roledio/roled/auth/internal/models"
 	repositorymocks "github.com/roledio/roled/auth/internal/repositories/mocks"
-	inframocks "github.com/roledio/roled/auth/internal/services/infra/mocks"
 	projectmocks "github.com/roledio/roled/auth/internal/services/project/mocks"
+	redismocks "github.com/roledio/roled/auth/pkg/redis/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/tidwall/gjson"
 )
 
 func TestPingRoute(t *testing.T) {
 	app := fiber.New()
-	redisMock := inframocks.NewMockRedisService(t)
+	redisMock := redismocks.NewMockService(t)
 	deps := &Dependencies{
 		Redis: redisMock,
 	}
@@ -39,7 +39,7 @@ func TestGetSystemHealth_AllOK(t *testing.T) {
 	app := fiber.New()
 	regMock := repositorymocks.NewMockRegistry(t)
 	regMock.EXPECT().Ping().Return(nil)
-	redisMock := inframocks.NewMockRedisService(t)
+	redisMock := redismocks.NewMockService(t)
 	redisMock.EXPECT().Ping().Return(nil)
 	deps := &Dependencies{
 		Registry: regMock,
@@ -61,7 +61,7 @@ func TestGetSystemHealth_DBFail(t *testing.T) {
 	// simulate db fail
 	regFail := repositorymocks.NewMockRegistry(t)
 	regFail.EXPECT().Ping().Return(errors.New("db fail"))
-	redisMock := inframocks.NewMockRedisService(t)
+	redisMock := redismocks.NewMockService(t)
 	redisMock.EXPECT().Ping().Return(nil)
 	deps := &Dependencies{
 		Registry: regFail,
@@ -82,7 +82,7 @@ func TestGetSystemHealth_RedisFail(t *testing.T) {
 	app := fiber.New()
 	regMock := repositorymocks.NewMockRegistry(t)
 	regMock.EXPECT().Ping().Return(nil)
-	redisFail := inframocks.NewMockRedisService(t)
+	redisFail := redismocks.NewMockService(t)
 	redisFail.EXPECT().Ping().Return(errors.New("redis fail"))
 	deps := &Dependencies{
 		Registry: regMock,
@@ -103,7 +103,7 @@ func TestGetSystemHealth_BothFail(t *testing.T) {
 	app := fiber.New()
 	regFail := repositorymocks.NewMockRegistry(t)
 	regFail.EXPECT().Ping().Return(errors.New("db fail"))
-	redisFail := inframocks.NewMockRedisService(t)
+	redisFail := redismocks.NewMockService(t)
 	redisFail.EXPECT().Ping().Return(errors.New("redis fail"))
 	deps := &Dependencies{
 		Registry: regFail,
@@ -125,7 +125,7 @@ func TestGetSystemInfo_AllOK(t *testing.T) {
 	app := fiber.New()
 	regMock := repositorymocks.NewMockRegistry(t)
 	regMock.EXPECT().Ping().Return(nil)
-	redisMock := inframocks.NewMockRedisService(t)
+	redisMock := redismocks.NewMockService(t)
 	redisMock.EXPECT().Ping().Return(nil)
 	deps := &Dependencies{
 		Registry: regMock,
@@ -150,7 +150,7 @@ func TestGetSystemInfo_DBFail(t *testing.T) {
 	app := fiber.New()
 	regFail := repositorymocks.NewMockRegistry(t)
 	regFail.EXPECT().Ping().Return(errors.New("db fail"))
-	redisMock := inframocks.NewMockRedisService(t)
+	redisMock := redismocks.NewMockService(t)
 	redisMock.EXPECT().Ping().Return(nil)
 	deps := &Dependencies{
 		Registry: regFail,
@@ -175,7 +175,7 @@ func TestGetSystemInfo_RedisFail(t *testing.T) {
 	app := fiber.New()
 	regMock := repositorymocks.NewMockRegistry(t)
 	regMock.EXPECT().Ping().Return(nil)
-	redisFail := inframocks.NewMockRedisService(t)
+	redisFail := redismocks.NewMockService(t)
 	redisFail.EXPECT().Ping().Return(errors.New("redis fail"))
 	deps := &Dependencies{
 		Registry: regMock,
@@ -200,7 +200,7 @@ func TestGetSystemInfo_BothFail(t *testing.T) {
 	app := fiber.New()
 	regFail := repositorymocks.NewMockRegistry(t)
 	regFail.EXPECT().Ping().Return(errors.New("db fail"))
-	redisFail := inframocks.NewMockRedisService(t)
+	redisFail := redismocks.NewMockService(t)
 	redisFail.EXPECT().Ping().Return(errors.New("redis fail"))
 	deps := &Dependencies{
 		Registry: regFail,

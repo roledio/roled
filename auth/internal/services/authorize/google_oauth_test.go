@@ -27,7 +27,7 @@ import (
 	"github.com/roledio/roled/auth/internal/repositories"
 	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
 	repositorymocks "github.com/roledio/roled/auth/internal/repositories/mocks"
-	redismocks "github.com/roledio/roled/auth/internal/services/infra/mocks"
+	redismocks "github.com/roledio/roled/auth/pkg/redis/mocks"
 	"github.com/roledio/roled/auth/pkg/utils/encryptionutil"
 )
 
@@ -269,7 +269,7 @@ func TestAuthorizeService_InitiateGoogleOAuth_Success(t *testing.T) {
 	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
 	mockRedirectURIRepo := interfacemocks.NewMockRedirectURIRepository(t)
 	mockOAuthConnRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
-	mockRedisService := redismocks.NewMockRedisService(t)
+	mockRedisService := redismocks.NewMockService(t)
 
 	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -387,7 +387,7 @@ func TestAuthorizeService_InitiateGoogleOAuth_RedisError(t *testing.T) {
 	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
 	mockRedirectURIRepo := interfacemocks.NewMockRedirectURIRepository(t)
 	mockOAuthConnRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
-	mockRedisService := redismocks.NewMockRedisService(t)
+	mockRedisService := redismocks.NewMockService(t)
 
 	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -476,7 +476,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_ExistingIdentity(t *
 	mockUserIdentityRepo := interfacemocks.NewMockUserIdentityRepository(t)
 	mockUserRepo := interfacemocks.NewMockUserRepository(t)
 	mockAuthCodeRepo := interfacemocks.NewMockAuthCodeRepository(t)
-	mockRedisService := redismocks.NewMockRedisService(t)
+	mockRedisService := redismocks.NewMockService(t)
 
 	state := "test-google-state"
 	transaction := models.GoogleOAuthTransaction{
@@ -632,7 +632,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_NewUser_SystemProjec
 	mockUserRoleRepo := interfacemocks.NewMockUserRoleRepository(t)
 	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
 	mockAuthCodeRepo := interfacemocks.NewMockAuthCodeRepository(t)
-	mockRedisService := redismocks.NewMockRedisService(t)
+	mockRedisService := redismocks.NewMockService(t)
 
 	state := "test-google-state"
 	transaction := models.GoogleOAuthTransaction{
@@ -792,7 +792,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_NewUser_NonSystemPro
 	mockUserRoleRepo := interfacemocks.NewMockUserRoleRepository(t)
 	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
 	mockAuthCodeRepo := interfacemocks.NewMockAuthCodeRepository(t)
-	mockRedisService := redismocks.NewMockRedisService(t)
+	mockRedisService := redismocks.NewMockService(t)
 
 	state := "test-google-state"
 	transaction := models.GoogleOAuthTransaction{
@@ -952,7 +952,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_UserExistsByEmail(t 
 	mockUserIdentityRepo := interfacemocks.NewMockUserIdentityRepository(t)
 	mockUserRepo := interfacemocks.NewMockUserRepository(t)
 	mockAuthCodeRepo := interfacemocks.NewMockAuthCodeRepository(t)
-	mockRedisService := redismocks.NewMockRedisService(t)
+	mockRedisService := redismocks.NewMockService(t)
 
 	state := "test-google-state"
 	transaction := models.GoogleOAuthTransaction{
@@ -1091,7 +1091,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_Success_UserExistsByEmail(t 
 func TestAuthorizeService_HandleGoogleOAuthCallback_TransactionNotFound(t *testing.T) {
 	ctx := context.Background()
 
-	mockRedisService := redismocks.NewMockRedisService(t)
+	mockRedisService := redismocks.NewMockService(t)
 	mockRedisService.EXPECT().GetData(ctx, mock.Anything, mock.AnythingOfType("*models.GoogleOAuthTransaction")).Return(false, nil)
 
 	defaultConfig := configs.DefaultConfig{}
@@ -1120,7 +1120,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_TokenExchangeFailed(t *testi
 	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
 	mockRedirectURIRepo := interfacemocks.NewMockRedirectURIRepository(t)
 	mockOAuthConnRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
-	mockRedisService := redismocks.NewMockRedisService(t)
+	mockRedisService := redismocks.NewMockService(t)
 
 	transaction := models.GoogleOAuthTransaction{
 		ClientID:    "test-client",
@@ -1221,7 +1221,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_IDTokenMissing(t *testing.T)
 	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
 	mockRedirectURIRepo := interfacemocks.NewMockRedirectURIRepository(t)
 	mockOAuthConnRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
-	mockRedisService := redismocks.NewMockRedisService(t)
+	mockRedisService := redismocks.NewMockService(t)
 
 	transaction := models.GoogleOAuthTransaction{
 		ClientID:    "test-client",
@@ -1325,7 +1325,7 @@ func TestAuthorizeService_HandleGoogleOAuthCallback_UserInactive(t *testing.T) {
 	mockOAuthConnRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
 	mockUserIdentityRepo := interfacemocks.NewMockUserIdentityRepository(t)
 	mockUserRepo := interfacemocks.NewMockUserRepository(t)
-	mockRedisService := redismocks.NewMockRedisService(t)
+	mockRedisService := redismocks.NewMockService(t)
 
 	state := "test-google-state"
 	transaction := models.GoogleOAuthTransaction{

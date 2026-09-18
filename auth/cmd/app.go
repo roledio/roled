@@ -19,20 +19,20 @@ import (
 	"github.com/roledio/roled/auth/internal/services/accesstoken"
 	"github.com/roledio/roled/auth/internal/services/account"
 	"github.com/roledio/roled/auth/internal/services/authorize"
-	"github.com/roledio/roled/auth/internal/services/infra"
 	"github.com/roledio/roled/auth/internal/services/member"
 	"github.com/roledio/roled/auth/internal/services/project"
 	"github.com/roledio/roled/auth/internal/services/upload"
 	"github.com/roledio/roled/auth/internal/services/user"
 	"github.com/roledio/roled/auth/pkg/email"
 	"github.com/roledio/roled/auth/pkg/newrelic"
+	"github.com/roledio/roled/auth/pkg/redis"
 	"github.com/roledio/roled/auth/pkg/utils/cacheutil"
 )
 
 type App struct {
 	config           *configs.DefaultConfig
 	db               *sqlx.DB
-	redisService     infra.RedisService
+	redisService     redis.Service
 	emailService     email.Service
 	authorizeService authorize.AuthorizeService
 	projectService   project.ProjectService
@@ -44,7 +44,6 @@ type App struct {
 	queueHandlers    QueueHandlers
 	queuePublishers  QueuePublishers
 	logger           *fiberzap.LoggerConfig
-	newrelicService  newrelic.Service
 	app              *fiber.App
 }
 
@@ -71,7 +70,14 @@ func NewApp(config *configs.DefaultConfig) (*App, error) {
 	}
 
 	// Setup registry and services
-	redisService := infra.NewRedisService(config)
+	redisService := redis.NewService(&redis.Config{
+		Host:     config.Redis.Host,
+		Port:     config.Redis.Port,
+		Username: config.Redis.Username,
+		Password: config.Redis.Password,
+		Prefix:   config.Redis.Prefix,
+		Newrelic: config.Newrelic.Enabled,
+	})
 	registry := repositories.NewRegistry(config, db, redisService)
 	emailService := email.NewService(&email.SMTPConfig{
 		Host:     config.Email.SMTP.Host,

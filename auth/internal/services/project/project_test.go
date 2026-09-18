@@ -10,8 +10,8 @@ import (
 	"github.com/roledio/roled/auth/internal/entities"
 	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
 	repositorymocks "github.com/roledio/roled/auth/internal/repositories/mocks"
-	redismocks "github.com/roledio/roled/auth/internal/services/infra/mocks"
 	"github.com/roledio/roled/auth/pkg/errors"
+	redismocks "github.com/roledio/roled/auth/pkg/redis/mocks"
 )
 
 func TestProjectService_GetConsoleConfig_Success(t *testing.T) {
@@ -21,7 +21,7 @@ func TestProjectService_GetConsoleConfig_Success(t *testing.T) {
 	mockRegistry := repositorymocks.NewMockRegistry(t)
 	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
 	mockClientRepo := interfacemocks.NewMockClientRepository(t)
-	mockRedisService := redismocks.NewMockRedisService(t)
+	mockRedisService := redismocks.NewMockService(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -60,7 +60,7 @@ func TestProjectService_GetConsoleConfig_ProjectNotFound(t *testing.T) {
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
 	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
-	mockRedisService := redismocks.NewMockRedisService(t)
+	mockRedisService := redismocks.NewMockService(t)
 
 	// Mock registry to return project repo
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -86,7 +86,7 @@ func TestProjectService_GetConsoleConfig_DatabaseError(t *testing.T) {
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
 	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
-	mockRedisService := redismocks.NewMockRedisService(t)
+	mockRedisService := redismocks.NewMockService(t)
 
 	// Mock registry to return project repo
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)

@@ -5,14 +5,14 @@ import (
 	"github.com/roledio/roled/auth/internal/configs"
 	"github.com/roledio/roled/auth/internal/repositories"
 	"github.com/roledio/roled/auth/internal/services/authorize"
-	"github.com/roledio/roled/auth/internal/services/infra"
 	"github.com/roledio/roled/auth/internal/services/member"
 	"github.com/roledio/roled/auth/internal/services/user"
+	"github.com/roledio/roled/auth/pkg/redis"
 )
 
 type Dependencies struct {
 	Registry         repositories.Registry
-	Redis            infra.RedisService
+	Redis            redis.Service
 	AuthorizeService authorize.AuthorizeService
 	UserService      user.UserService
 	MemberService    member.MemberService
@@ -22,7 +22,7 @@ type handler struct {
 	app              *fiber.App
 	defaultConfig    *configs.DefaultConfig
 	repo             repositories.Registry
-	redisService     infra.RedisService
+	redisService     redis.Service
 	authorizeService authorize.AuthorizeService
 	userService      user.UserService
 	memberService    member.MemberService

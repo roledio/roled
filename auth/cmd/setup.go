@@ -18,7 +18,6 @@ import (
 	"github.com/roledio/roled/auth/internal/services/account"
 	"github.com/roledio/roled/auth/internal/services/authorize"
 	"github.com/roledio/roled/auth/internal/services/client"
-	"github.com/roledio/roled/auth/internal/services/infra"
 	"github.com/roledio/roled/auth/internal/services/member"
 	"github.com/roledio/roled/auth/internal/services/oauthconnection"
 	"github.com/roledio/roled/auth/internal/services/permission"
@@ -30,6 +29,7 @@ import (
 	_ "github.com/roledio/roled/auth/migrations"
 	"github.com/roledio/roled/auth/pkg/databases"
 	pkgmodels "github.com/roledio/roled/auth/pkg/models"
+	"github.com/roledio/roled/auth/pkg/redis"
 	sqldblogger "github.com/simukti/sqldb-logger"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -59,7 +59,7 @@ type Services struct {
 	PermissionService      permission.PermissionService
 }
 
-func setupServices(config *configs.DefaultConfig, registry repositories.Registry, publishers QueuePublishers, redis infra.RedisService) *Services {
+func setupServices(config *configs.DefaultConfig, registry repositories.Registry, publishers QueuePublishers, redis redis.Service) *Services {
 	uploadService := upload.NewUploadService(config)
 	return &Services{
 		AuthorizeService:       authorize.NewAuthorizeService(config, registry, redis, publishers.EmailPublisher),

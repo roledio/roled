@@ -7,10 +7,10 @@ import (
 	"github.com/roledio/roled/auth/internal/constants/rediskeys"
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/repositories"
-	"github.com/roledio/roled/auth/internal/services/infra"
+	pkgredis "github.com/roledio/roled/auth/pkg/redis"
 )
 
-func InvalidateAccountCache(ctx context.Context, redis infra.RedisService, accountID string) {
+func InvalidateAccountCache(ctx context.Context, redis pkgredis.Service, accountID string) {
 	if redis == nil {
 		log.WithContext(ctx).Warnw("Redis service is nil, skipping account cache invalidation", "account_id", accountID)
 		return
@@ -26,7 +26,7 @@ type OldUserCacheKeyParts struct {
 	ExternalUserID *string
 }
 
-func InvalidateUserCache(ctx context.Context, redis infra.RedisService, user *entities.User, oldData *OldUserCacheKeyParts) {
+func InvalidateUserCache(ctx context.Context, redis pkgredis.Service, user *entities.User, oldData *OldUserCacheKeyParts) {
 	if user == nil {
 		return
 	}
@@ -63,7 +63,7 @@ func InvalidateUserCache(ctx context.Context, redis infra.RedisService, user *en
 	}
 }
 
-func InvalidateMemberCache(ctx context.Context, redis infra.RedisService, member *entities.Member) {
+func InvalidateMemberCache(ctx context.Context, redis pkgredis.Service, member *entities.Member) {
 	if member == nil {
 		return
 	}
@@ -85,7 +85,7 @@ func InvalidateMemberCache(ctx context.Context, redis infra.RedisService, member
 	}
 }
 
-func InvalidateProjectCache(ctx context.Context, redis infra.RedisService, project *entities.Project) {
+func InvalidateProjectCache(ctx context.Context, redis pkgredis.Service, project *entities.Project) {
 	if project == nil {
 		return
 	}
@@ -109,7 +109,7 @@ func InvalidateProjectCache(ctx context.Context, redis infra.RedisService, proje
 	}
 }
 
-func InvalidateRedirectURICache(ctx context.Context, redis infra.RedisService, projectID string, oldRedirectURIs []entities.RedirectURI) {
+func InvalidateRedirectURICache(ctx context.Context, redis pkgredis.Service, projectID string, oldRedirectURIs []entities.RedirectURI) {
 	if redis == nil {
 		log.WithContext(ctx).Warnw("Redis service is nil, skipping redirect URI cache invalidation", "project_id", projectID)
 		return
@@ -129,7 +129,7 @@ func InvalidateRedirectURICache(ctx context.Context, redis infra.RedisService, p
 	}
 }
 
-func InvalidateProjectSettingCache(ctx context.Context, redis infra.RedisService, projectID string) {
+func InvalidateProjectSettingCache(ctx context.Context, redis pkgredis.Service, projectID string) {
 	if redis == nil {
 		log.WithContext(ctx).Warnw("Redis service is nil, skipping project setting cache invalidation", "project_id", projectID)
 		return
@@ -140,7 +140,7 @@ func InvalidateProjectSettingCache(ctx context.Context, redis infra.RedisService
 	}
 }
 
-func InvalidateClientCache(ctx context.Context, redis infra.RedisService, client *entities.Client) {
+func InvalidateClientCache(ctx context.Context, redis pkgredis.Service, client *entities.Client) {
 	if client == nil {
 		return
 	}
@@ -164,7 +164,7 @@ func InvalidateClientCache(ctx context.Context, redis infra.RedisService, client
 	}
 }
 
-func InvalidateClientPermissionsCache(ctx context.Context, redis infra.RedisService, clientID string) {
+func InvalidateClientPermissionsCache(ctx context.Context, redis pkgredis.Service, clientID string) {
 	if redis == nil {
 		log.WithContext(ctx).Warnw("Redis service is nil, skipping client permissions cache invalidation", "client_id", clientID)
 		return
@@ -177,7 +177,7 @@ func InvalidateClientPermissionsCache(ctx context.Context, redis infra.RedisServ
 	}
 }
 
-func InvalidateAccessTokenCache(ctx context.Context, redis infra.RedisService, tokenID string) {
+func InvalidateAccessTokenCache(ctx context.Context, redis pkgredis.Service, tokenID string) {
 	if redis == nil {
 		log.WithContext(ctx).Warnw("Redis service is nil, skipping access token cache invalidation", "token_id", tokenID)
 		return
@@ -195,7 +195,7 @@ func InvalidateAccessTokenCache(ctx context.Context, redis infra.RedisService, t
 	}
 }
 
-func InvalidateRefreshTokenCache(ctx context.Context, redis infra.RedisService, clientID, tokenHash string) {
+func InvalidateRefreshTokenCache(ctx context.Context, redis pkgredis.Service, clientID, tokenHash string) {
 	if redis == nil {
 		log.WithContext(ctx).Warnw("Redis service is nil, skipping refresh token cache invalidation", "client_id", clientID)
 		return
@@ -208,7 +208,7 @@ func InvalidateRefreshTokenCache(ctx context.Context, redis infra.RedisService, 
 	}
 }
 
-func InvalidateAuthCodeCache(ctx context.Context, redis infra.RedisService, clientID, codeHash string) {
+func InvalidateAuthCodeCache(ctx context.Context, redis pkgredis.Service, clientID, codeHash string) {
 	if redis == nil {
 		log.WithContext(ctx).Warnw("Redis service is nil, skipping auth code cache invalidation", "client_id", clientID)
 		return
@@ -221,7 +221,7 @@ func InvalidateAuthCodeCache(ctx context.Context, redis infra.RedisService, clie
 	}
 }
 
-func InvalidateRoleCache(ctx context.Context, redis infra.RedisService, registry repositories.Registry, role *entities.Role) {
+func InvalidateRoleCache(ctx context.Context, redis pkgredis.Service, registry repositories.Registry, role *entities.Role) {
 	if role == nil {
 		return
 	}
@@ -254,7 +254,7 @@ func InvalidateRoleCache(ctx context.Context, redis infra.RedisService, registry
 	}
 }
 
-func InvalidateRolePermissionsCache(ctx context.Context, redis infra.RedisService, roleID string) {
+func InvalidateRolePermissionsCache(ctx context.Context, redis pkgredis.Service, roleID string) {
 	if redis == nil {
 		log.WithContext(ctx).Warnw("Redis service is nil, skipping role permissions cache invalidation", "role_id", roleID)
 		return
@@ -267,7 +267,7 @@ func InvalidateRolePermissionsCache(ctx context.Context, redis infra.RedisServic
 	}
 }
 
-func InvalidateResourceCache(ctx context.Context, redis infra.RedisService, resource *entities.Resource) {
+func InvalidateResourceCache(ctx context.Context, redis pkgredis.Service, resource *entities.Resource) {
 	if resource == nil {
 		return
 	}
@@ -288,7 +288,7 @@ func InvalidateResourceCache(ctx context.Context, redis infra.RedisService, reso
 	}
 }
 
-func InvalidateOAuthConnectionCache(ctx context.Context, redis infra.RedisService, projectID, provider string) {
+func InvalidateOAuthConnectionCache(ctx context.Context, redis pkgredis.Service, projectID, provider string) {
 	if redis == nil {
 		log.WithContext(ctx).Warnw("Redis service is nil, skipping OAuth connection cache invalidation", "project_id", projectID, "provider", provider)
 		return

@@ -10,7 +10,7 @@ import (
 	"github.com/gofiber/fiber/v3/log"
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
-	"github.com/roledio/roled/auth/internal/services/infra"
+	pkgredis "github.com/roledio/roled/auth/pkg/redis"
 	"github.com/roledio/roled/auth/pkg/utils/jsonutil"
 )
 
@@ -23,7 +23,7 @@ type WorkerConfig struct {
 	DLQStream    string
 }
 
-func StartWorker(ctx context.Context, redisService infra.RedisService, cfg WorkerConfig) {
+func StartWorker(ctx context.Context, redisService pkgredis.Service, cfg WorkerConfig) {
 	// Override stream names with prefix
 	cfg.Stream = redisService.KeyWithPrefix(cfg.Stream)
 	cfg.DLQStream = redisService.KeyWithPrefix(cfg.DLQStream)

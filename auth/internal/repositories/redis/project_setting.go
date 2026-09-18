@@ -8,17 +8,17 @@ import (
 	"github.com/roledio/roled/auth/internal/constants/rediskeys"
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/repositories/interfaces"
-	"github.com/roledio/roled/auth/internal/services/infra"
+	pkgredis "github.com/roledio/roled/auth/pkg/redis"
 )
 
 type projectSettingRepository struct {
 	repo  interfaces.ProjectSettingRepository
-	redis infra.RedisService
+	redis pkgredis.Service
 	ttl   time.Duration
 }
 
 func NewProjectSettingRepository(repo interfaces.ProjectSettingRepository,
-	redis infra.RedisService, ttl time.Duration) interfaces.ProjectSettingRepository {
+	redis pkgredis.Service, ttl time.Duration) interfaces.ProjectSettingRepository {
 	if redis == nil {
 		return repo
 	}

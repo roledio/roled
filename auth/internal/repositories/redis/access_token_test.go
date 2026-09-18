@@ -14,13 +14,13 @@ import (
 	"github.com/roledio/roled/auth/internal/repositories/interfaces"
 	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
 	"github.com/roledio/roled/auth/internal/repositories/redis"
-	redismocks "github.com/roledio/roled/auth/internal/services/infra/mocks"
+	redismocks "github.com/roledio/roled/auth/pkg/redis/mocks"
 )
 
 func TestCachedAccessTokenRepository_FindByID_CacheHit(t *testing.T) {
 	ctx := context.Background()
 	mockDBRepo := interfacemocks.NewMockAccessTokenRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewAccessTokenRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -69,7 +69,7 @@ func TestCachedAccessTokenRepository_FindByID_CacheMiss(t *testing.T) {
 	}
 
 	mockDBRepo := interfacemocks.NewMockAccessTokenRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewAccessTokenRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -113,7 +113,7 @@ func TestCachedAccessTokenRepository_Create(t *testing.T) {
 	}
 
 	mockDBRepo := interfacemocks.NewMockAccessTokenRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewAccessTokenRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -142,7 +142,7 @@ func TestCachedAccessTokenRepository_UpdateAsIssued(t *testing.T) {
 	}
 
 	mockDBRepo := interfacemocks.NewMockAccessTokenRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewAccessTokenRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -161,7 +161,7 @@ func TestCachedAccessTokenRepository_UpdateAsRevoked(t *testing.T) {
 	tokenID := "token-123"
 
 	mockDBRepo := interfacemocks.NewMockAccessTokenRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewAccessTokenRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -180,7 +180,7 @@ func TestCachedAccessTokenRepository_DeleteByAccountID(t *testing.T) {
 	accountID := "acc-123"
 
 	mockDBRepo := interfacemocks.NewMockAccessTokenRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewAccessTokenRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -200,7 +200,7 @@ func TestCachedAccessTokenRepository_DeleteByUserID(t *testing.T) {
 	userID := "user-123"
 
 	mockDBRepo := interfacemocks.NewMockAccessTokenRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewAccessTokenRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -220,7 +220,7 @@ func TestCachedAccessTokenRepository_DeleteByProjectID(t *testing.T) {
 	projectID := "proj-123"
 
 	mockDBRepo := interfacemocks.NewMockAccessTokenRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewAccessTokenRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -240,7 +240,7 @@ func TestCachedAccessTokenRepository_DeleteByClientID(t *testing.T) {
 	clientID := "client-123"
 
 	mockDBRepo := interfacemocks.NewMockAccessTokenRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewAccessTokenRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -258,7 +258,7 @@ func TestCachedAccessTokenRepository_DeleteByClientID(t *testing.T) {
 func TestCachedAccessTokenRepository_FindByIDJoin_CacheHit(t *testing.T) {
 	ctx := context.Background()
 	mockDBRepo := interfacemocks.NewMockAccessTokenRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewAccessTokenRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -309,7 +309,7 @@ func TestCachedAccessTokenRepository_FindByIDJoin_CacheMiss(t *testing.T) {
 	}
 
 	mockDBRepo := interfacemocks.NewMockAccessTokenRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewAccessTokenRepository(mockDBRepo, mockRedis, 24*time.Hour)
 

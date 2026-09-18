@@ -14,7 +14,7 @@ import (
 	"github.com/roledio/roled/auth/internal/repositories/interfaces"
 	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
 	"github.com/roledio/roled/auth/internal/repositories/redis"
-	redismocks "github.com/roledio/roled/auth/internal/services/infra/mocks"
+	redismocks "github.com/roledio/roled/auth/pkg/redis/mocks"
 )
 
 func TestCachedMemberRepository_Create(t *testing.T) {
@@ -27,7 +27,7 @@ func TestCachedMemberRepository_Create(t *testing.T) {
 	}
 
 	mockDBRepo := interfacemocks.NewMockMemberRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewMemberRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -43,7 +43,7 @@ func TestCachedMemberRepository_Create(t *testing.T) {
 func TestCachedMemberRepository_FindByAccountIDAndUserID_CacheHit(t *testing.T) {
 	ctx := context.Background()
 	mockDBRepo := interfacemocks.NewMockMemberRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewMemberRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -82,7 +82,7 @@ func TestCachedMemberRepository_FindByAccountIDAndUserID_CacheMiss(t *testing.T)
 	}
 
 	mockDBRepo := interfacemocks.NewMockMemberRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewMemberRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -125,7 +125,7 @@ func TestCachedMemberRepository_FindAll_NoCache(t *testing.T) {
 	}
 
 	mockDBRepo := interfacemocks.NewMockMemberRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewMemberRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -144,7 +144,7 @@ func TestCachedMemberRepository_Count_NoCache(t *testing.T) {
 	ctx := context.Background()
 
 	mockDBRepo := interfacemocks.NewMockMemberRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewMemberRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -162,7 +162,7 @@ func TestCachedMemberRepository_Count_NoCache(t *testing.T) {
 func TestCachedMemberRepository_FindByID_CacheHit(t *testing.T) {
 	ctx := context.Background()
 	mockDBRepo := interfacemocks.NewMockMemberRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewMemberRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -200,7 +200,7 @@ func TestCachedMemberRepository_FindByID_CacheMiss(t *testing.T) {
 	}
 
 	mockDBRepo := interfacemocks.NewMockMemberRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewMemberRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -241,7 +241,7 @@ func TestCachedMemberRepository_Delete(t *testing.T) {
 	userID := "user-123"
 
 	mockDBRepo := interfacemocks.NewMockMemberRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewMemberRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -268,7 +268,7 @@ func TestCachedMemberRepository_Update(t *testing.T) {
 	isAdmin := true
 
 	mockDBRepo := interfacemocks.NewMockMemberRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewMemberRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -293,7 +293,7 @@ func TestCachedMemberRepository_CountByAccountID_NoCache(t *testing.T) {
 	accountID := "acc-123"
 
 	mockDBRepo := interfacemocks.NewMockMemberRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewMemberRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -312,7 +312,7 @@ func TestCachedMemberRepository_DeleteByAccountID_NoCache(t *testing.T) {
 	accountID := "acc-123"
 
 	mockDBRepo := interfacemocks.NewMockMemberRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewMemberRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -329,7 +329,7 @@ func TestCachedMemberRepository_DeleteByAccountID_NoCache(t *testing.T) {
 func TestCachedMemberRepository_FindByIDJoinUser_CacheHit(t *testing.T) {
 	ctx := context.Background()
 	mockDBRepo := interfacemocks.NewMockMemberRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewMemberRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -369,7 +369,7 @@ func TestCachedMemberRepository_FindByIDJoinUser_CacheMiss(t *testing.T) {
 	}
 
 	mockDBRepo := interfacemocks.NewMockMemberRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewMemberRepository(mockDBRepo, mockRedis, 24*time.Hour)
 

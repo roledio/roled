@@ -12,7 +12,7 @@ import (
 	"github.com/roledio/roled/auth/internal/configs"
 	"github.com/roledio/roled/auth/internal/constants"
 	"github.com/roledio/roled/auth/internal/queues"
-	"github.com/roledio/roled/auth/internal/services/infra"
+	"github.com/roledio/roled/auth/pkg/redis"
 )
 
 func main() {
@@ -79,7 +79,7 @@ func registerQueues(defaultConfig *configs.DefaultConfig, app *App) {
 	queues.Register(emailQueue, app.queuePublishers.EmailPublisher, app.queueHandlers.EmailHandler)
 }
 
-func startQueueWorkers(ctx context.Context, redisService infra.RedisService, wg *sync.WaitGroup) {
+func startQueueWorkers(ctx context.Context, redisService redis.Service, wg *sync.WaitGroup) {
 	configs := []queues.WorkerConfig{
 		{
 			Stream:       constants.QueueEmail,

@@ -6,7 +6,7 @@ import (
 	"github.com/roledio/roled/auth/internal/configs"
 	"github.com/roledio/roled/auth/internal/models"
 	"github.com/roledio/roled/auth/internal/repositories"
-	"github.com/roledio/roled/auth/internal/services/infra"
+	"github.com/roledio/roled/auth/pkg/redis"
 )
 
 const tokenTypeBearer = "bearer"
@@ -20,10 +20,10 @@ type AccessTokenService interface {
 type accessTokenService struct {
 	defaultConfig *configs.DefaultConfig
 	registry      repositories.Registry
-	redisService  infra.RedisService
+	redisService  redis.Service
 }
 
-func NewAccessTokenService(defaultConfig *configs.DefaultConfig, registry repositories.Registry, redisService infra.RedisService) AccessTokenService {
+func NewAccessTokenService(defaultConfig *configs.DefaultConfig, registry repositories.Registry, redisService redis.Service) AccessTokenService {
 	return &accessTokenService{
 		defaultConfig: defaultConfig,
 		registry:      registry,

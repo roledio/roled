@@ -8,16 +8,16 @@ import (
 	"github.com/roledio/roled/auth/internal/constants/rediskeys"
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/repositories/interfaces"
-	"github.com/roledio/roled/auth/internal/services/infra"
+	pkgredis "github.com/roledio/roled/auth/pkg/redis"
 )
 
 type oAuthConnectionRepository struct {
 	repo  interfaces.OAuthConnectionRepository
-	redis infra.RedisService
+	redis pkgredis.Service
 	ttl   time.Duration
 }
 
-func NewOAuthConnectionRepository(repo interfaces.OAuthConnectionRepository, redis infra.RedisService,
+func NewOAuthConnectionRepository(repo interfaces.OAuthConnectionRepository, redis pkgredis.Service,
 	ttl time.Duration) interfaces.OAuthConnectionRepository {
 	if redis == nil {
 		return repo

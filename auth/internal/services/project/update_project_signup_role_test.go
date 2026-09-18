@@ -16,8 +16,8 @@ import (
 	"github.com/roledio/roled/auth/internal/models"
 	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
 	repositorymocks "github.com/roledio/roled/auth/internal/repositories/mocks"
-	redismocks "github.com/roledio/roled/auth/internal/services/infra/mocks"
 	pkgerrors "github.com/roledio/roled/auth/pkg/errors"
+	redismocks "github.com/roledio/roled/auth/pkg/redis/mocks"
 )
 
 // newUpdateSignupRoleTestCtx returns a context with an active system account and shared test fixtures.
@@ -56,7 +56,7 @@ func TestProjectService_UpdateProjectSignupRole_Success(t *testing.T) {
 	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
 	mockProjectSettingRepo := interfacemocks.NewMockProjectSettingRepository(t)
 	mockRoleRepo := interfacemocks.NewMockRoleRepository(t)
-	mockRedisService := redismocks.NewMockRedisService(t)
+	mockRedisService := redismocks.NewMockService(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().ProjectSettingRepository().Return(mockProjectSettingRepo)
@@ -88,7 +88,7 @@ func TestProjectService_UpdateProjectSignupRole_SignupDisabled_ReturnsError(t *t
 	mockRegistry := repositorymocks.NewMockRegistry(t)
 	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
 	mockProjectSettingRepo := interfacemocks.NewMockProjectSettingRepository(t)
-	mockRedisService := redismocks.NewMockRedisService(t)
+	mockRedisService := redismocks.NewMockService(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().ProjectSettingRepository().Return(mockProjectSettingRepo)
@@ -113,7 +113,7 @@ func TestProjectService_UpdateProjectSignupRole_SettingsNotFound(t *testing.T) {
 	mockRegistry := repositorymocks.NewMockRegistry(t)
 	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
 	mockProjectSettingRepo := interfacemocks.NewMockProjectSettingRepository(t)
-	mockRedisService := redismocks.NewMockRedisService(t)
+	mockRedisService := redismocks.NewMockService(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().ProjectSettingRepository().Return(mockProjectSettingRepo)
@@ -141,7 +141,7 @@ func TestProjectService_UpdateProjectSignupRole_RoleNotFound(t *testing.T) {
 	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
 	mockProjectSettingRepo := interfacemocks.NewMockProjectSettingRepository(t)
 	mockRoleRepo := interfacemocks.NewMockRoleRepository(t)
-	mockRedisService := redismocks.NewMockRedisService(t)
+	mockRedisService := redismocks.NewMockService(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().ProjectSettingRepository().Return(mockProjectSettingRepo)
@@ -171,7 +171,7 @@ func TestProjectService_UpdateProjectSignupRole_RoleDoesNotBelongToProject(t *te
 	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
 	mockProjectSettingRepo := interfacemocks.NewMockProjectSettingRepository(t)
 	mockRoleRepo := interfacemocks.NewMockRoleRepository(t)
-	mockRedisService := redismocks.NewMockRedisService(t)
+	mockRedisService := redismocks.NewMockService(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().ProjectSettingRepository().Return(mockProjectSettingRepo)
@@ -201,7 +201,7 @@ func TestProjectService_UpdateProjectSignupRole_FindSettingsRepoError(t *testing
 	mockRegistry := repositorymocks.NewMockRegistry(t)
 	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
 	mockProjectSettingRepo := interfacemocks.NewMockProjectSettingRepository(t)
-	mockRedisService := redismocks.NewMockRedisService(t)
+	mockRedisService := redismocks.NewMockService(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().ProjectSettingRepository().Return(mockProjectSettingRepo)
@@ -230,7 +230,7 @@ func TestProjectService_UpdateProjectSignupRole_FindRoleRepoError(t *testing.T) 
 	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
 	mockProjectSettingRepo := interfacemocks.NewMockProjectSettingRepository(t)
 	mockRoleRepo := interfacemocks.NewMockRoleRepository(t)
-	mockRedisService := redismocks.NewMockRedisService(t)
+	mockRedisService := redismocks.NewMockService(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().ProjectSettingRepository().Return(mockProjectSettingRepo)
@@ -262,7 +262,7 @@ func TestProjectService_UpdateProjectSignupRole_UpdateRepoError(t *testing.T) {
 	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
 	mockProjectSettingRepo := interfacemocks.NewMockProjectSettingRepository(t)
 	mockRoleRepo := interfacemocks.NewMockRoleRepository(t)
-	mockRedisService := redismocks.NewMockRedisService(t)
+	mockRedisService := redismocks.NewMockService(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().ProjectSettingRepository().Return(mockProjectSettingRepo)
@@ -294,7 +294,7 @@ func TestProjectService_UpdateProjectSignupRole_ZeroRowsAffected(t *testing.T) {
 	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
 	mockProjectSettingRepo := interfacemocks.NewMockProjectSettingRepository(t)
 	mockRoleRepo := interfacemocks.NewMockRoleRepository(t)
-	mockRedisService := redismocks.NewMockRedisService(t)
+	mockRedisService := redismocks.NewMockService(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().ProjectSettingRepository().Return(mockProjectSettingRepo)

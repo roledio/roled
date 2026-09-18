@@ -13,13 +13,13 @@ import (
 	"github.com/roledio/roled/auth/internal/models"
 	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
 	"github.com/roledio/roled/auth/internal/repositories/redis"
-	redismocks "github.com/roledio/roled/auth/internal/services/infra/mocks"
+	redismocks "github.com/roledio/roled/auth/pkg/redis/mocks"
 )
 
 func TestCachedAccountRepository_FindByID_CacheHit(t *testing.T) {
 	ctx := context.Background()
 	mockDBRepo := interfacemocks.NewMockAccountRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewAccountRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -59,7 +59,7 @@ func TestCachedAccountRepository_FindByID_CacheMiss(t *testing.T) {
 	}
 
 	mockDBRepo := interfacemocks.NewMockAccountRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewAccountRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -98,7 +98,7 @@ func TestCachedAccountRepository_Create(t *testing.T) {
 	}
 
 	mockDBRepo := interfacemocks.NewMockAccountRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewAccountRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -122,7 +122,7 @@ func TestCachedAccountRepository_Update(t *testing.T) {
 	}
 
 	mockDBRepo := interfacemocks.NewMockAccountRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewAccountRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -141,7 +141,7 @@ func TestCachedAccountRepository_DeleteByID(t *testing.T) {
 	accountID := "acc-123"
 
 	mockDBRepo := interfacemocks.NewMockAccountRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewAccountRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -163,7 +163,7 @@ func TestCachedAccountRepository_FindAll_NoCache(t *testing.T) {
 	}
 
 	mockDBRepo := interfacemocks.NewMockAccountRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewAccountRepository(mockDBRepo, mockRedis, 24*time.Hour)
 

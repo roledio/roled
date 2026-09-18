@@ -8,8 +8,8 @@ import (
 	"github.com/roledio/roled/auth/internal/models"
 	"github.com/roledio/roled/auth/internal/queues"
 	"github.com/roledio/roled/auth/internal/repositories"
-	"github.com/roledio/roled/auth/internal/services/infra"
 	"github.com/roledio/roled/auth/internal/services/upload"
+	pkgredis "github.com/roledio/roled/auth/pkg/redis"
 )
 
 type UserService interface {
@@ -36,7 +36,7 @@ type UserService interface {
 type userService struct {
 	defaultConfig  *configs.DefaultConfig
 	registry       repositories.Registry
-	redisService   infra.RedisService
+	redisService   pkgredis.Service
 	emailPublisher queues.Publisher
 	uploadService  upload.UploadService
 	uploadBaseURL  string
@@ -46,7 +46,7 @@ func NewUserService(
 	defaultConfig *configs.DefaultConfig,
 	registry repositories.Registry,
 	uploadService upload.UploadService,
-	redisService infra.RedisService,
+	redisService pkgredis.Service,
 	emailPublisher queues.Publisher) UserService {
 
 	var uploadBaseURL string

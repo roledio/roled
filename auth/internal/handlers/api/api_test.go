@@ -7,14 +7,14 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"github.com/roledio/roled/auth/internal/configs"
 	repositorymocks "github.com/roledio/roled/auth/internal/repositories/mocks"
-	inframocks "github.com/roledio/roled/auth/internal/services/infra/mocks"
+	redismocks "github.com/roledio/roled/auth/pkg/redis/mocks"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSetupRoutes(t *testing.T) {
 	app := fiber.New()
 	regMock := repositorymocks.NewMockRegistry(t)
-	redisMock := inframocks.NewMockRedisService(t)
+	redisMock := redismocks.NewMockService(t)
 	deps := &Dependencies{
 		Registry: regMock,
 		Redis:    redisMock,

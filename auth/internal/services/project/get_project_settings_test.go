@@ -13,7 +13,7 @@ import (
 	"github.com/roledio/roled/auth/internal/models"
 	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
 	repositorymocks "github.com/roledio/roled/auth/internal/repositories/mocks"
-	redismocks "github.com/roledio/roled/auth/internal/services/infra/mocks"
+	redismocks "github.com/roledio/roled/auth/pkg/redis/mocks"
 )
 
 func TestProjectService_GetProjectSettings_Success(t *testing.T) {
@@ -49,7 +49,7 @@ func TestProjectService_GetProjectSettings_Success(t *testing.T) {
 	mockRegistry := repositorymocks.NewMockRegistry(t)
 	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
 	mockProjectSettingRepo := interfacemocks.NewMockProjectSettingRepository(t)
-	mockRedisService := redismocks.NewMockRedisService(t)
+	mockRedisService := redismocks.NewMockService(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().ProjectSettingRepository().Return(mockProjectSettingRepo)
@@ -104,7 +104,7 @@ func TestProjectService_GetProjectSettings_SingleflightDeduplication(t *testing.
 	mockRegistry := repositorymocks.NewMockRegistry(t)
 	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
 	mockProjectSettingRepo := interfacemocks.NewMockProjectSettingRepository(t)
-	mockRedisService := redismocks.NewMockRedisService(t)
+	mockRedisService := redismocks.NewMockService(t)
 
 	// Since calls are singleflighted, underlying repository methods are called ONLY ONCE even with 10 concurrent callers.
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo).Once()

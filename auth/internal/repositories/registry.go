@@ -12,7 +12,7 @@ import (
 	"github.com/roledio/roled/auth/internal/repositories/interfaces"
 	"github.com/roledio/roled/auth/internal/repositories/mariadb"
 	"github.com/roledio/roled/auth/internal/repositories/redis"
-	"github.com/roledio/roled/auth/internal/services/infra"
+	pkgredis "github.com/roledio/roled/auth/pkg/redis"
 	"github.com/roledio/roled/auth/pkg/repositories"
 )
 
@@ -42,10 +42,10 @@ type Registry interface {
 type registry struct {
 	defaultConfig *configs.DefaultConfig
 	qx            repositories.QueryExecutor
-	redisService  infra.RedisService
+	redisService  pkgredis.Service
 }
 
-func NewRegistry(defaultConfig *configs.DefaultConfig, db *sqlx.DB, redis ...infra.RedisService) Registry {
+func NewRegistry(defaultConfig *configs.DefaultConfig, db *sqlx.DB, redis ...pkgredis.Service) Registry {
 	sq.StatementBuilder = sq.StatementBuilder.PlaceholderFormat(sq.Question)
 	reg := registry{
 		defaultConfig: defaultConfig,

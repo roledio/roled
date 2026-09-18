@@ -14,13 +14,13 @@ import (
 	"github.com/roledio/roled/auth/internal/entities"
 	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
 	"github.com/roledio/roled/auth/internal/repositories/redis"
-	redismocks "github.com/roledio/roled/auth/internal/services/infra/mocks"
+	redismocks "github.com/roledio/roled/auth/pkg/redis/mocks"
 )
 
 func TestCachedOAuthConnectionRepository_FindByProjectID_CacheHit(t *testing.T) {
 	ctx := context.Background()
 	mockDBRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewOAuthConnectionRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -71,7 +71,7 @@ func TestCachedOAuthConnectionRepository_FindByProjectID_CacheMiss(t *testing.T)
 	}
 
 	mockDBRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewOAuthConnectionRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -129,7 +129,7 @@ func TestCachedOAuthConnectionRepository_FindByProjectID_CacheMissMultipleConnec
 	}
 
 	mockDBRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewOAuthConnectionRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -181,7 +181,7 @@ func TestCachedOAuthConnectionRepository_FindByProjectID_CacheError(t *testing.T
 	}
 
 	mockDBRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewOAuthConnectionRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -215,7 +215,7 @@ func TestCachedOAuthConnectionRepository_FindByProjectID_CacheError(t *testing.T
 func TestCachedOAuthConnectionRepository_FindByProjectID_DBError(t *testing.T) {
 	ctx := context.Background()
 	mockDBRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 
 	cachedRepo := redis.NewOAuthConnectionRepository(mockDBRepo, mockRedis, 24*time.Hour)
 

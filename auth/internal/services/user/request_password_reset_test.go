@@ -11,7 +11,7 @@ import (
 	queuemocks "github.com/roledio/roled/auth/internal/queues/mocks"
 	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
 	repositorymocks "github.com/roledio/roled/auth/internal/repositories/mocks"
-	redismocks "github.com/roledio/roled/auth/internal/services/infra/mocks"
+	redismocks "github.com/roledio/roled/auth/pkg/redis/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"go.openly.dev/pointy"
@@ -25,7 +25,7 @@ func TestUserService_RequestPasswordReset_Success_WithoutRedirectURI(t *testing.
 	mockRegistry := repositorymocks.NewMockRegistry(t)
 	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
 	mockUserRepo := interfacemocks.NewMockUserRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 	mockPublisher := queuemocks.NewMockPublisher(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -64,7 +64,7 @@ func TestUserService_RequestPasswordReset_Success_WithRedirectURI(t *testing.T) 
 	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
 	mockUserRepo := interfacemocks.NewMockUserRepository(t)
 	mockRedirectURIRepo := interfacemocks.NewMockRedirectURIRepository(t)
-	mockRedis := redismocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockService(t)
 	mockPublisher := queuemocks.NewMockPublisher(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)

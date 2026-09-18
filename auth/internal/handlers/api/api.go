@@ -9,7 +9,6 @@ import (
 	"github.com/roledio/roled/auth/internal/services/accesstoken"
 	"github.com/roledio/roled/auth/internal/services/account"
 	"github.com/roledio/roled/auth/internal/services/client"
-	"github.com/roledio/roled/auth/internal/services/infra"
 	"github.com/roledio/roled/auth/internal/services/member"
 	"github.com/roledio/roled/auth/internal/services/oauthconnection"
 	"github.com/roledio/roled/auth/internal/services/permission"
@@ -18,11 +17,12 @@ import (
 	"github.com/roledio/roled/auth/internal/services/role"
 	"github.com/roledio/roled/auth/internal/services/upload"
 	"github.com/roledio/roled/auth/internal/services/user"
+	"github.com/roledio/roled/auth/pkg/redis"
 )
 
 type Dependencies struct {
 	Registry               repositories.Registry
-	Redis                  infra.RedisService
+	Redis                  redis.Service
 	ProjectService         project.ProjectService
 	OAuthConnectionService oauthconnection.OAuthConnectionService
 	TokenService           accesstoken.AccessTokenService
@@ -40,7 +40,7 @@ type handler struct {
 	app                    *fiber.App
 	defaultConfig          *configs.DefaultConfig
 	repo                   repositories.Registry
-	redisService           infra.RedisService
+	redisService           redis.Service
 	projectService         project.ProjectService
 	oAuthConnectionService oauthconnection.OAuthConnectionService
 	tokenService           accesstoken.AccessTokenService

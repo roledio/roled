@@ -6,7 +6,7 @@ import (
 	"github.com/roledio/roled/auth/internal/configs"
 	"github.com/roledio/roled/auth/internal/models"
 	"github.com/roledio/roled/auth/internal/repositories"
-	"github.com/roledio/roled/auth/internal/services/infra"
+	pkgredis "github.com/roledio/roled/auth/pkg/redis"
 )
 
 type ClientService interface {
@@ -20,10 +20,10 @@ type ClientService interface {
 type clientService struct {
 	defaultConfig *configs.DefaultConfig
 	registry      repositories.Registry
-	redisService  infra.RedisService
+	redisService  pkgredis.Service
 }
 
-func NewClientService(defaultConfig *configs.DefaultConfig, registry repositories.Registry, redisService infra.RedisService) ClientService {
+func NewClientService(defaultConfig *configs.DefaultConfig, registry repositories.Registry, redisService pkgredis.Service) ClientService {
 	return &clientService{
 		defaultConfig: defaultConfig,
 		registry:      registry,

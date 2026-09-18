@@ -9,16 +9,16 @@ import (
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/models"
 	"github.com/roledio/roled/auth/internal/repositories/interfaces"
-	"github.com/roledio/roled/auth/internal/services/infra"
+	pkgredis "github.com/roledio/roled/auth/pkg/redis"
 )
 
 type clientRepository struct {
 	repo  interfaces.ClientRepository
-	redis infra.RedisService
+	redis pkgredis.Service
 	ttl   time.Duration
 }
 
-func NewClientRepository(repo interfaces.ClientRepository, redis infra.RedisService,
+func NewClientRepository(repo interfaces.ClientRepository, redis pkgredis.Service,
 	ttl time.Duration) interfaces.ClientRepository {
 	if redis == nil {
 		return repo
