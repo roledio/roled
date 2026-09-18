@@ -11,8 +11,9 @@ import (
 	"github.com/roledio/roled/auth/internal/configs"
 	"github.com/roledio/roled/auth/internal/constants"
 	"github.com/roledio/roled/auth/internal/entities"
-	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
 	"github.com/roledio/roled/auth/internal/repositories/interfaces"
+	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
+	repositorymocks "github.com/roledio/roled/auth/internal/repositories/mocks"
 )
 
 func TestGetCurrentAccessToken_UserTokenWithRole(t *testing.T) {
@@ -30,8 +31,8 @@ func TestGetCurrentAccessToken_UserTokenWithRole(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockAccessTokenRepo := repositorymocks.NewMockAccessTokenRepository(t)
-	mockPermissionRepo := repositorymocks.NewMockPermissionRepository(t)
+	mockAccessTokenRepo := interfacemocks.NewMockAccessTokenRepository(t)
+	mockPermissionRepo := interfacemocks.NewMockPermissionRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().AccessTokenRepository().Return(mockAccessTokenRepo)
@@ -120,8 +121,8 @@ func TestGetCurrentAccessToken_UserTokenWithoutRole(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockAccessTokenRepo := repositorymocks.NewMockAccessTokenRepository(t)
-	mockPermissionRepo := repositorymocks.NewMockPermissionRepository(t)
+	mockAccessTokenRepo := interfacemocks.NewMockAccessTokenRepository(t)
+	mockPermissionRepo := interfacemocks.NewMockPermissionRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().AccessTokenRepository().Return(mockAccessTokenRepo)
@@ -188,8 +189,8 @@ func TestGetCurrentAccessToken_ClientToken(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockAccessTokenRepo := repositorymocks.NewMockAccessTokenRepository(t)
-	mockPermissionRepo := repositorymocks.NewMockPermissionRepository(t)
+	mockAccessTokenRepo := interfacemocks.NewMockAccessTokenRepository(t)
+	mockPermissionRepo := interfacemocks.NewMockPermissionRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().AccessTokenRepository().Return(mockAccessTokenRepo)

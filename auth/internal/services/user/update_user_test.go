@@ -12,10 +12,11 @@ import (
 	"github.com/roledio/roled/auth/internal/constants"
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/errors"
-	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
-	servicemocks "github.com/roledio/roled/auth/internal/mocks/services"
 	"github.com/roledio/roled/auth/internal/models"
 	"github.com/roledio/roled/auth/internal/repositories"
+	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
+	repositorymocks "github.com/roledio/roled/auth/internal/repositories/mocks"
+	uploadmocks "github.com/roledio/roled/auth/internal/services/upload/mocks"
 )
 
 func TestUserService_UpdateUser_ChangeAvatar_Success(t *testing.T) {
@@ -24,11 +25,11 @@ func TestUserService_UpdateUser_ChangeAvatar_Success(t *testing.T) {
 	ctx = context.WithValue(ctx, constants.CtxAccount, account)
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
-	mockRoleRepo := repositorymocks.NewMockRoleRepository(t)
-	mockUserRoleRepo := repositorymocks.NewMockUserRoleRepository(t)
-	mockUpload := servicemocks.NewMockUploadService(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
+	mockRoleRepo := interfacemocks.NewMockRoleRepository(t)
+	mockUserRoleRepo := interfacemocks.NewMockUserRoleRepository(t)
+	mockUpload := uploadmocks.NewMockUploadService(t)
 
 	project := &entities.Project{ID: "proj-1", AccountID: account.ID, IsSystem: false}
 
@@ -108,8 +109,8 @@ func TestUserService_UpdateUser_EmailAlreadyUsed(t *testing.T) {
 	ctx = context.WithValue(ctx, constants.CtxAccount, account)
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().UserRepository().Return(mockUserRepo)

@@ -14,9 +14,9 @@ import (
 	"github.com/roledio/roled/auth/internal/errors"
 	"github.com/roledio/roled/auth/internal/models"
 	"github.com/roledio/roled/auth/internal/repositories"
-
-	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
-	servicemocks "github.com/roledio/roled/auth/internal/mocks/services"
+	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
+	repositorymocks "github.com/roledio/roled/auth/internal/repositories/mocks"
+	redismocks "github.com/roledio/roled/auth/internal/services/infra/mocks"
 )
 
 func TestAccountService_DeleteAccount_SystemAccount_SelfDeletion(t *testing.T) {
@@ -29,8 +29,8 @@ func TestAccountService_DeleteAccount_SystemAccount_SelfDeletion(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
@@ -61,11 +61,11 @@ func TestAccountService_DeleteAccount_SystemAccount_OtherAccount_Success(t *test
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
-	mockAccessTokenRepo := repositorymocks.NewMockAccessTokenRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
+	mockAccessTokenRepo := interfacemocks.NewMockAccessTokenRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo) // For top level call
@@ -121,8 +121,8 @@ func TestAccountService_DeleteAccount_SystemAccount_OtherAccount_SystemTarget(t 
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
@@ -160,8 +160,8 @@ func TestAccountService_DeleteAccount_SystemAccount_OtherAccount_NotFound(t *tes
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
@@ -202,11 +202,11 @@ func TestAccountService_DeleteAccount_NonSystemAccount_SelfDeletion_UserToken_Su
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
-	mockAccessTokenRepo := repositorymocks.NewMockAccessTokenRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
+	mockAccessTokenRepo := interfacemocks.NewMockAccessTokenRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().UserRepository().Return(mockUserRepo)
@@ -273,8 +273,8 @@ func TestAccountService_DeleteAccount_NonSystemAccount_OtherAccount(t *testing.T
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
@@ -312,8 +312,8 @@ func TestAccountService_DeleteAccount_NonSystemAccount_ClientToken(t *testing.T)
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
@@ -351,9 +351,9 @@ func TestAccountService_DeleteAccount_NonSystemAccount_UserNotFound(t *testing.T
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
@@ -396,9 +396,9 @@ func TestAccountService_DeleteAccount_NonSystemAccount_InvalidPassword(t *testin
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
@@ -446,10 +446,10 @@ func TestAccountService_DeleteAccount_NonSystemAccount_MemberNotFound(t *testing
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
@@ -501,10 +501,10 @@ func TestAccountService_DeleteAccount_NonSystemAccount_NonAdminUser(t *testing.T
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
@@ -551,7 +551,7 @@ func TestAccountService_DeleteAccount_AccountNotInContext(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 
 	// Create service
 	service := NewAccountService(mockRegistry, mockRedis)
@@ -580,8 +580,8 @@ func TestAccountService_DeleteAccount_NonSystemAccount_AccessTokenNotInContext(t
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
@@ -612,11 +612,11 @@ func TestAccountService_DeleteAccount_SystemAccount_DeleteError(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
-	mockAccessTokenRepo := repositorymocks.NewMockAccessTokenRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
+	mockAccessTokenRepo := interfacemocks.NewMockAccessTokenRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo) // For top level call
@@ -678,11 +678,11 @@ func TestAccountService_DeleteAccount_NonSystemAccount_DeleteAccessTokensError(t
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
-	mockAccessTokenRepo := repositorymocks.NewMockAccessTokenRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
+	mockAccessTokenRepo := interfacemocks.NewMockAccessTokenRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().UserRepository().Return(mockUserRepo)

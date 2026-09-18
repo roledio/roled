@@ -7,10 +7,11 @@ import (
 	"github.com/roledio/roled/auth/internal/constants"
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/errors"
-	queuemocks "github.com/roledio/roled/auth/internal/mocks/queues"
-	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
-	servicemocks "github.com/roledio/roled/auth/internal/mocks/services"
 	"github.com/roledio/roled/auth/internal/models"
+	queuemocks "github.com/roledio/roled/auth/internal/queues/mocks"
+	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
+	repositorymocks "github.com/roledio/roled/auth/internal/repositories/mocks"
+	redismocks "github.com/roledio/roled/auth/internal/services/infra/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"go.openly.dev/pointy"
@@ -22,9 +23,9 @@ func TestUserService_RequestPasswordReset_Success_WithoutRedirectURI(t *testing.
 	ctx = context.WithValue(ctx, constants.CtxAccount, account)
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 	mockPublisher := queuemocks.NewMockPublisher(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -60,10 +61,10 @@ func TestUserService_RequestPasswordReset_Success_WithRedirectURI(t *testing.T) 
 	ctx = context.WithValue(ctx, constants.CtxAccount, account)
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
-	mockRedirectURIRepo := repositorymocks.NewMockRedirectURIRepository(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
+	mockRedirectURIRepo := interfacemocks.NewMockRedirectURIRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 	mockPublisher := queuemocks.NewMockPublisher(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -107,8 +108,8 @@ func TestUserService_RequestPasswordReset_UserNotFound(t *testing.T) {
 	ctx = context.WithValue(ctx, constants.CtxAccount, account)
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().UserRepository().Return(mockUserRepo)
@@ -134,8 +135,8 @@ func TestUserService_RequestPasswordReset_UserNoEmail(t *testing.T) {
 	ctx = context.WithValue(ctx, constants.CtxAccount, account)
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().UserRepository().Return(mockUserRepo)
@@ -168,8 +169,8 @@ func TestUserService_RequestPasswordReset_UserInactive(t *testing.T) {
 	ctx = context.WithValue(ctx, constants.CtxAccount, account)
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().UserRepository().Return(mockUserRepo)
@@ -202,9 +203,9 @@ func TestUserService_RequestPasswordReset_RedirectURINotFound(t *testing.T) {
 	ctx = context.WithValue(ctx, constants.CtxAccount, account)
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
-	mockRedirectURIRepo := repositorymocks.NewMockRedirectURIRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
+	mockRedirectURIRepo := interfacemocks.NewMockRedirectURIRepository(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().UserRepository().Return(mockUserRepo)

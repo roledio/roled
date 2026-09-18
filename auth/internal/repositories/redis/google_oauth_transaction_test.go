@@ -9,14 +9,14 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"github.com/roledio/roled/auth/internal/constants/rediskeys"
-	servicemocks "github.com/roledio/roled/auth/internal/mocks/services"
 	"github.com/roledio/roled/auth/internal/models"
 	"github.com/roledio/roled/auth/internal/repositories/redis"
+	redismocks "github.com/roledio/roled/auth/internal/services/infra/mocks"
 )
 
 func TestGoogleOAuthTransactionRepository_Store_Success(t *testing.T) {
 	ctx := context.Background()
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 
 	repo := redis.NewGoogleOAuthTransactionRepository(mockRedis, 5*time.Minute)
 
@@ -44,7 +44,7 @@ func TestGoogleOAuthTransactionRepository_Store_Success(t *testing.T) {
 
 func TestGoogleOAuthTransactionRepository_Store_RedisError(t *testing.T) {
 	ctx := context.Background()
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 
 	repo := redis.NewGoogleOAuthTransactionRepository(mockRedis, 5*time.Minute)
 
@@ -72,7 +72,7 @@ func TestGoogleOAuthTransactionRepository_Store_RedisError(t *testing.T) {
 
 func TestGoogleOAuthTransactionRepository_Retrieve_Success(t *testing.T) {
 	ctx := context.Background()
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 
 	repo := redis.NewGoogleOAuthTransactionRepository(mockRedis, 5*time.Minute)
 
@@ -112,7 +112,7 @@ func TestGoogleOAuthTransactionRepository_Retrieve_Success(t *testing.T) {
 
 func TestGoogleOAuthTransactionRepository_Retrieve_NotFound(t *testing.T) {
 	ctx := context.Background()
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 
 	repo := redis.NewGoogleOAuthTransactionRepository(mockRedis, 5*time.Minute)
 
@@ -131,7 +131,7 @@ func TestGoogleOAuthTransactionRepository_Retrieve_NotFound(t *testing.T) {
 
 func TestGoogleOAuthTransactionRepository_Retrieve_RedisError(t *testing.T) {
 	ctx := context.Background()
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 
 	repo := redis.NewGoogleOAuthTransactionRepository(mockRedis, 5*time.Minute)
 
@@ -150,7 +150,7 @@ func TestGoogleOAuthTransactionRepository_Retrieve_RedisError(t *testing.T) {
 
 func TestGoogleOAuthTransactionRepository_Retrieve_DeleteError(t *testing.T) {
 	ctx := context.Background()
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 
 	repo := redis.NewGoogleOAuthTransactionRepository(mockRedis, 5*time.Minute)
 
@@ -190,7 +190,7 @@ func TestGoogleOAuthTransactionRepository_Retrieve_DeleteError(t *testing.T) {
 
 func TestGoogleOAuthTransactionRepository_Delete_Success(t *testing.T) {
 	ctx := context.Background()
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 
 	repo := redis.NewGoogleOAuthTransactionRepository(mockRedis, 5*time.Minute)
 
@@ -208,7 +208,7 @@ func TestGoogleOAuthTransactionRepository_Delete_Success(t *testing.T) {
 
 func TestGoogleOAuthTransactionRepository_Delete_Error(t *testing.T) {
 	ctx := context.Background()
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 
 	repo := redis.NewGoogleOAuthTransactionRepository(mockRedis, 5*time.Minute)
 

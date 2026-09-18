@@ -9,17 +9,18 @@ import (
 	"github.com/roledio/roled/auth/internal/configs"
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/errors"
-	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
 	"github.com/roledio/roled/auth/internal/models"
+	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
+	"github.com/roledio/roled/auth/internal/repositories/mocks"
 )
 
 func TestAccessTokenService_ExchangeToken_InvalidGrantType(t *testing.T) {
 	ctx := context.Background()
 
 	// Setup mocks
-	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockClientRepo := repositorymocks.NewMockClientRepository(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
+	mockRegistry := mocks.NewMockRegistry(t)
+	mockClientRepo := interfacemocks.NewMockClientRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)

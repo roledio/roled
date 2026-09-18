@@ -11,9 +11,10 @@ import (
 	"github.com/roledio/roled/auth/internal/constants"
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/errors"
-	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
 	"github.com/roledio/roled/auth/internal/models"
 	"github.com/roledio/roled/auth/internal/repositories"
+	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
+	repositorymocks "github.com/roledio/roled/auth/internal/repositories/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"go.openly.dev/pointy"
@@ -29,11 +30,11 @@ func TestAccessTokenService_ExchangeToken_AuthorizationCode_Success(t *testing.T
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockClientRepo := repositorymocks.NewMockClientRepository(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockAuthCodeRepo := repositorymocks.NewMockAuthCodeRepository(t)
-	mockRefreshTokenRepo := repositorymocks.NewMockRefreshTokenRepository(t)
-	mockAccessTokenRepo := repositorymocks.NewMockAccessTokenRepository(t)
+	mockClientRepo := interfacemocks.NewMockClientRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockAuthCodeRepo := interfacemocks.NewMockAuthCodeRepository(t)
+	mockRefreshTokenRepo := interfacemocks.NewMockRefreshTokenRepository(t)
+	mockAccessTokenRepo := interfacemocks.NewMockAccessTokenRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)
@@ -124,9 +125,9 @@ func TestAccessTokenService_ExchangeToken_AuthorizationCode_InvalidCode(t *testi
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockClientRepo := repositorymocks.NewMockClientRepository(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockAuthCodeRepo := repositorymocks.NewMockAuthCodeRepository(t)
+	mockClientRepo := interfacemocks.NewMockClientRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockAuthCodeRepo := interfacemocks.NewMockAuthCodeRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)

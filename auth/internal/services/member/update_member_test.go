@@ -12,8 +12,9 @@ import (
 	"github.com/roledio/roled/auth/internal/constants"
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/errors"
-	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
 	"github.com/roledio/roled/auth/internal/models"
+	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
+	repositorymocks "github.com/roledio/roled/auth/internal/repositories/mocks"
 	pkgerrors "github.com/roledio/roled/auth/pkg/errors"
 )
 
@@ -21,7 +22,7 @@ func TestMemberService_UpdateMember_SystemProjectNotFound(t *testing.T) {
 	ctx := context.Background()
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockProjectRepo.EXPECT().FindSystem(ctx).Return(nil, nil)
@@ -45,7 +46,7 @@ func TestMemberService_UpdateMember_AccessTokenNotFound(t *testing.T) {
 	systemProject := &entities.Project{ID: "sys-proj", IsActive: true}
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockProjectRepo.EXPECT().FindSystem(ctx).Return(systemProject, nil)
@@ -70,7 +71,7 @@ func TestMemberService_UpdateMember_AccountNotFound(t *testing.T) {
 	ctx = context.WithValue(ctx, constants.CtxAccessToken, accessToken)
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockProjectRepo.EXPECT().FindSystem(ctx).Return(systemProject, nil)
@@ -97,8 +98,8 @@ func TestMemberService_UpdateMember_MemberNotFound(t *testing.T) {
 	ctx = context.WithValue(ctx, constants.CtxAccount, account)
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().MemberRepository().Return(mockMemberRepo)
@@ -129,8 +130,8 @@ func TestMemberService_UpdateMember_ClientJWT_NonSystemAccount_DifferentAccount(
 	targetMember := &entities.Member{ID: "member-id", AccountID: "acc-2", IsAdmin: false}
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().MemberRepository().Return(mockMemberRepo)
@@ -161,8 +162,8 @@ func TestMemberService_UpdateMember_SystemAccount_AccountIDMismatch(t *testing.T
 	targetMember := &entities.Member{ID: "member-id", AccountID: "acc-2", IsAdmin: false}
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().MemberRepository().Return(mockMemberRepo)
@@ -194,8 +195,8 @@ func TestMemberService_UpdateMember_ClientJWT_DemoteLastAdmin(t *testing.T) {
 	targetMember := &entities.Member{ID: "member-id", AccountID: "acc-1", IsAdmin: true}
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().MemberRepository().Return(mockMemberRepo)
@@ -227,8 +228,8 @@ func TestMemberService_UpdateMember_ClientJWT_NoOp(t *testing.T) {
 	targetMember := &entities.Member{ID: "member-id", AccountID: "acc-1", IsAdmin: true, UserID: "user-id", CreatedAt: time.Now(), UpdatedAt: time.Now()}
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().MemberRepository().Return(mockMemberRepo)
@@ -260,8 +261,8 @@ func TestMemberService_UpdateMember_ClientJWT_UpdateSuccess(t *testing.T) {
 	targetMember := &entities.Member{ID: "member-id", AccountID: "acc-1", IsAdmin: false, UserID: "user-id", CreatedAt: time.Now(), UpdatedAt: time.Now()}
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().MemberRepository().Return(mockMemberRepo)
@@ -294,8 +295,8 @@ func TestMemberService_UpdateMember_UserJWT_UpdateSelf(t *testing.T) {
 	targetMember := &entities.Member{ID: "member-id", AccountID: "acc-1", IsAdmin: true, UserID: "current-user"}
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().MemberRepository().Return(mockMemberRepo)
@@ -327,8 +328,8 @@ func TestMemberService_UpdateMember_UserJWT_NonSystemAccount_CallerNotAdmin(t *t
 	callerMember := &entities.Member{ID: "caller-member-id", AccountID: "acc-1", IsAdmin: false, UserID: "current-user"}
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().MemberRepository().Return(mockMemberRepo)
@@ -361,8 +362,8 @@ func TestMemberService_UpdateMember_UserJWT_NonSystemAccount_Success(t *testing.
 	callerMember := &entities.Member{ID: "caller-member-id", AccountID: "acc-1", IsAdmin: true, UserID: "current-user"}
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().MemberRepository().Return(mockMemberRepo)
@@ -396,8 +397,8 @@ func TestMemberService_UpdateMember_UpdateByID_NoRowsAffected(t *testing.T) {
 	targetMember := &entities.Member{ID: "member-id", AccountID: "acc-1", IsAdmin: false, UserID: "user-id"}
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().MemberRepository().Return(mockMemberRepo)
@@ -430,8 +431,8 @@ func TestMemberService_UpdateMember_UpdateByID_Error(t *testing.T) {
 	dbErr := assert.AnError
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().MemberRepository().Return(mockMemberRepo)

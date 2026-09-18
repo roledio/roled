@@ -12,15 +12,15 @@ import (
 	"github.com/roledio/roled/auth/internal/constants"
 	"github.com/roledio/roled/auth/internal/constants/rediskeys"
 	"github.com/roledio/roled/auth/internal/entities"
-	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
-	servicemocks "github.com/roledio/roled/auth/internal/mocks/services"
+	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
 	"github.com/roledio/roled/auth/internal/repositories/redis"
+	redismocks "github.com/roledio/roled/auth/internal/services/infra/mocks"
 )
 
 func TestCachedOAuthConnectionRepository_FindByProjectID_CacheHit(t *testing.T) {
 	ctx := context.Background()
-	mockDBRepo := repositorymocks.NewMockOAuthConnectionRepository(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockDBRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 
 	cachedRepo := redis.NewOAuthConnectionRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -70,8 +70,8 @@ func TestCachedOAuthConnectionRepository_FindByProjectID_CacheMiss(t *testing.T)
 		},
 	}
 
-	mockDBRepo := repositorymocks.NewMockOAuthConnectionRepository(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockDBRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 
 	cachedRepo := redis.NewOAuthConnectionRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -128,8 +128,8 @@ func TestCachedOAuthConnectionRepository_FindByProjectID_CacheMissMultipleConnec
 		},
 	}
 
-	mockDBRepo := repositorymocks.NewMockOAuthConnectionRepository(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockDBRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 
 	cachedRepo := redis.NewOAuthConnectionRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -180,8 +180,8 @@ func TestCachedOAuthConnectionRepository_FindByProjectID_CacheError(t *testing.T
 		},
 	}
 
-	mockDBRepo := repositorymocks.NewMockOAuthConnectionRepository(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockDBRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 
 	cachedRepo := redis.NewOAuthConnectionRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -214,8 +214,8 @@ func TestCachedOAuthConnectionRepository_FindByProjectID_CacheError(t *testing.T
 
 func TestCachedOAuthConnectionRepository_FindByProjectID_DBError(t *testing.T) {
 	ctx := context.Background()
-	mockDBRepo := repositorymocks.NewMockOAuthConnectionRepository(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockDBRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 
 	cachedRepo := redis.NewOAuthConnectionRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -238,7 +238,7 @@ func TestCachedOAuthConnectionRepository_FindByProjectID_DBError(t *testing.T) {
 
 func TestCachedOAuthConnectionRepository_FindByProjectID_NilRedis(t *testing.T) {
 	ctx := context.Background()
-	mockDBRepo := repositorymocks.NewMockOAuthConnectionRepository(t)
+	mockDBRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
 
 	cachedRepo := redis.NewOAuthConnectionRepository(mockDBRepo, nil, 24*time.Hour)
 

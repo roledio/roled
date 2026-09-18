@@ -12,9 +12,9 @@ import (
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/errors"
 	"github.com/roledio/roled/auth/internal/models"
-
-	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
-	servicemocks "github.com/roledio/roled/auth/internal/mocks/services"
+	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
+	repositorymocks "github.com/roledio/roled/auth/internal/repositories/mocks"
+	redismocks "github.com/roledio/roled/auth/internal/services/infra/mocks"
 )
 
 func TestGetOAuthConnections_Success(t *testing.T) {
@@ -28,9 +28,9 @@ func TestGetOAuthConnections_Success(t *testing.T) {
 	ctx = context.WithValue(ctx, constants.CtxAccount, account)
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockOAuthConnectionRepo := repositorymocks.NewMockOAuthConnectionRepository(t)
-	mockRedisService := servicemocks.NewMockRedisService(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockOAuthConnectionRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
+	mockRedisService := redismocks.NewMockRedisService(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().OAuthConnectionRepository().Return(mockOAuthConnectionRepo)
@@ -79,8 +79,8 @@ func TestGetOAuthConnections_ProjectNotFound(t *testing.T) {
 	ctx = context.WithValue(ctx, constants.CtxAccount, account)
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockRedisService := servicemocks.NewMockRedisService(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockRedisService := redismocks.NewMockRedisService(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 
@@ -110,8 +110,8 @@ func TestGetOAuthConnections_ProjectDBError(t *testing.T) {
 	ctx = context.WithValue(ctx, constants.CtxAccount, account)
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockRedisService := servicemocks.NewMockRedisService(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockRedisService := redismocks.NewMockRedisService(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 
@@ -140,9 +140,9 @@ func TestGetOAuthConnections_ConnectionsDBError(t *testing.T) {
 	ctx = context.WithValue(ctx, constants.CtxAccount, account)
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockOAuthConnectionRepo := repositorymocks.NewMockOAuthConnectionRepository(t)
-	mockRedisService := servicemocks.NewMockRedisService(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockOAuthConnectionRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
+	mockRedisService := redismocks.NewMockRedisService(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().OAuthConnectionRepository().Return(mockOAuthConnectionRepo)
@@ -177,9 +177,9 @@ func TestGetOAuthConnections_EmptyList(t *testing.T) {
 	ctx = context.WithValue(ctx, constants.CtxAccount, account)
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockOAuthConnectionRepo := repositorymocks.NewMockOAuthConnectionRepository(t)
-	mockRedisService := servicemocks.NewMockRedisService(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockOAuthConnectionRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
+	mockRedisService := redismocks.NewMockRedisService(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().OAuthConnectionRepository().Return(mockOAuthConnectionRepo)

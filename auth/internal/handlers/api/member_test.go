@@ -11,8 +11,8 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"github.com/roledio/roled/auth/internal/configs"
 	customerrors "github.com/roledio/roled/auth/internal/errors"
-	servicemocks "github.com/roledio/roled/auth/internal/mocks/services"
 	"github.com/roledio/roled/auth/internal/models"
+	membermocks "github.com/roledio/roled/auth/internal/services/member/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/tidwall/gjson"
@@ -21,7 +21,7 @@ import (
 
 func TestUpdateMember_Success(t *testing.T) {
 	app := fiber.New()
-	memberServiceMock := servicemocks.NewMockMemberService(t)
+	memberServiceMock := membermocks.NewMockMemberService(t)
 
 	now := time.Now()
 	expectedResponse := &models.UpdateMemberResponse{
@@ -69,7 +69,7 @@ func TestUpdateMember_Success(t *testing.T) {
 
 func TestUpdateMember_ValidationError(t *testing.T) {
 	app := fiber.New()
-	memberServiceMock := servicemocks.NewMockMemberService(t)
+	memberServiceMock := membermocks.NewMockMemberService(t)
 
 	deps := &Dependencies{
 		MemberService: memberServiceMock,
@@ -100,7 +100,7 @@ func TestUpdateMember_ValidationError(t *testing.T) {
 
 func TestUpdateMember_ServiceError(t *testing.T) {
 	app := fiber.New()
-	memberServiceMock := servicemocks.NewMockMemberService(t)
+	memberServiceMock := membermocks.NewMockMemberService(t)
 
 	memberServiceMock.EXPECT().UpdateMember(mock.Anything, &models.UpdateMemberRequest{
 		MemberID: "member-id",

@@ -15,7 +15,8 @@ import (
 	"github.com/roledio/roled/auth/internal/repositories"
 	pkgerrors "github.com/roledio/roled/auth/pkg/errors"
 
-	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
+	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
+	repositorymocks "github.com/roledio/roled/auth/internal/repositories/mocks"
 )
 
 func TestMemberService_DeleteMember_SystemProjectNotFound(t *testing.T) {
@@ -23,7 +24,7 @@ func TestMemberService_DeleteMember_SystemProjectNotFound(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -54,7 +55,7 @@ func TestMemberService_DeleteMember_SystemProjectFindError(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -91,7 +92,7 @@ func TestMemberService_DeleteMember_AccessTokenNotInContext(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -133,7 +134,7 @@ func TestMemberService_DeleteMember_ProjectIDMismatch(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -175,7 +176,7 @@ func TestMemberService_DeleteMember_AccountNotInContext(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -237,10 +238,10 @@ func TestMemberService_DeleteMember_ClientJWT_SystemAccount_Success(t *testing.T
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
-	mockAccessTokenRepo := repositorymocks.NewMockAccessTokenRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
+	mockAccessTokenRepo := interfacemocks.NewMockAccessTokenRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -321,8 +322,8 @@ func TestMemberService_DeleteMember_ClientJWT_SystemAccount_LastAdmin(t *testing
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -391,10 +392,10 @@ func TestMemberService_DeleteMember_ClientJWT_NonSystemAccount_Success(t *testin
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
-	mockAccessTokenRepo := repositorymocks.NewMockAccessTokenRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
+	mockAccessTokenRepo := interfacemocks.NewMockAccessTokenRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -475,8 +476,8 @@ func TestMemberService_DeleteMember_ClientJWT_NonSystemAccount_DifferentAccount(
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -529,8 +530,8 @@ func TestMemberService_DeleteMember_ClientJWT_MemberNotFound(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -596,10 +597,10 @@ func TestMemberService_DeleteMember_UserJWT_SystemAccount_Success(t *testing.T) 
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
-	mockAccessTokenRepo := repositorymocks.NewMockAccessTokenRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
+	mockAccessTokenRepo := interfacemocks.NewMockAccessTokenRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -680,8 +681,8 @@ func TestMemberService_DeleteMember_UserJWT_SystemAccount_DeleteSelf(t *testing.
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -755,10 +756,10 @@ func TestMemberService_DeleteMember_UserJWT_NonSystemAccount_Success(t *testing.
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
-	mockAccessTokenRepo := repositorymocks.NewMockAccessTokenRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
+	mockAccessTokenRepo := interfacemocks.NewMockAccessTokenRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -850,8 +851,8 @@ func TestMemberService_DeleteMember_UserJWT_NonSystemAccount_DeleteSelf(t *testi
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -922,8 +923,8 @@ func TestMemberService_DeleteMember_UserJWT_NonSystemAccount_NonAdminUser(t *tes
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -987,8 +988,8 @@ func TestMemberService_DeleteMember_UserJWT_NonSystemAccount_DifferentAccount(t 
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -1054,9 +1055,9 @@ func TestMemberService_DeleteMember_TransactionFailure_MemberDeleteError(t *test
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -1142,9 +1143,9 @@ func TestMemberService_DeleteMember_TransactionFailure_UserDeleteError(t *testin
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -1232,10 +1233,10 @@ func TestMemberService_DeleteMember_TransactionFailure_AccessTokenDeleteError(t 
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
-	mockAccessTokenRepo := repositorymocks.NewMockAccessTokenRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
+	mockAccessTokenRepo := interfacemocks.NewMockAccessTokenRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)

@@ -8,9 +8,10 @@ import (
 	"github.com/roledio/roled/auth/internal/constants"
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/errors"
-	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
 	"github.com/roledio/roled/auth/internal/models"
 	"github.com/roledio/roled/auth/internal/repositories/interfaces"
+	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
+	repositorymocks "github.com/roledio/roled/auth/internal/repositories/mocks"
 	"github.com/stretchr/testify/assert"
 	"go.openly.dev/pointy"
 )
@@ -21,8 +22,8 @@ func TestUserService_GetUserDetails_Success(t *testing.T) {
 	ctx = context.WithValue(ctx, constants.CtxAccount, account)
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
 
 	req := &models.GetUserDetailsRequest{ProjectID: "project-1", UserID: "user-1"}
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -69,8 +70,8 @@ func TestUserService_GetUserDetails_NotFound(t *testing.T) {
 	ctx = context.WithValue(ctx, constants.CtxAccount, account)
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
 
 	req := &models.GetUserDetailsRequest{ProjectID: "project-1", UserID: "user-1"}
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)

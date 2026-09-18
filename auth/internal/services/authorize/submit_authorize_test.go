@@ -14,8 +14,9 @@ import (
 	"github.com/roledio/roled/auth/internal/repositories"
 	"github.com/roledio/roled/auth/pkg/utils/passwordutil"
 
-	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
 	"github.com/roledio/roled/auth/internal/models"
+	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
+	repositorymocks "github.com/roledio/roled/auth/internal/repositories/mocks"
 )
 
 func TestAuthorizeService_SubmitAuthorize_Success(t *testing.T) {
@@ -23,13 +24,13 @@ func TestAuthorizeService_SubmitAuthorize_Success(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockClientRepo := repositorymocks.NewMockClientRepository(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockProjectSettingRepo := repositorymocks.NewMockProjectSettingRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
-	mockAuthCodeRepo := repositorymocks.NewMockAuthCodeRepository(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
-	mockRedirectURIRepo := repositorymocks.NewMockRedirectURIRepository(t)
+	mockClientRepo := interfacemocks.NewMockClientRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockProjectSettingRepo := interfacemocks.NewMockProjectSettingRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
+	mockAuthCodeRepo := interfacemocks.NewMockAuthCodeRepository(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
+	mockRedirectURIRepo := interfacemocks.NewMockRedirectURIRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)
@@ -132,12 +133,12 @@ func TestAuthorizeService_SubmitAuthorize_UserNotFound(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockClientRepo := repositorymocks.NewMockClientRepository(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockProjectSettingRepo := repositorymocks.NewMockProjectSettingRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
-	mockRedirectURIRepo := repositorymocks.NewMockRedirectURIRepository(t)
+	mockClientRepo := interfacemocks.NewMockClientRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockProjectSettingRepo := interfacemocks.NewMockProjectSettingRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
+	mockRedirectURIRepo := interfacemocks.NewMockRedirectURIRepository(t)
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -218,13 +219,13 @@ func TestAuthorizeService_SubmitAuthorize_AuthCodeCreateError(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockClientRepo := repositorymocks.NewMockClientRepository(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockProjectSettingRepo := repositorymocks.NewMockProjectSettingRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
-	mockAuthCodeRepo := repositorymocks.NewMockAuthCodeRepository(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
-	mockRedirectURIRepo := repositorymocks.NewMockRedirectURIRepository(t)
+	mockClientRepo := interfacemocks.NewMockClientRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockProjectSettingRepo := interfacemocks.NewMockProjectSettingRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
+	mockAuthCodeRepo := interfacemocks.NewMockAuthCodeRepository(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
+	mockRedirectURIRepo := interfacemocks.NewMockRedirectURIRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)
@@ -327,12 +328,12 @@ func TestAuthorizeService_SubmitAuthorize_InvalidPassword(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockClientRepo := repositorymocks.NewMockClientRepository(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockProjectSettingRepo := repositorymocks.NewMockProjectSettingRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
-	mockRedirectURIRepo := repositorymocks.NewMockRedirectURIRepository(t)
+	mockClientRepo := interfacemocks.NewMockClientRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockProjectSettingRepo := interfacemocks.NewMockProjectSettingRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
+	mockRedirectURIRepo := interfacemocks.NewMockRedirectURIRepository(t)
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -421,12 +422,12 @@ func TestAuthorizeService_SubmitAuthorize_UserHasNoPassword(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockClientRepo := repositorymocks.NewMockClientRepository(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockProjectSettingRepo := repositorymocks.NewMockProjectSettingRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
-	mockRedirectURIRepo := repositorymocks.NewMockRedirectURIRepository(t)
+	mockClientRepo := interfacemocks.NewMockClientRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockProjectSettingRepo := interfacemocks.NewMockProjectSettingRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
+	mockRedirectURIRepo := interfacemocks.NewMockRedirectURIRepository(t)
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
@@ -514,12 +515,12 @@ func TestAuthorizeService_SubmitAuthorize_UserNotActive(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockClientRepo := repositorymocks.NewMockClientRepository(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockProjectSettingRepo := repositorymocks.NewMockProjectSettingRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
-	mockRedirectURIRepo := repositorymocks.NewMockRedirectURIRepository(t)
+	mockClientRepo := interfacemocks.NewMockClientRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockProjectSettingRepo := interfacemocks.NewMockProjectSettingRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
+	mockRedirectURIRepo := interfacemocks.NewMockRedirectURIRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)
@@ -609,15 +610,15 @@ func TestAuthorizeService_SubmitAuthorize_SignupSuccess_SystemProject(t *testing
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockClientRepo := repositorymocks.NewMockClientRepository(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockProjectSettingRepo := repositorymocks.NewMockProjectSettingRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
-	mockMemberRepo := repositorymocks.NewMockMemberRepository(t)
-	mockUserRoleRepo := repositorymocks.NewMockUserRoleRepository(t)
-	mockAuthCodeRepo := repositorymocks.NewMockAuthCodeRepository(t)
-	mockRedirectURIRepo := repositorymocks.NewMockRedirectURIRepository(t)
+	mockClientRepo := interfacemocks.NewMockClientRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockProjectSettingRepo := interfacemocks.NewMockProjectSettingRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
+	mockMemberRepo := interfacemocks.NewMockMemberRepository(t)
+	mockUserRoleRepo := interfacemocks.NewMockUserRoleRepository(t)
+	mockAuthCodeRepo := interfacemocks.NewMockAuthCodeRepository(t)
+	mockRedirectURIRepo := interfacemocks.NewMockRedirectURIRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)
@@ -729,11 +730,11 @@ func TestAuthorizeService_SubmitAuthorize_SignupNotEnabled(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockClientRepo := repositorymocks.NewMockClientRepository(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockProjectSettingRepo := repositorymocks.NewMockProjectSettingRepository(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
-	mockRedirectURIRepo := repositorymocks.NewMockRedirectURIRepository(t)
+	mockClientRepo := interfacemocks.NewMockClientRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockProjectSettingRepo := interfacemocks.NewMockProjectSettingRepository(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
+	mockRedirectURIRepo := interfacemocks.NewMockRedirectURIRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)
@@ -813,12 +814,12 @@ func TestAuthorizeService_SubmitAuthorize_UserAlreadyExists(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockClientRepo := repositorymocks.NewMockClientRepository(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockProjectSettingRepo := repositorymocks.NewMockProjectSettingRepository(t)
-	mockUserRepo := repositorymocks.NewMockUserRepository(t)
-	mockRedirectURIRepo := repositorymocks.NewMockRedirectURIRepository(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
+	mockClientRepo := interfacemocks.NewMockClientRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockProjectSettingRepo := interfacemocks.NewMockProjectSettingRepository(t)
+	mockUserRepo := interfacemocks.NewMockUserRepository(t)
+	mockRedirectURIRepo := interfacemocks.NewMockRedirectURIRepository(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)

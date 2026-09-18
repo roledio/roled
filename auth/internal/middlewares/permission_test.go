@@ -14,10 +14,11 @@ import (
 
 	"github.com/roledio/roled/auth/internal/constants"
 	"github.com/roledio/roled/auth/internal/entities"
-	"github.com/roledio/roled/auth/internal/repositories/interfaces"
 	"github.com/roledio/roled/auth/pkg/errors"
 
-	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
+	"github.com/roledio/roled/auth/internal/repositories/interfaces"
+	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
+	repositorymocks "github.com/roledio/roled/auth/internal/repositories/mocks"
 )
 
 func testHandler(c fiber.Ctx) error {
@@ -53,8 +54,8 @@ func TestPermission_NoAccessToken(t *testing.T) {
 func TestPermission_RouteNoRequiredPermissions(t *testing.T) {
 	app := fiber.New()
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockPermissionRepo := repositorymocks.NewMockPermissionRepository(t)
-	mockRoleRepo := repositorymocks.NewMockRoleRepository(t)
+	mockPermissionRepo := interfacemocks.NewMockPermissionRepository(t)
+	mockRoleRepo := interfacemocks.NewMockRoleRepository(t)
 
 	// Mock registry - but it shouldn't be called for routes without required permissions
 	mockRegistry.EXPECT().PermissionRepository().Return(mockPermissionRepo).Maybe()
@@ -90,8 +91,8 @@ func TestPermission_RouteNoRequiredPermissions(t *testing.T) {
 func TestPermission_UserHasPermission(t *testing.T) {
 	app := fiber.New()
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockPermissionRepo := repositorymocks.NewMockPermissionRepository(t)
-	mockRoleRepo := repositorymocks.NewMockRoleRepository(t)
+	mockPermissionRepo := interfacemocks.NewMockPermissionRepository(t)
+	mockRoleRepo := interfacemocks.NewMockRoleRepository(t)
 
 	// Mock registry
 	mockRegistry.EXPECT().PermissionRepository().Return(mockPermissionRepo).Once()
@@ -135,8 +136,8 @@ func TestPermission_UserHasPermission(t *testing.T) {
 func TestPermission_UserNoPermission(t *testing.T) {
 	app := fiber.New()
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockPermissionRepo := repositorymocks.NewMockPermissionRepository(t)
-	mockRoleRepo := repositorymocks.NewMockRoleRepository(t)
+	mockPermissionRepo := interfacemocks.NewMockPermissionRepository(t)
+	mockRoleRepo := interfacemocks.NewMockRoleRepository(t)
 
 	// Mock registry
 	mockRegistry.EXPECT().PermissionRepository().Return(mockPermissionRepo).Once()
@@ -185,7 +186,7 @@ func TestPermission_UserNoPermission(t *testing.T) {
 func TestPermission_ClientHasPermission(t *testing.T) {
 	app := fiber.New()
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockPermissionRepo := repositorymocks.NewMockPermissionRepository(t)
+	mockPermissionRepo := interfacemocks.NewMockPermissionRepository(t)
 
 	// Mock registry
 	mockRegistry.EXPECT().PermissionRepository().Return(mockPermissionRepo).Once()
@@ -225,7 +226,7 @@ func TestPermission_ClientHasPermission(t *testing.T) {
 func TestPermission_ClientNoPermission(t *testing.T) {
 	app := fiber.New()
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockPermissionRepo := repositorymocks.NewMockPermissionRepository(t)
+	mockPermissionRepo := interfacemocks.NewMockPermissionRepository(t)
 
 	// Mock registry
 	mockRegistry.EXPECT().PermissionRepository().Return(mockPermissionRepo).Once()
@@ -270,8 +271,8 @@ func TestPermission_ClientNoPermission(t *testing.T) {
 func TestPermission_FindByUserIDError(t *testing.T) {
 	app := fiber.New()
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockPermissionRepo := repositorymocks.NewMockPermissionRepository(t)
-	mockRoleRepo := repositorymocks.NewMockRoleRepository(t)
+	mockPermissionRepo := interfacemocks.NewMockPermissionRepository(t)
+	mockRoleRepo := interfacemocks.NewMockRoleRepository(t)
 
 	// Mock registry
 	mockRegistry.EXPECT().PermissionRepository().Return(mockPermissionRepo).Once()
@@ -316,7 +317,7 @@ func TestPermission_FindByUserIDError(t *testing.T) {
 func TestPermission_FindByClientIDError(t *testing.T) {
 	app := fiber.New()
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockPermissionRepo := repositorymocks.NewMockPermissionRepository(t)
+	mockPermissionRepo := interfacemocks.NewMockPermissionRepository(t)
 
 	// Mock registry
 	mockRegistry.EXPECT().PermissionRepository().Return(mockPermissionRepo).Once()

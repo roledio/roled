@@ -11,8 +11,8 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"github.com/roledio/roled/auth/internal/configs"
 	customerrors "github.com/roledio/roled/auth/internal/errors"
-	servicemocks "github.com/roledio/roled/auth/internal/mocks/services"
 	"github.com/roledio/roled/auth/internal/models"
+	oauthconnectionmocks "github.com/roledio/roled/auth/internal/services/oauthconnection/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/tidwall/gjson"
@@ -20,7 +20,7 @@ import (
 
 func TestGetProjectOAuthConnections_Success(t *testing.T) {
 	app := fiber.New()
-	oauthConnectionServiceMock := servicemocks.NewMockOAuthConnectionService(t)
+	oauthConnectionServiceMock := oauthconnectionmocks.NewMockOAuthConnectionService(t)
 
 	now := time.Now()
 	expectedResponse := []models.OAuthConnectionDetails{
@@ -66,7 +66,7 @@ func TestGetProjectOAuthConnections_Success(t *testing.T) {
 
 func TestGetProjectOAuthConnections_EmptyList(t *testing.T) {
 	app := fiber.New()
-	oauthConnectionServiceMock := servicemocks.NewMockOAuthConnectionService(t)
+	oauthConnectionServiceMock := oauthconnectionmocks.NewMockOAuthConnectionService(t)
 
 	expectedResponse := []models.OAuthConnectionDetails{}
 
@@ -97,7 +97,7 @@ func TestGetProjectOAuthConnections_EmptyList(t *testing.T) {
 
 func TestGetProjectOAuthConnection_Success(t *testing.T) {
 	app := fiber.New()
-	oauthConnectionServiceMock := servicemocks.NewMockOAuthConnectionService(t)
+	oauthConnectionServiceMock := oauthconnectionmocks.NewMockOAuthConnectionService(t)
 
 	now := time.Now()
 	expectedResponse := &models.OAuthConnectionDetails{
@@ -141,7 +141,7 @@ func TestGetProjectOAuthConnection_Success(t *testing.T) {
 
 func TestGetProjectOAuthConnection_NotFound(t *testing.T) {
 	app := fiber.New()
-	oauthConnectionServiceMock := servicemocks.NewMockOAuthConnectionService(t)
+	oauthConnectionServiceMock := oauthconnectionmocks.NewMockOAuthConnectionService(t)
 
 	oauthConnectionServiceMock.EXPECT().GetOAuthConnectionDetails(mock.Anything, mock.MatchedBy(func(req *models.GetOAuthConnectionRequest) bool {
 		return req.ProjectID == "proj-123" && req.Provider == "google"
@@ -171,7 +171,7 @@ func TestGetProjectOAuthConnection_NotFound(t *testing.T) {
 
 func TestCreateProjectOAuthConnection_Success(t *testing.T) {
 	app := fiber.New()
-	oauthConnectionServiceMock := servicemocks.NewMockOAuthConnectionService(t)
+	oauthConnectionServiceMock := oauthconnectionmocks.NewMockOAuthConnectionService(t)
 
 	now := time.Now()
 	expectedResponse := &models.OAuthConnectionDetails{
@@ -230,7 +230,7 @@ func TestCreateProjectOAuthConnection_Success(t *testing.T) {
 
 func TestCreateProjectOAuthConnection_ValidationError(t *testing.T) {
 	app := fiber.New()
-	oauthConnectionServiceMock := servicemocks.NewMockOAuthConnectionService(t)
+	oauthConnectionServiceMock := oauthconnectionmocks.NewMockOAuthConnectionService(t)
 
 	deps := &Dependencies{
 		OAuthConnectionService: oauthConnectionServiceMock,
@@ -259,7 +259,7 @@ func TestCreateProjectOAuthConnection_ValidationError(t *testing.T) {
 
 func TestCreateProjectOAuthConnection_ServiceError(t *testing.T) {
 	app := fiber.New()
-	oauthConnectionServiceMock := servicemocks.NewMockOAuthConnectionService(t)
+	oauthConnectionServiceMock := oauthconnectionmocks.NewMockOAuthConnectionService(t)
 
 	oauthConnectionServiceMock.EXPECT().CreateOAuthConnection(mock.Anything, mock.MatchedBy(func(req *models.CreateOAuthConnectionRequest) bool {
 		return req.ProjectID == "proj-123" &&
@@ -303,7 +303,7 @@ func TestCreateProjectOAuthConnection_ServiceError(t *testing.T) {
 
 func TestUpdateProjectOAuthConnection_Success(t *testing.T) {
 	app := fiber.New()
-	oauthConnectionServiceMock := servicemocks.NewMockOAuthConnectionService(t)
+	oauthConnectionServiceMock := oauthconnectionmocks.NewMockOAuthConnectionService(t)
 
 	now := time.Now()
 	expectedResponse := &models.OAuthConnectionDetails{
@@ -359,7 +359,7 @@ func TestUpdateProjectOAuthConnection_Success(t *testing.T) {
 
 func TestUpdateProjectOAuthConnection_ServiceError(t *testing.T) {
 	app := fiber.New()
-	oauthConnectionServiceMock := servicemocks.NewMockOAuthConnectionService(t)
+	oauthConnectionServiceMock := oauthconnectionmocks.NewMockOAuthConnectionService(t)
 
 	oauthConnectionServiceMock.EXPECT().UpdateOAuthConnection(mock.Anything, mock.MatchedBy(func(req *models.UpdateOAuthConnectionRequest) bool {
 		return req.ProjectID == "proj-123" &&
@@ -402,7 +402,7 @@ func TestUpdateProjectOAuthConnection_ServiceError(t *testing.T) {
 
 func TestDeleteProjectOAuthConnection_Success(t *testing.T) {
 	app := fiber.New()
-	oauthConnectionServiceMock := servicemocks.NewMockOAuthConnectionService(t)
+	oauthConnectionServiceMock := oauthconnectionmocks.NewMockOAuthConnectionService(t)
 
 	oauthConnectionServiceMock.EXPECT().DeleteOAuthConnection(mock.Anything, mock.MatchedBy(func(req *models.DeleteOAuthConnectionRequest) bool {
 		return req.ProjectID == "proj-123" &&
@@ -431,7 +431,7 @@ func TestDeleteProjectOAuthConnection_Success(t *testing.T) {
 
 func TestDeleteProjectOAuthConnection_ServiceError(t *testing.T) {
 	app := fiber.New()
-	oauthConnectionServiceMock := servicemocks.NewMockOAuthConnectionService(t)
+	oauthConnectionServiceMock := oauthconnectionmocks.NewMockOAuthConnectionService(t)
 
 	oauthConnectionServiceMock.EXPECT().DeleteOAuthConnection(mock.Anything, mock.MatchedBy(func(req *models.DeleteOAuthConnectionRequest) bool {
 		return req.ProjectID == "proj-123" &&

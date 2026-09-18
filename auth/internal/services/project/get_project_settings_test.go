@@ -10,9 +10,10 @@ import (
 	"github.com/roledio/roled/auth/internal/configs"
 	"github.com/roledio/roled/auth/internal/constants"
 	"github.com/roledio/roled/auth/internal/entities"
-	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
-	servicemocks "github.com/roledio/roled/auth/internal/mocks/services"
 	"github.com/roledio/roled/auth/internal/models"
+	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
+	repositorymocks "github.com/roledio/roled/auth/internal/repositories/mocks"
+	redismocks "github.com/roledio/roled/auth/internal/services/infra/mocks"
 )
 
 func TestProjectService_GetProjectSettings_Success(t *testing.T) {
@@ -46,9 +47,9 @@ func TestProjectService_GetProjectSettings_Success(t *testing.T) {
 	}
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockProjectSettingRepo := repositorymocks.NewMockProjectSettingRepository(t)
-	mockRedisService := servicemocks.NewMockRedisService(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockProjectSettingRepo := interfacemocks.NewMockProjectSettingRepository(t)
+	mockRedisService := redismocks.NewMockRedisService(t)
 
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
 	mockRegistry.EXPECT().ProjectSettingRepository().Return(mockProjectSettingRepo)
@@ -101,9 +102,9 @@ func TestProjectService_GetProjectSettings_SingleflightDeduplication(t *testing.
 	}
 
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockProjectSettingRepo := repositorymocks.NewMockProjectSettingRepository(t)
-	mockRedisService := servicemocks.NewMockRedisService(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockProjectSettingRepo := interfacemocks.NewMockProjectSettingRepository(t)
+	mockRedisService := redismocks.NewMockRedisService(t)
 
 	// Since calls are singleflighted, underlying repository methods are called ONLY ONCE even with 10 concurrent callers.
 	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo).Once()

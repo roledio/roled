@@ -8,8 +8,9 @@ import (
 	"github.com/roledio/roled/auth/internal/constants"
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/errors"
-	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
 	"github.com/roledio/roled/auth/internal/models"
+	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
+	repositorymocks "github.com/roledio/roled/auth/internal/repositories/mocks"
 	pkgconstants "github.com/roledio/roled/auth/pkg/constants"
 	"github.com/roledio/roled/auth/pkg/utils/encryptionutil"
 	"github.com/stretchr/testify/assert"
@@ -27,9 +28,9 @@ func TestAccessTokenService_ExchangeToken_ClientCredentials_Success(t *testing.T
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockClientRepo := repositorymocks.NewMockClientRepository(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockAccessTokenRepo := repositorymocks.NewMockAccessTokenRepository(t)
+	mockClientRepo := interfacemocks.NewMockClientRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockAccessTokenRepo := interfacemocks.NewMockAccessTokenRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)
@@ -87,7 +88,7 @@ func TestAccessTokenService_ExchangeToken_ClientCredentials_InvalidClient(t *tes
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockClientRepo := repositorymocks.NewMockClientRepository(t)
+	mockClientRepo := interfacemocks.NewMockClientRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)
@@ -120,7 +121,7 @@ func TestAccessTokenService_ExchangeToken_ClientCredentials_InactiveClient(t *te
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockClientRepo := repositorymocks.NewMockClientRepository(t)
+	mockClientRepo := interfacemocks.NewMockClientRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)
@@ -157,8 +158,8 @@ func TestAccessTokenService_ExchangeToken_ClientCredentials_InvalidSecret(t *tes
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockClientRepo := repositorymocks.NewMockClientRepository(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
+	mockClientRepo := interfacemocks.NewMockClientRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)

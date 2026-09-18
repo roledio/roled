@@ -7,8 +7,9 @@ import (
 	"github.com/roledio/roled/auth/internal/configs"
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/errors"
-	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
 	"github.com/roledio/roled/auth/internal/models"
+	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
+	repositorymocks "github.com/roledio/roled/auth/internal/repositories/mocks"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,12 +18,12 @@ func TestAuthorizeService_RenderAuthorize_Success(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockClientRepo := repositorymocks.NewMockClientRepository(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockProjectSettingRepo := repositorymocks.NewMockProjectSettingRepository(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
-	mockRedirectURIRepo := repositorymocks.NewMockRedirectURIRepository(t)
-	mockOAuthConnectionRepo := repositorymocks.NewMockOAuthConnectionRepository(t)
+	mockClientRepo := interfacemocks.NewMockClientRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockProjectSettingRepo := interfacemocks.NewMockProjectSettingRepository(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
+	mockRedirectURIRepo := interfacemocks.NewMockRedirectURIRepository(t)
+	mockOAuthConnectionRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)
@@ -98,7 +99,7 @@ func TestAuthorizeService_RenderAuthorize_ClientNotFound(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockClientRepo := repositorymocks.NewMockClientRepository(t)
+	mockClientRepo := interfacemocks.NewMockClientRepository(t)
 
 	// Mock registry to return client repo
 	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)
@@ -132,10 +133,10 @@ func TestAuthorizeService_RenderAuthorize_InvalidRedirectURI(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockClientRepo := repositorymocks.NewMockClientRepository(t)
-	mockProjectRepo := repositorymocks.NewMockProjectRepository(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
-	mockRedirectURIRepo := repositorymocks.NewMockRedirectURIRepository(t)
+	mockClientRepo := interfacemocks.NewMockClientRepository(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
+	mockRedirectURIRepo := interfacemocks.NewMockRedirectURIRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)
@@ -195,7 +196,7 @@ func TestAuthorizeService_RenderAuthorize_DatabaseError(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockClientRepo := repositorymocks.NewMockClientRepository(t)
+	mockClientRepo := interfacemocks.NewMockClientRepository(t)
 
 	// Mock registry to return client repo
 	mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)

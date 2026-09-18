@@ -10,15 +10,15 @@ import (
 
 	"github.com/roledio/roled/auth/internal/constants/rediskeys"
 	"github.com/roledio/roled/auth/internal/entities"
-	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
-	servicemocks "github.com/roledio/roled/auth/internal/mocks/services"
+	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
 	"github.com/roledio/roled/auth/internal/repositories/redis"
+	redismocks "github.com/roledio/roled/auth/internal/services/infra/mocks"
 )
 
 func TestCachedRedirectURIRepository_FindByProjectIDAndRedirectURI_CacheHit(t *testing.T) {
 	ctx := context.Background()
-	mockDBRepo := repositorymocks.NewMockRedirectURIRepository(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockDBRepo := interfacemocks.NewMockRedirectURIRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 
 	cachedRepo := redis.NewRedirectURIRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -57,8 +57,8 @@ func TestCachedRedirectURIRepository_FindByProjectIDAndRedirectURI_CacheMiss(t *
 		LoginURL:    &loginURL,
 	}
 
-	mockDBRepo := repositorymocks.NewMockRedirectURIRepository(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockDBRepo := interfacemocks.NewMockRedirectURIRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 
 	cachedRepo := redis.NewRedirectURIRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -96,8 +96,8 @@ func TestCachedRedirectURIRepository_Create(t *testing.T) {
 		{ProjectID: "proj-123", RedirectURI: "https://example.com/callback2", LoginURL: &loginURL},
 	}
 
-	mockDBRepo := repositorymocks.NewMockRedirectURIRepository(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockDBRepo := interfacemocks.NewMockRedirectURIRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 
 	cachedRepo := redis.NewRedirectURIRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -115,8 +115,8 @@ func TestCachedRedirectURIRepository_DeleteByProjectID(t *testing.T) {
 	ctx := context.Background()
 	projectID := "proj-123"
 
-	mockDBRepo := repositorymocks.NewMockRedirectURIRepository(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockDBRepo := interfacemocks.NewMockRedirectURIRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 
 	cachedRepo := redis.NewRedirectURIRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -132,8 +132,8 @@ func TestCachedRedirectURIRepository_DeleteByProjectID(t *testing.T) {
 
 func TestCachedRedirectURIRepository_FindByProjectID_CacheHit(t *testing.T) {
 	ctx := context.Background()
-	mockDBRepo := repositorymocks.NewMockRedirectURIRepository(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockDBRepo := interfacemocks.NewMockRedirectURIRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 
 	cachedRepo := redis.NewRedirectURIRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -173,8 +173,8 @@ func TestCachedRedirectURIRepository_FindByProjectID_CacheMiss(t *testing.T) {
 		LoginURL:    &loginURL,
 	}
 
-	mockDBRepo := repositorymocks.NewMockRedirectURIRepository(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockDBRepo := interfacemocks.NewMockRedirectURIRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 
 	cachedRepo := redis.NewRedirectURIRepository(mockDBRepo, mockRedis, 24*time.Hour)
 

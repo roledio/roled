@@ -8,9 +8,10 @@ import (
 	"github.com/roledio/roled/auth/internal/constants"
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/errors"
-	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
-	servicemocks "github.com/roledio/roled/auth/internal/mocks/services"
 	"github.com/roledio/roled/auth/internal/models"
+	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
+	repositorymocks "github.com/roledio/roled/auth/internal/repositories/mocks"
+	redismocks "github.com/roledio/roled/auth/internal/services/infra/mocks"
 	pkgerrors "github.com/roledio/roled/auth/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -27,8 +28,8 @@ func TestAccountService_GetAccounts_Success_SystemAccount(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
@@ -84,8 +85,8 @@ func TestAccountService_GetAccounts_Success_NonSystemAccount(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
@@ -128,7 +129,7 @@ func TestAccountService_GetAccounts_AccountNotInContext(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 
 	// Create service
 	service := NewAccountService(mockRegistry, mockRedis)
@@ -156,8 +157,8 @@ func TestAccountService_GetAccounts_CountError(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
@@ -192,8 +193,8 @@ func TestAccountService_GetAccounts_CountZero(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
@@ -226,8 +227,8 @@ func TestAccountService_GetAccounts_FindAllError(t *testing.T) {
 
 	// Setup mocks
 	mockRegistry := repositorymocks.NewMockRegistry(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
-	mockAccountRepo := repositorymocks.NewMockAccountRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
+	mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
 
 	// Mock registry to return repositories
 	mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)

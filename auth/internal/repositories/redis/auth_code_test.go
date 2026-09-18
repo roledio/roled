@@ -10,15 +10,15 @@ import (
 
 	"github.com/roledio/roled/auth/internal/constants/rediskeys"
 	"github.com/roledio/roled/auth/internal/entities"
-	repositorymocks "github.com/roledio/roled/auth/internal/mocks/repositories"
-	servicemocks "github.com/roledio/roled/auth/internal/mocks/services"
+	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
 	"github.com/roledio/roled/auth/internal/repositories/redis"
+	redismocks "github.com/roledio/roled/auth/internal/services/infra/mocks"
 )
 
 func TestCachedAuthCodeRepository_FindByClientIDAndCodeHash_CacheHit(t *testing.T) {
 	ctx := context.Background()
-	mockDBRepo := repositorymocks.NewMockAuthCodeRepository(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockDBRepo := interfacemocks.NewMockAuthCodeRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 
 	cachedRepo := redis.NewAuthCodeRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -57,8 +57,8 @@ func TestCachedAuthCodeRepository_FindByClientIDAndCodeHash_CacheMiss(t *testing
 		ExpiresAt: time.Now().Add(time.Hour),
 	}
 
-	mockDBRepo := repositorymocks.NewMockAuthCodeRepository(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockDBRepo := interfacemocks.NewMockAuthCodeRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 
 	cachedRepo := redis.NewAuthCodeRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -97,8 +97,8 @@ func TestCachedAuthCodeRepository_Create(t *testing.T) {
 		ExpiresAt: time.Now().Add(time.Hour),
 	}
 
-	mockDBRepo := repositorymocks.NewMockAuthCodeRepository(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockDBRepo := interfacemocks.NewMockAuthCodeRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 
 	cachedRepo := redis.NewAuthCodeRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
@@ -121,8 +121,8 @@ func TestCachedAuthCodeRepository_UpdateUsedAuthCode(t *testing.T) {
 		ExpiresAt: time.Now().Add(time.Hour),
 	}
 
-	mockDBRepo := repositorymocks.NewMockAuthCodeRepository(t)
-	mockRedis := servicemocks.NewMockRedisService(t)
+	mockDBRepo := interfacemocks.NewMockAuthCodeRepository(t)
+	mockRedis := redismocks.NewMockRedisService(t)
 
 	cachedRepo := redis.NewAuthCodeRepository(mockDBRepo, mockRedis, 24*time.Hour)
 
