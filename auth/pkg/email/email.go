@@ -7,14 +7,6 @@ import (
 	"gopkg.in/gomail.v2"
 )
 
-type Service interface {
-	Send(ctx context.Context, req Request) error
-}
-
-type service struct {
-	dialer *gomail.Dialer
-}
-
 type Request struct {
 	To      []string
 	CC      []string
@@ -31,6 +23,14 @@ type SMTPConfig struct {
 	Port     int
 	Username string
 	Password string
+}
+
+type Service interface {
+	Send(ctx context.Context, req Request) error
+}
+
+type service struct {
+	dialer *gomail.Dialer
 }
 
 func NewService(config *SMTPConfig) Service {

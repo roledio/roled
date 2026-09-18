@@ -25,6 +25,7 @@ import (
 	"github.com/roledio/roled/auth/internal/services/upload"
 	"github.com/roledio/roled/auth/internal/services/user"
 	"github.com/roledio/roled/auth/pkg/email"
+	"github.com/roledio/roled/auth/pkg/newrelic"
 	"github.com/roledio/roled/auth/pkg/utils/cacheutil"
 )
 
@@ -43,6 +44,7 @@ type App struct {
 	queueHandlers    QueueHandlers
 	queuePublishers  QueuePublishers
 	logger           *fiberzap.LoggerConfig
+	newrelicService  newrelic.Service
 	app              *fiber.App
 }
 
@@ -50,7 +52,11 @@ func NewApp(config *configs.DefaultConfig) (*App, error) {
 	buildInfo := models.GetCurrentBuildInfo(config)
 
 	// Setup New Relic
-	newrelicService, err := infra.NewNewrelicService(config, buildInfo)
+	newrelicService, err := newrelic.NewService(newrelic.Config{
+		Enabled:    config.Newrelic.Enabled,
+		LicenseKey: config.Newrelic.LicenseKey,
+		AppName:    fmt.Sprintf("%s-%s", buildInfo.ProjectName, buildInfo.Env),
+	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to create New Relic service: %w", err)
 	}
