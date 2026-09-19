@@ -327,6 +327,7 @@ Registry (decorator composition)
 ### 3.13 Testing (Auth)
 
 - **Unit tests** sit next to unit: `create_project_test.go`. Use `mockery` (`.mockery.yml`) for interface mocks + testify suite.
+- **Mock generation**: Always use mockery-generated mocks from `internal/<domain>/mocks/` or `internal/services/<domain>/mocks/` instead of manually creating mock implementations. Only create manual mocks when absolutely necessary (e.g., for external libraries not under your control).
 - **Repository integration tests** use `mariadb/testutil/suite.go` — testcontainers spins up a MariaDB, applies migrations, loads fixtures. Example `mariadb/account_test.go`.
 - Always assert both error code (via `errors.Is` for CustomError) AND returned fields where applicable.
 

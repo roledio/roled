@@ -1,52 +1,20 @@
 package web
 
 import (
-	"context"
 	"errors"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/roledio/roled/auth/internal/configs"
-	"github.com/roledio/roled/auth/internal/models"
+	"github.com/roledio/roled/auth/internal/services/authorize/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
-// MockAuthorizeService is a mock implementation of AuthorizeService for testing
-type MockAuthorizeService struct {
-	mock.Mock
-}
-
-func (m *MockAuthorizeService) RenderAuthorize(ctx context.Context, req *models.RenderAuthorizeRequest) (*models.RenderAuthorizeResult, error) {
-	args := m.Called(ctx, req)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*models.RenderAuthorizeResult), args.Error(1)
-}
-
-func (m *MockAuthorizeService) SubmitAuthorize(ctx context.Context, req *models.SubmitAuthorizeRequest) (*models.SubmitAuthorizeResult, error) {
-	args := m.Called(ctx, req)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*models.SubmitAuthorizeResult), args.Error(1)
-}
-
-func (m *MockAuthorizeService) InitiateGoogleOAuth(ctx context.Context, req *models.GoogleOAuthRequest) (string, error) {
-	args := m.Called(ctx, req)
-	return args.String(0), args.Error(1)
-}
-
-func (m *MockAuthorizeService) HandleGoogleOAuthCallback(ctx context.Context, req *models.GoogleOAuthCallbackRequest) (string, error) {
-	args := m.Called(ctx, req)
-	return args.String(0), args.Error(1)
-}
-
 func TestHandleGoogleOAuth_Success(t *testing.T) {
 	app := fiber.New()
-	mockService := new(MockAuthorizeService)
+	mockService := new(mocks.MockAuthorizeService)
 	h := &handler{
 		app:              app,
 		defaultConfig:    &configs.DefaultConfig{},
@@ -74,7 +42,7 @@ func TestHandleGoogleOAuth_Success(t *testing.T) {
 
 func TestHandleGoogleOAuth_BindValidationError(t *testing.T) {
 	app := fiber.New()
-	mockService := new(MockAuthorizeService)
+	mockService := new(mocks.MockAuthorizeService)
 	h := &handler{
 		app:              app,
 		defaultConfig:    &configs.DefaultConfig{},
@@ -99,7 +67,7 @@ func TestHandleGoogleOAuth_BindValidationError(t *testing.T) {
 
 func TestHandleGoogleOAuth_ServiceError(t *testing.T) {
 	app := fiber.New()
-	mockService := new(MockAuthorizeService)
+	mockService := new(mocks.MockAuthorizeService)
 	h := &handler{
 		app:              app,
 		defaultConfig:    &configs.DefaultConfig{},
@@ -126,7 +94,7 @@ func TestHandleGoogleOAuth_ServiceError(t *testing.T) {
 
 func TestHandleGoogleOAuthCallback_Success(t *testing.T) {
 	app := fiber.New()
-	mockService := new(MockAuthorizeService)
+	mockService := new(mocks.MockAuthorizeService)
 	h := &handler{
 		app:              app,
 		defaultConfig:    &configs.DefaultConfig{},
@@ -154,7 +122,7 @@ func TestHandleGoogleOAuthCallback_Success(t *testing.T) {
 
 func TestHandleGoogleOAuthCallback_BindValidationError(t *testing.T) {
 	app := fiber.New()
-	mockService := new(MockAuthorizeService)
+	mockService := new(mocks.MockAuthorizeService)
 	h := &handler{
 		app:              app,
 		defaultConfig:    &configs.DefaultConfig{},
@@ -179,7 +147,7 @@ func TestHandleGoogleOAuthCallback_BindValidationError(t *testing.T) {
 
 func TestHandleGoogleOAuthCallback_ServiceError(t *testing.T) {
 	app := fiber.New()
-	mockService := new(MockAuthorizeService)
+	mockService := new(mocks.MockAuthorizeService)
 	h := &handler{
 		app:              app,
 		defaultConfig:    &configs.DefaultConfig{},
