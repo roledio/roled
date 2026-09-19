@@ -442,3 +442,85 @@ func DefaultOAuthConnectionFixtures(projectID string) []OAuthConnectionFixture {
 		},
 	}
 }
+
+// UserIdentityFixture represents test data for user identity
+type UserIdentityFixture struct {
+	ID             string
+	UserID         string
+	Provider       string
+	ProviderUserID string
+	ProjectID      string
+}
+
+// CreateUserIdentity inserts a user identity into the database and returns the entity
+func CreateUserIdentity(ctx context.Context, db *TestDB, fixture UserIdentityFixture) (*entities.UserIdentity, error) {
+	now := time.Now().UTC().Truncate(time.Millisecond)
+
+	userIdentity := &entities.UserIdentity{
+		ID:             fixture.ID,
+		UserID:         fixture.UserID,
+		Provider:       fixture.Provider,
+		ProviderUserID: fixture.ProviderUserID,
+		ProjectID:      fixture.ProjectID,
+		CreatedAt:      now,
+		UpdatedAt:      now,
+	}
+
+	query := `INSERT INTO user_identities (id, user_id, provider, provider_user_id, project_id, created_at, updated_at) 
+			  VALUES (?, ?, ?, ?, ?, ?, ?)`
+
+	_, err := db.ExecContext(ctx, query,
+		userIdentity.ID,
+		userIdentity.UserID,
+		userIdentity.Provider,
+		userIdentity.ProviderUserID,
+		userIdentity.ProjectID,
+		userIdentity.CreatedAt,
+		userIdentity.UpdatedAt,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create user identity: %w", err)
+	}
+
+	return userIdentity, nil
+}
+
+// CreateUserIdentities inserts multiple user identities into the database
+func CreateUserIdentities(ctx context.Context, db *TestDB, fixtures []UserIdentityFixture) ([]entities.UserIdentity, error) {
+	userIdentities := make([]entities.UserIdentity, 0, len(fixtures))
+	for _, f := range fixtures {
+		userIdentity, err := CreateUserIdentity(ctx, db, f)
+		if err != nil {
+			return nil, err
+		}
+		userIdentities = append(userIdentities, *userIdentity)
+	}
+	return userIdentities, nil
+}
+
+// DefaultUserIdentityFixtures returns common test fixtures for user identities
+func DefaultUserIdentityFixtures(userID, projectID string) []UserIdentityFixture {
+	return []UserIdentityFixture{
+		{
+			ID:             "uid_001_github",
+			UserID:         userID,
+			Provider:       "github",
+			ProviderUserID: "github_user_123",
+			ProjectID:      projectID,
+		},
+		{
+			ID:             "uid_002_google",
+			UserID:         userID,
+			Provider:       "google",
+			ProviderUserID: "google_user_456",
+			ProjectID:      projectID,
+		},
+		{
+			ID:             "uid_003_custom",
+			UserID:         userID,
+			Provider:       "custom_provider",
+			ProviderUserID: "custom_user_789",
+			ProjectID:      projectID,
+		},
+	}
+}
