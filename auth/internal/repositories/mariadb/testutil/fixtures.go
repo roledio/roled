@@ -338,3 +338,107 @@ func CreateAccessToken(ctx context.Context, db *TestDB, fixture AccessTokenFixtu
 
 	return token, nil
 }
+
+// OAuthConnectionFixture represents test data for OAuth connection
+type OAuthConnectionFixture struct {
+	ID                    string
+	ProjectID             string
+	Provider              string
+	CredentialType        string
+	ClientID              *string
+	ClientSecretEncrypted *string
+	Scopes                *string
+	Enabled               bool
+}
+
+// CreateOAuthConnection inserts an OAuth connection into the database and returns the entity
+func CreateOAuthConnection(ctx context.Context, db *TestDB, fixture OAuthConnectionFixture) (*entities.OAuthConnection, error) {
+	now := time.Now().UTC().Truncate(time.Millisecond)
+
+	connection := &entities.OAuthConnection{
+		ID:                    fixture.ID,
+		ProjectID:             fixture.ProjectID,
+		Provider:              fixture.Provider,
+		CredentialType:        fixture.CredentialType,
+		ClientID:              fixture.ClientID,
+		ClientSecretEncrypted: fixture.ClientSecretEncrypted,
+		Scopes:                fixture.Scopes,
+		Enabled:               fixture.Enabled,
+		CreatedAt:             now,
+		UpdatedAt:             now,
+	}
+
+	query := `INSERT INTO oauth_connections (id, project_id, provider, credential_type, client_id, client_secret_encrypted, scopes, enabled, created_at, updated_at) 
+			  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+
+	_, err := db.ExecContext(ctx, query,
+		connection.ID,
+		connection.ProjectID,
+		connection.Provider,
+		connection.CredentialType,
+		connection.ClientID,
+		connection.ClientSecretEncrypted,
+		connection.Scopes,
+		connection.Enabled,
+		connection.CreatedAt,
+		connection.UpdatedAt,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create OAuth connection: %w", err)
+	}
+
+	return connection, nil
+}
+
+// CreateOAuthConnections inserts multiple OAuth connections into the database
+func CreateOAuthConnections(ctx context.Context, db *TestDB, fixtures []OAuthConnectionFixture) ([]entities.OAuthConnection, error) {
+	connections := make([]entities.OAuthConnection, 0, len(fixtures))
+	for _, f := range fixtures {
+		connection, err := CreateOAuthConnection(ctx, db, f)
+		if err != nil {
+			return nil, err
+		}
+		connections = append(connections, *connection)
+	}
+	return connections, nil
+}
+
+// DefaultOAuthConnectionFixtures returns common test fixtures for OAuth connections
+func DefaultOAuthConnectionFixtures(projectID string) []OAuthConnectionFixture {
+	clientID := "test_client_id"
+	clientSecret := "encrypted_secret"
+	scopes := "read,write"
+
+	return []OAuthConnectionFixture{
+		{
+			ID:                    "oauth_001_github",
+			ProjectID:             projectID,
+			Provider:              "github",
+			CredentialType:        "default",
+			ClientID:              &clientID,
+			ClientSecretEncrypted: &clientSecret,
+			Scopes:                &scopes,
+			Enabled:               true,
+		},
+		{
+			ID:                    "oauth_002_google",
+			ProjectID:             projectID,
+			Provider:              "google",
+			CredentialType:        "default",
+			ClientID:              &clientID,
+			ClientSecretEncrypted: &clientSecret,
+			Scopes:                &scopes,
+			Enabled:               true,
+		},
+		{
+			ID:                    "oauth_003_custom",
+			ProjectID:             projectID,
+			Provider:              "custom_provider",
+			CredentialType:        "custom",
+			ClientID:              &clientID,
+			ClientSecretEncrypted: &clientSecret,
+			Scopes:                &scopes,
+			Enabled:               false,
+		},
+	}
+}

@@ -256,8 +256,8 @@ Registry (decorator composition)
 
 ### 3.5 Entities & DB
 
-- **Entities** (pure DB reflection structs) are in `internal/entities/<domain>.go` with only `db:"col"` tags. Timestamps, soft-delete `DeletedAt *time.Time` always present. No business methods.
-- **Soft delete**: Use `UPDATE SET deleted_at = NOW(4)` never `DELETE FROM`. Every SELECT has `WHERE deleted_at IS NULL`.
+- **Entities** (pure DB reflection structs) are in `internal/entities/<domain>.go` with only `db:"col"` tags. Timestamps always present. Soft-delete `DeletedAt *time.Time` should be added when needed for the domain (e.g., when audit trail or recovery is required). No business methods.
+- **Soft delete**: When `DeletedAt` is present on an entity, use `UPDATE SET deleted_at = NOW(4)` never `DELETE FROM`. Every SELECT has `WHERE deleted_at IS NULL`. For entities without soft delete, hard delete (`DELETE FROM`) is acceptable.
 - **Naming conventions**: snake_case columns mirror struct fields via `db:` tags.
 - **Write helpers in mariadb package**:
   - Write operation methods in repository implementations should leverage the [repositories/helper.go](auth/pkg/repositories/helper.go) functions: `repositories.Exec`, `repositories.ExecOne`, `repositories.NamedExec`, or `repositories.NamedExecOne`. Delete and update methods should use `(int, error)` as return type.
