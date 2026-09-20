@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/bsm/redislock"
 	"github.com/gofiber/fiber/v3"
 	fiberredis "github.com/gofiber/storage/redis/v3"
 	nrredis "github.com/newrelic/go-agent/v3/integrations/nrredis-v9"
@@ -34,10 +35,16 @@ type Service interface {
 	Client() redis.UniversalClient
 	KeyWithPrefix(key string) string
 	DeleteManyWithContext(ctx context.Context, keys []string) error
+
+	// AcquireLock tried once; it does not wait if the lock is in use.
+	// The caller must release the lock with lock.Release() after using the locked resource.
+	// Returns nil if the lock could not be acquired after waiting `ttl` duration.
+	AcquireLock(ctx context.Context, key string, ttl time.Duration) (*redislock.Lock, error)
 }
 
 type service struct {
 	redisStorage *fiberredis.Storage
+	locker       *redislock.Client
 	prefix       string
 }
 
@@ -59,6 +66,7 @@ func NewService(config *Config) Service {
 	}
 	return &service{
 		redisStorage: redisStorage,
+		locker:       redislock.New(redisStorage.Conn()),
 		prefix:       config.Prefix,
 	}
 }
@@ -183,4 +191,16 @@ func (p *service) Ping() error {
 
 func (p *service) Client() redis.UniversalClient {
 	return p.redisStorage.Conn()
+}
+func (p *service) AcquireLock(ctx context.Context, key string, ttl time.Duration) (*redislock.Lock, error) {
+	if key == "" {
+		return nil, fmt.Errorf("redis lock key must not be empty")
+	}
+	if ttl < time.Millisecond {
+		return nil, fmt.Errorf("redis lock TTL must be at least 1ms")
+	}
+
+	return p.locker.Obtain(ctx, p.KeyWithPrefix(key), ttl, &redislock.Options{
+		RetryStrategy: redislock.NoRetry(),
+	})
 }

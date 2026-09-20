@@ -129,6 +129,7 @@ require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/andybalholm/brotli v1.2.2 // indirect
+	github.com/bsm/redislock v0.10.0
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.1
