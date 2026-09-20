@@ -1,18 +1,27 @@
 package idutil
 
 import (
-	"github.com/google/uuid"
-	"github.com/lithammer/shortuuid/v4"
+	"crypto/rand"
+
+	"github.com/lithammer/shortuuid/v5"
 	gonanoid "github.com/matoous/go-nanoid/v2"
+	"github.com/oklog/ulid/v2"
 )
 
 const (
+	DefaultChars      = shortuuid.DefaultAlphabet
 	NanoIDDefaultSize = 21
 )
 
-// NewID generates a globally unique, opaque identifier for Roled entities.
+var (
+	ulidEntropy = &ulid.LockedMonotonicReader{
+		MonotonicReader: ulid.Monotonic(rand.Reader, 0),
+	}
+)
+
+// NewID generates a globally unique, opaque identifier for database entities.
 //
-// Roled intentionally uses a string-based ID generated from UUID v7 encoded
+// It intentionally uses a string-based ID generated from UUID v7 encoded
 // with shortuuid, instead of auto-increment integers or fully custom ID formats.
 //
 // Rationale:
@@ -54,11 +63,13 @@ const (
 // human readability, and long-term flexibility without over-optimizing for
 // premature scaling concerns.
 func NewID() string {
-	uuid, err := uuid.NewV7()
-	if err != nil {
-		panic(err)
-	}
-	return shortuuid.DefaultEncoder.Encode(uuid)
+	return shortuuid.NewV7()
+}
+
+// ULID generates a ULID string. It has 26 characters and is sortable by time.
+// It produces a string in uppercase format and is URL-safe.
+func ULID() string {
+	return ulid.MustNew(ulid.Now(), ulidEntropy).String()
 }
 
 // NanoID generates a random NanoID string with the given length.
@@ -70,5 +81,5 @@ func NanoID(length ...int) string {
 	if len(length) > 0 && length[0] > 0 {
 		size = length[0]
 	}
-	return gonanoid.MustGenerate(shortuuid.DefaultAlphabet, size)
+	return gonanoid.MustGenerate(DefaultChars, size)
 }

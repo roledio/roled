@@ -12,7 +12,7 @@ This file is kept short on purpose. Apply all rules in AGENTS.md. Below are shor
 
 Roled is a centralized User & Role Management Platform (OAuth2/OIDC + RBAC). Monorepo:
 
-- `/auth/`    — Go 1.26 backend: Fiber v3, sqlx + MariaDB, Redis cache decorator, Zap logger, Goose migrations, Testcontainers. Module: `github.com/roledio/roled/auth`.
+- `/auth/`    — Go 1.27 backend: Fiber v3, sqlx + MariaDB, Redis cache decorator, Zap logger, Goose migrations, Testcontainers. Module: `github.com/roledio/roled/auth`.
 - `/console/` — React 18 + Vite + TypeScript admin console: shadcn/ui, Tailwind v3, TanStack Query v5, React Router v6, Vitest, posthog-js, axios.
 
 ## Hard Rules (no exceptions)

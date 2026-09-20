@@ -196,7 +196,7 @@ Roled is a centralized User & Role Management Platform with two main sub-project
 
 ### 3.1 Tech Stack
 
-- **Go 1.26** with module `github.com/roledio/roled/auth`
+- **Go 1.27** with module `github.com/roledio/roled/auth`
 - **Web**: Fiber v3 (zero-allocation HTTP). Templates: `gofiber/template/html/v3`
 - **Router**: Fiber group-based, with helpers `protectedGet/Post/Put/Delete/Patch` that chain `middlewares.JWT` + `middlewares.Permission`.
 - **DB**: MariaDB/MySQL via `sqlx` + raw SQL (**not** ORM-generated queries). Query builder: `github.com/Masterminds/squirrel` for dynamic SELECTs.

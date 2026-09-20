@@ -15,7 +15,7 @@ Two subprojects in the monorepo:
 
 | Path | Stack | What it does |
 |---|---|---|
-| `/auth/`    | Go 1.26, Fiber v3, sqlx/MariaDB, Redis v9, Zap, Goose, Testcontainers | OAuth2/OIDC + RBAC auth server. REST APIs for Projects, Clients, Resources, Roles, Users, Members, Access Tokens. |
+| `/auth/`    | Go 1.27, Fiber v3, sqlx/MariaDB, Redis v9, Zap, Goose, Testcontainers | OAuth2/OIDC + RBAC auth server. REST APIs for Projects, Clients, Resources, Roles, Users, Members, Access Tokens. |
 | `/console/` | Vite, React 18, TypeScript, shadcn/ui, Tailwind, TanStack Query v5, React Router v6, Vitest, PostHog, Axios | Admin console UI for project owners to manage the above. |
 
 ## Trae session startup checklist
