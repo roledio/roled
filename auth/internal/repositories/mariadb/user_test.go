@@ -353,7 +353,7 @@ func TestUserRepository_FindByProjectIDAndExternalUserIDJoinRole(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, result)
 
-		assert.Equal(t, user.ID, result.User.ID)
+		assert.Equal(t, user.ID, result.ID)
 		assert.Equal(t, role.ID, result.RoleID)
 		assert.Equal(t, role.Name, result.RoleName)
 	})
@@ -394,7 +394,7 @@ func TestUserRepository_FindByProjectIDAndExternalUserIDJoinRole(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, result)
 
-		assert.Equal(t, user.ID, result.User.ID)
+		assert.Equal(t, user.ID, result.ID)
 		assert.Empty(t, result.RoleID)
 		assert.Empty(t, result.RoleName)
 	})
@@ -565,7 +565,7 @@ func TestUserRepository_FindByIDAndProjectIDJoinRole(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, result)
 
-		assert.Equal(t, user.ID, result.User.ID)
+		assert.Equal(t, user.ID, result.ID)
 		assert.Equal(t, role.ID, result.RoleID)
 		assert.Equal(t, role.Name, result.RoleName)
 	})
@@ -1412,7 +1412,7 @@ func TestUserRepository_FindAll(t *testing.T) {
 		require.NoError(t, err)
 		assert.Len(t, result2, 5)
 
-		assert.NotEqual(t, result[0].User.ID, result2[0].User.ID)
+		assert.NotEqual(t, result[0].ID, result2[0].ID)
 	})
 
 	t.Run("supports sorting", func(t *testing.T) {
@@ -1469,8 +1469,8 @@ func TestUserRepository_FindAll(t *testing.T) {
 		result, err := repo.FindAll(ctx, req)
 		require.NoError(t, err)
 		assert.Len(t, result, 2)
-		assert.Equal(t, "Alpha User", result[0].User.DisplayName)
-		assert.Equal(t, "Zebra User", result[1].User.DisplayName)
+		assert.Equal(t, "Alpha User", result[0].DisplayName)
+		assert.Equal(t, "Zebra User", result[1].DisplayName)
 	})
 
 	t.Run("filters by is_active", func(t *testing.T) {
@@ -1523,7 +1523,7 @@ func TestUserRepository_FindAll(t *testing.T) {
 		result, err := repo.FindAll(ctx, req)
 		require.NoError(t, err)
 		assert.Len(t, result, 1)
-		assert.True(t, result[0].User.IsActive)
+		assert.True(t, result[0].IsActive)
 	})
 
 	t.Run("includes role information", func(t *testing.T) {
