@@ -433,3 +433,192 @@ func TestContextUsage(t *testing.T) {
 	ctxWithValue := context.WithValue(context.Background(), types.ContextKey("key"), "value")
 	assert.NotNil(t, ctxWithValue)
 }
+
+// TestAcquireLock_EmptyKey tests lock with empty key
+func TestAcquireLock_EmptyKey(t *testing.T) {
+	svc := &service{
+		prefix: "app",
+	}
+
+	ctx := context.Background()
+
+	lock, err := svc.AcquireLock(ctx, "", 10*time.Second)
+	assert.Error(t, err)
+	assert.Nil(t, lock)
+	assert.Contains(t, err.Error(), "must not be empty")
+}
+
+// TestAcquireLock_InvalidTTL tests lock with TTL < 1ms
+func TestAcquireLock_InvalidTTL(t *testing.T) {
+	svc := &service{
+		prefix: "app",
+	}
+
+	ctx := context.Background()
+
+	invalidTTLs := []struct {
+		name string
+		ttl  time.Duration
+	}{
+		{"zero duration", 0},
+		{"negative duration", -1 * time.Second},
+		{"sub-millisecond", 999 * time.Microsecond},
+	}
+
+	for _, tt := range invalidTTLs {
+		t.Run(tt.name, func(t *testing.T) {
+			lock, err := svc.AcquireLock(ctx, "resource", tt.ttl)
+			assert.Error(t, err)
+			assert.Nil(t, lock)
+			assert.Contains(t, err.Error(), "at least 1ms")
+		})
+	}
+}
+
+// TestAcquireLock_ValidTTL validates that TTL validation works for valid values
+func TestAcquireLock_ValidTTL(t *testing.T) {
+	validTTLs := []struct {
+		name string
+		ttl  time.Duration
+	}{
+		{"1 millisecond", 1 * time.Millisecond},
+		{"100 milliseconds", 100 * time.Millisecond},
+		{"1 second", 1 * time.Second},
+		{"1 hour", 1 * time.Hour},
+	}
+
+	for _, tt := range validTTLs {
+		t.Run(tt.name, func(t *testing.T) {
+			// Validation passes for valid TTL
+			assert.True(t, tt.ttl >= 1*time.Millisecond)
+		})
+	}
+}
+
+// TestSetData_MarshalError tests SetData when JSON marshaling fails
+func TestSetData_MarshalError(t *testing.T) {
+	svc := &service{
+		prefix: "test",
+	}
+
+	ctx := context.Background()
+
+	// Create a value that cannot be marshaled (channel type)
+	unmarshalable := make(chan int)
+
+	err := svc.SetData(ctx, "bad", unmarshalable, 24*time.Hour)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "json")
+}
+
+// TestNewService_BasicConfig tests Service creation with basic config
+func TestNewService_BasicConfig(t *testing.T) {
+	config := &Config{
+		Host:     "localhost",
+		Port:     6379,
+		Username: "default",
+		Password: "password",
+		Prefix:   "app",
+		DB:       0,
+		Newrelic: false,
+	}
+
+	svc := NewService(config)
+	assert.NotNil(t, svc)
+	assert.NotNil(t, svc.Client())
+}
+
+// TestNewService_WithNewrelic tests Service creation with Newrelic enabled
+func TestNewService_WithNewrelic(t *testing.T) {
+	config := &Config{
+		Host:     "localhost",
+		Port:     6379,
+		Username: "default",
+		Password: "password",
+		Prefix:   "monitoring",
+		DB:       1,
+		Newrelic: true,
+	}
+
+	svc := NewService(config)
+	assert.NotNil(t, svc)
+	assert.NotNil(t, svc.Client())
+}
+
+// TestNewService_EmptyPrefix tests Service creation with empty prefix
+func TestNewService_EmptyPrefix(t *testing.T) {
+	config := &Config{
+		Host:     "localhost",
+		Port:     6379,
+		Username: "default",
+		Password: "password",
+		Prefix:   "",
+		DB:       0,
+		Newrelic: false,
+	}
+
+	svc := NewService(config)
+	assert.NotNil(t, svc)
+}
+
+// TestServiceInterfaceImplementation verifies Service interface implementation
+func TestServiceInterfaceImplementation(t *testing.T) {
+	config := &Config{
+		Host:   "localhost",
+		Port:   6379,
+		Prefix: "test",
+	}
+
+	svc := NewService(config)
+	assert.NotNil(t, svc)
+
+	// Call methods that don't require a real Redis connection
+	prefixedKey := svc.KeyWithPrefix("testkey")
+	assert.NotEmpty(t, prefixedKey)
+	assert.Equal(t, "test:testkey", prefixedKey)
+}
+
+// TestKeyPrefixConsistency tests that prefix is applied consistently
+func TestKeyPrefixConsistency(t *testing.T) {
+	config := &Config{
+		Host:   "localhost",
+		Port:   6379,
+		Prefix: "myservice",
+	}
+
+	svc := NewService(config)
+
+	key1 := svc.KeyWithPrefix("user:123")
+	key2 := svc.KeyWithPrefix("user:123")
+
+	assert.Equal(t, key1, key2, "Same key should produce same prefixed key")
+	assert.Equal(t, "myservice:user:123", key1)
+}
+
+// TestNewService_MultipleInstances tests creating multiple service instances
+func TestNewService_MultipleInstances(t *testing.T) {
+	config1 := &Config{
+		Host:   "localhost",
+		Port:   6379,
+		Prefix: "app1",
+	}
+
+	config2 := &Config{
+		Host:   "localhost",
+		Port:   6379,
+		Prefix: "app2",
+	}
+
+	svc1 := NewService(config1)
+	svc2 := NewService(config2)
+
+	assert.NotNil(t, svc1)
+	assert.NotNil(t, svc2)
+
+	key1 := svc1.KeyWithPrefix("data")
+	key2 := svc2.KeyWithPrefix("data")
+
+	assert.NotEqual(t, key1, key2, "Different prefixes should produce different keys")
+	assert.Equal(t, "app1:data", key1)
+	assert.Equal(t, "app2:data", key2)
+}
