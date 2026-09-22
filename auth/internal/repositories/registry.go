@@ -23,6 +23,7 @@ type Registry interface {
 	MemberRepository() interfaces.MemberRepository
 	ProjectRepository() interfaces.ProjectRepository
 	OAuthConnectionRepository() interfaces.OAuthConnectionRepository
+	BrandingRepository() interfaces.BrandingRepository
 	ProjectSettingRepository() interfaces.ProjectSettingRepository
 	RedirectURIRepository() interfaces.RedirectURIRepository
 	RoleRepository() interfaces.RoleRepository
@@ -257,4 +258,9 @@ func (r *registry) UserIdentityRepository() interfaces.UserIdentityRepository {
 			r.defaultConfig.CacheDefaultTTLDuration)
 	}
 	return repo
+}
+
+// Branding is read directly so system fallback changes are immediately visible to all projects.
+func (r *registry) BrandingRepository() interfaces.BrandingRepository {
+	return mariadb.NewBrandingRepository(r.qx)
 }

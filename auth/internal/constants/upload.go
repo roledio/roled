@@ -1,6 +1,7 @@
 package constants
 
 const (
+	UploadTypeFavicon     = "favicon"
 	UploadTypeProjectLogo = "project-logo"
 	UploadTypeUserAvatar  = "user-avatar"
 

@@ -22,6 +22,7 @@ func newApiHandlerDeps(registry repositories.Registry, redis redis.Service, serv
 		RoleService:            services.RoleService,
 		UserService:            services.UserService,
 		PermissionService:      services.PermissionService,
+		BrandingService:        services.BrandingService,
 	}
 }
 
@@ -32,5 +33,6 @@ func newWebHandlerDeps(registry repositories.Registry, redis redis.Service, serv
 		AuthorizeService: services.AuthorizeService,
 		UserService:      services.UserService,
 		MemberService:    services.MemberService,
+		BrandingService:  services.BrandingService,
 	}
 }

@@ -10,6 +10,7 @@ import (
 )
 
 type TemplateData struct {
+	Branding  *BrandingDetails
 	Data      any
 	Flash     any
 	Error     pkgerrors.CustomError

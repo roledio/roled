@@ -111,6 +111,10 @@ var routePermissionsMap = map[string][]string{
 	constants.RouteUpdateProjects:    {constants.PermissionUpdateProjects},
 	constants.RouteDeleteProjects:    {constants.PermissionDeleteProjects},
 
+	// Project branding routes
+	constants.RouteGetProjectBranding:    {constants.PermissionReadProjects},
+	constants.RouteUpdateProjectBranding: {constants.PermissionUpdateProjects},
+
 	// Project setting routes
 	constants.RouteGetProjectSettings:    {constants.PermissionReadProjects},
 	constants.RouteUpdateProjectSettings: {constants.PermissionUpdateProjects},

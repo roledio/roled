@@ -17,6 +17,7 @@ import (
 	"github.com/roledio/roled/auth/internal/services/accesstoken"
 	"github.com/roledio/roled/auth/internal/services/account"
 	"github.com/roledio/roled/auth/internal/services/authorize"
+	"github.com/roledio/roled/auth/internal/services/branding"
 	"github.com/roledio/roled/auth/internal/services/client"
 	"github.com/roledio/roled/auth/internal/services/member"
 	"github.com/roledio/roled/auth/internal/services/oauthconnection"
@@ -57,6 +58,7 @@ type Services struct {
 	ResourceService        resource.ResourceService
 	RoleService            role.RoleService
 	PermissionService      permission.PermissionService
+	BrandingService        branding.Service
 }
 
 func setupServices(config *configs.DefaultConfig, registry repositories.Registry, publishers QueuePublishers, redis redis.Service) *Services {
@@ -74,6 +76,7 @@ func setupServices(config *configs.DefaultConfig, registry repositories.Registry
 		ResourceService:        resource.NewResourceService(registry, redis),
 		RoleService:            role.NewRoleService(registry, redis),
 		PermissionService:      permission.NewPermissionService(config, registry),
+		BrandingService:        branding.NewService(config, registry, uploadService),
 	}
 }
 

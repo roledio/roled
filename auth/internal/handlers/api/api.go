@@ -8,6 +8,7 @@ import (
 	"github.com/roledio/roled/auth/internal/repositories"
 	"github.com/roledio/roled/auth/internal/services/accesstoken"
 	"github.com/roledio/roled/auth/internal/services/account"
+	"github.com/roledio/roled/auth/internal/services/branding"
 	"github.com/roledio/roled/auth/internal/services/client"
 	"github.com/roledio/roled/auth/internal/services/member"
 	"github.com/roledio/roled/auth/internal/services/oauthconnection"
@@ -34,6 +35,7 @@ type Dependencies struct {
 	RoleService            role.RoleService
 	UserService            user.UserService
 	PermissionService      permission.PermissionService
+	BrandingService        branding.Service
 }
 
 type handler struct {
@@ -52,6 +54,7 @@ type handler struct {
 	roleService            role.RoleService
 	userService            user.UserService
 	permissionService      permission.PermissionService
+	brandingService        branding.Service
 }
 
 func NewHandler(app *fiber.App, defaultConfig *configs.DefaultConfig, deps *Dependencies) *handler {
@@ -71,6 +74,7 @@ func NewHandler(app *fiber.App, defaultConfig *configs.DefaultConfig, deps *Depe
 		roleService:            deps.RoleService,
 		userService:            deps.UserService,
 		permissionService:      deps.PermissionService,
+		brandingService:        deps.BrandingService,
 	}
 }
 
@@ -108,6 +112,8 @@ func (h *handler) SetupRoutes() {
 	h.protectedPut("/api/v1/projects/:project_id", constants.RouteUpdateProjects, h.updateProject)
 	h.protectedPost("/api/v1/projects/:project_id/delete", constants.RouteDeleteProjects, h.deleteProject)
 
+	h.protectedGet("/api/v1/projects/:project_id/branding", constants.RouteGetProjectBranding, h.getProjectBranding)
+	h.protectedPut("/api/v1/projects/:project_id/branding", constants.RouteUpdateProjectBranding, h.updateProjectBranding)
 	h.protectedGet("/api/v1/projects/:project_id/settings", constants.RouteGetProjectSettings, h.getProjectSettings)
 	h.protectedPut("/api/v1/projects/:project_id/settings", constants.RouteUpdateProjectSettings, h.updateProjectSettings)
 
