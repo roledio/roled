@@ -1,3 +1,4 @@
+import BrandingSection from '@/pages/projects/details/branding/branding-section';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Button } from '@/components/ui/button';
@@ -236,6 +237,7 @@ export default function SettingsTab({ httpClient, project }: Props) {
 
     return (
         <div className="space-y-4">
+            <BrandingSection httpClient={httpClient} projectId={project_id!} />
             <section className="border rounded p-4 bg-card w-full">
                 <h3 className="text-lg font-medium">Project Settings</h3>
                 <div className="text-sm text-muted-foreground">
