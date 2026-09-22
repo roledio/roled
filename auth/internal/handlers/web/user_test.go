@@ -11,6 +11,7 @@ import (
 	"github.com/roledio/roled/auth/internal/configs"
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/models"
+	brandingmocks "github.com/roledio/roled/auth/internal/services/branding/mocks"
 	"github.com/roledio/roled/auth/internal/services/user/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -19,10 +20,13 @@ import (
 func TestRenderActivateProjectUser_Success(t *testing.T) {
 	app := fiber.New()
 	mockService := new(mocks.MockUserService)
+	brandingService := brandingmocks.NewMockService(t)
+	brandingService.On("ResolveBranding", mock.Anything, mock.Anything).Return(&models.BrandingDetails{}, nil).Maybe()
 	h := &handler{
-		app:           app,
-		defaultConfig: &configs.DefaultConfig{},
-		userService:   mockService,
+		brandingService: brandingService,
+		app:             app,
+		defaultConfig:   &configs.DefaultConfig{},
+		userService:     mockService,
 	}
 
 	// Register the route
@@ -57,10 +61,13 @@ func TestRenderActivateProjectUser_Success(t *testing.T) {
 func TestRenderActivateProjectUser_BindValidationError(t *testing.T) {
 	app := fiber.New()
 	mockService := new(mocks.MockUserService)
+	brandingService := brandingmocks.NewMockService(t)
+	brandingService.On("ResolveBranding", mock.Anything, mock.Anything).Return(&models.BrandingDetails{}, nil).Maybe()
 	h := &handler{
-		app:           app,
-		defaultConfig: &configs.DefaultConfig{},
-		userService:   mockService,
+		brandingService: brandingService,
+		app:             app,
+		defaultConfig:   &configs.DefaultConfig{},
+		userService:     mockService,
 	}
 
 	// Register the route
@@ -81,10 +88,13 @@ func TestRenderActivateProjectUser_BindValidationError(t *testing.T) {
 func TestRenderActivateProjectUser_ServiceError(t *testing.T) {
 	app := fiber.New()
 	mockService := new(mocks.MockUserService)
+	brandingService := brandingmocks.NewMockService(t)
+	brandingService.On("ResolveBranding", mock.Anything, mock.Anything).Return(&models.BrandingDetails{}, nil).Maybe()
 	h := &handler{
-		app:           app,
-		defaultConfig: &configs.DefaultConfig{},
-		userService:   mockService,
+		brandingService: brandingService,
+		app:             app,
+		defaultConfig:   &configs.DefaultConfig{},
+		userService:     mockService,
 	}
 
 	// Register the route
@@ -107,10 +117,13 @@ func TestRenderActivateProjectUser_ServiceError(t *testing.T) {
 func TestRenderActivateProjectUser_WithFlashData(t *testing.T) {
 	app := fiber.New()
 	mockService := new(mocks.MockUserService)
+	brandingService := brandingmocks.NewMockService(t)
+	brandingService.On("ResolveBranding", mock.Anything, mock.Anything).Return(&models.BrandingDetails{}, nil).Maybe()
 	h := &handler{
-		app:           app,
-		defaultConfig: &configs.DefaultConfig{},
-		userService:   mockService,
+		brandingService: brandingService,
+		app:             app,
+		defaultConfig:   &configs.DefaultConfig{},
+		userService:     mockService,
 	}
 
 	// Register the route with CSRF middleware
@@ -147,10 +160,13 @@ func TestRenderActivateProjectUser_WithFlashData(t *testing.T) {
 func TestSubmitActivateProjectUser_Success(t *testing.T) {
 	app := fiber.New()
 	mockService := new(mocks.MockUserService)
+	brandingService := brandingmocks.NewMockService(t)
+	brandingService.On("ResolveBranding", mock.Anything, mock.Anything).Return(&models.BrandingDetails{}, nil).Maybe()
 	h := &handler{
-		app:           app,
-		defaultConfig: &configs.DefaultConfig{},
-		userService:   mockService,
+		brandingService: brandingService,
+		app:             app,
+		defaultConfig:   &configs.DefaultConfig{},
+		userService:     mockService,
 	}
 
 	// Register the route
@@ -184,10 +200,13 @@ func TestSubmitActivateProjectUser_Success(t *testing.T) {
 func TestSubmitActivateProjectUser_BindValidationError(t *testing.T) {
 	app := fiber.New()
 	mockService := new(mocks.MockUserService)
+	brandingService := brandingmocks.NewMockService(t)
+	brandingService.On("ResolveBranding", mock.Anything, mock.Anything).Return(&models.BrandingDetails{}, nil).Maybe()
 	h := &handler{
-		app:           app,
-		defaultConfig: &configs.DefaultConfig{},
-		userService:   mockService,
+		brandingService: brandingService,
+		app:             app,
+		defaultConfig:   &configs.DefaultConfig{},
+		userService:     mockService,
 	}
 
 	// Register the route
@@ -208,10 +227,13 @@ func TestSubmitActivateProjectUser_BindValidationError(t *testing.T) {
 func TestSubmitActivateProjectUser_ServiceError(t *testing.T) {
 	app := fiber.New()
 	mockService := new(mocks.MockUserService)
+	brandingService := brandingmocks.NewMockService(t)
+	brandingService.On("ResolveBranding", mock.Anything, mock.Anything).Return(&models.BrandingDetails{}, nil).Maybe()
 	h := &handler{
-		app:           app,
-		defaultConfig: &configs.DefaultConfig{},
-		userService:   mockService,
+		brandingService: brandingService,
+		app:             app,
+		defaultConfig:   &configs.DefaultConfig{},
+		userService:     mockService,
 	}
 
 	// Register the route

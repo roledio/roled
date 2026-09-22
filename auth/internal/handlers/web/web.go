@@ -5,6 +5,7 @@ import (
 	"github.com/roledio/roled/auth/internal/configs"
 	"github.com/roledio/roled/auth/internal/repositories"
 	"github.com/roledio/roled/auth/internal/services/authorize"
+	"github.com/roledio/roled/auth/internal/services/branding"
 	"github.com/roledio/roled/auth/internal/services/member"
 	"github.com/roledio/roled/auth/internal/services/user"
 	"github.com/roledio/roled/auth/pkg/redis"
@@ -16,6 +17,7 @@ type Dependencies struct {
 	AuthorizeService authorize.AuthorizeService
 	UserService      user.UserService
 	MemberService    member.MemberService
+	BrandingService  branding.Service
 }
 
 type handler struct {
@@ -26,6 +28,7 @@ type handler struct {
 	authorizeService authorize.AuthorizeService
 	userService      user.UserService
 	memberService    member.MemberService
+	brandingService  branding.Service
 }
 
 func NewHandler(app *fiber.App, defaultConfig *configs.DefaultConfig, deps *Dependencies) *handler {
@@ -37,6 +40,7 @@ func NewHandler(app *fiber.App, defaultConfig *configs.DefaultConfig, deps *Depe
 		authorizeService: deps.AuthorizeService,
 		userService:      deps.UserService,
 		memberService:    deps.MemberService,
+		brandingService:  deps.BrandingService,
 	}
 }
 

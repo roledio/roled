@@ -35,8 +35,8 @@
 
                 <!-- Header with Logo and Project Name -->
                 <header class="roled-auth-header">
-                    {{if .Data.Project.LogoURL}}
-                    <img class="roled-auth-logo" src="{{.Data.Project.LogoURL}}" alt="{{.Data.Project.Name}} logo">
+                    {{if .Branding.LogoURL}}
+                    <img class="roled-auth-logo" src="{{.Branding.LogoURL}}" alt="{{.Data.Project.Name}} logo">
                     {{end}}
                     <h1 class="roled-auth-title" data-form-title>{{if or .Flash.IsSignup .Map.Req.IsSignup}}Create
                         account{{else}}Sign in{{end}}</h1>
@@ -178,7 +178,7 @@
         {{end}}
         {{if and (not .IsError) .Data.Project}}
         data-project-name="{{.Data.Project.Name}}"
-        data-project-logo-url="{{.Data.Project.LogoURL}}"
+        data-project-logo-url="{{.Branding.LogoURL}}"
         {{end}}
         data-map-is-signup="{{.Map.Req.IsSignup}}"
         data-error-message="{{.Error.Msg}}" 

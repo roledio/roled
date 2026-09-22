@@ -38,6 +38,9 @@ func (h *handler) renderAuthorize(c fiber.Ctx) error {
 		return views.RenderTemplate(c, "templates/authorize", templateData.WithError(err), h.defaultConfig)
 	}
 	templateData.Data = result
+	if err := h.applyBranding(c, &templateData, result.Project); err != nil {
+		return err
+	}
 	templateData.Map = map[string]any{
 		"CSRFToken": csrf.TokenFromContext(c),
 		"Req":       req,

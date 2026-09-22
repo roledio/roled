@@ -35,6 +35,9 @@ func (h *handler) renderForgotPassword(c fiber.Ctx) error {
 		return views.RenderTemplate(c, "templates/forgot-password", templateData.WithError(err), h.defaultConfig)
 	}
 	templateData.Data = res
+	if err := h.applyBranding(c, &templateData, res.Project); err != nil {
+		return err
+	}
 	templateData.Map = map[string]any{
 		"CSRFToken":   csrf.TokenFromContext(c),
 		"ClientID":    req.ClientID,
@@ -99,6 +102,9 @@ func (h *handler) renderResetPassword(c fiber.Ctx) error {
 		return views.RenderTemplate(c, "templates/reset-password", templateData.WithError(err), h.defaultConfig)
 	}
 	templateData.Data = result
+	if err := h.applyBranding(c, &templateData, result.Project); err != nil {
+		return err
+	}
 	templateData.Map = map[string]any{
 		"CSRFToken": csrf.TokenFromContext(c),
 	}
@@ -128,6 +134,9 @@ func (h *handler) submitResetPassword(c fiber.Ctx) error {
 	templateData := models.TemplateData{
 		BuildInfo: models.GetCurrentBuildInfo(h.defaultConfig),
 		Data:      res,
+	}
+	if err := h.applyBranding(c, &templateData, res.Project); err != nil {
+		return err
 	}
 	return views.RenderTemplate(c, "templates/reset-password-success", &templateData, h.defaultConfig)
 }

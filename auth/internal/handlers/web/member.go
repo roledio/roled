@@ -39,6 +39,9 @@ func (h *handler) renderActivateMember(c fiber.Ctx) error {
 		return views.RenderTemplate(c, "templates/activate-member", templateData.WithError(err), h.defaultConfig)
 	}
 	templateData.Data = res
+	if err := h.applyBranding(c, &templateData, res.Project); err != nil {
+		return err
+	}
 	templateData.Map = map[string]any{
 		"CSRFToken": csrf.TokenFromContext(c),
 	}
@@ -70,6 +73,9 @@ func (h *handler) submitActivateMember(c fiber.Ctx) error {
 	templateData := models.TemplateData{
 		BuildInfo: models.GetCurrentBuildInfo(h.defaultConfig),
 		Data:      res,
+	}
+	if err := h.applyBranding(c, &templateData, res.Project); err != nil {
+		return err
 	}
 	return views.RenderTemplate(c, "templates/activate-member-success", &templateData, h.defaultConfig)
 }

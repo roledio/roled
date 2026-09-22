@@ -1,0 +1,17 @@
+/* Shared by hosted authentication pages and the console's isolated preview. */
+:root, .roled-dark, [data-theme="dark"] {
+  --roled-primary: var(--brand-primary, #ba8d1c);
+  --roled-primary-hover: color-mix(in srgb, var(--roled-primary), black 10%);
+  --roled-primary-light: color-mix(in srgb, var(--roled-primary), white 12%);
+  --roled-ring: var(--roled-primary);
+  --roled-radius: var(--brand-radius, 0.25rem);
+  --roled-border: var(--roled-primary);
+  --roled-input: var(--roled-primary);
+}
+.roled-auth-card {
+  border: var(--brand-border, 0);
+  box-shadow: var(--brand-shadow);
+}
+.roled-input:focus, .roled-btn-primary:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--roled-primary), transparent 80%);
+}

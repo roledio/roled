@@ -489,7 +489,7 @@ a.roled-btn:hover {
 
 .roled-auth-footer {
   padding: 1.5rem 2rem;
-  border-top: 1px solid var(--roled-border);
+  border-top: 1px solid hsl(40, 12%, 88%);
   text-align: center;
 }
 
@@ -550,7 +550,7 @@ a.roled-btn:hover {
   padding: 0;
   margin: 0;
   background-color: var(--roled-muted);
-  border: 1px solid var(--roled-border);
+  border: 1px solid hsl(40, 12%, 88%);
   color: var(--roled-muted-foreground);
   cursor: pointer;
   border-radius: 50%;
@@ -594,7 +594,7 @@ a.roled-btn:hover {
   line-height: 1.4;
   text-align: center;
   border-radius: var(--roled-radius);
-  border: 1px solid var(--roled-border);
+  border: 1px solid hsl(40, 12%, 88%);
   box-shadow: var(--roled-shadow-lg);
   pointer-events: none;
   opacity: 0;
@@ -613,7 +613,7 @@ a.roled-btn:hover {
   transform: translateX(-50%);
   border-width: 6px;
   border-style: solid;
-  border-color: var(--roled-border) transparent transparent transparent;
+  border-color: hsl(40, 12%, 88%) transparent transparent transparent;
 }
 
 .roled-tooltip-content::after {
@@ -644,7 +644,7 @@ a.roled-btn:hover {
   left: auto;
   transform: none;
   border-width: 0 6px 6px 6px;
-  border-color: transparent transparent var(--roled-border) transparent;
+  border-color: transparent transparent hsl(40, 12%, 88%) transparent;
 }
 
 .roled-tooltip-content.roled-tooltip-bottom-left::after {

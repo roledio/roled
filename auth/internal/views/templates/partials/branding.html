@@ -1,0 +1,7 @@
+{{define "partials/branding"}}
+{{if .Branding}}
+{{if .Branding.FaviconURL}}<link rel="icon" href="{{.Branding.FaviconURL}}">{{else}}<link rel="icon" href="data:,">{{end}}
+<link rel="stylesheet" href="/assets/static/branding.css?v=1">
+<style>{{.Branding.CSS}}</style>
+{{else}}<link rel="icon" href="/assets/static/favicon.ico">{{end}}
+{{end}}
