@@ -31,6 +31,8 @@ type UploadTypeValidator interface {
 
 func newUploadTypeValidator(uploadType string) (UploadTypeValidator, error) {
 	switch uploadType {
+	case constants.UploadTypeFavicon:
+		return &faviconValidator{}, nil
 	case constants.UploadTypeProjectLogo:
 		return &projectLogoValidator{}, nil
 	case constants.UploadTypeUserAvatar:

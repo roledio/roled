@@ -4,7 +4,7 @@ import "mime/multipart"
 
 type UploadFileRequest struct {
 	File *multipart.FileHeader `form:"file" validate:"required"`
-	Type string                `form:"type" validate:"required,oneof=project-logo user-avatar"`
+	Type string                `form:"type" validate:"required,oneof=project-logo user-avatar favicon"`
 }
 
 type UploadFileResponse struct {
