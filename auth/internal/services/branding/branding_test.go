@@ -23,7 +23,7 @@ func TestBrandingFallbackAndCustom(t *testing.T) {
 		t.Run(map[bool]string{true: "custom", false: "system fallback"}[custom], func(t *testing.T) {
 			ctx := context.Background()
 			reg := rm.NewMockRegistry(t)
-			repo := im.NewMockProjectBrandingRepository(t)
+			repo := im.NewMockBrandingRepository(t)
 			projects := im.NewMockProjectRepository(t)
 			reg.EXPECT().BrandingRepository().Return(repo)
 			logo := "https://example.com/logo.png"
@@ -69,7 +69,7 @@ func TestBrandingSaveAndRestoreUploadsOnFailure(t *testing.T) {
 		t.Run(map[bool]string{true: "database failure", false: "save"}[fail], func(t *testing.T) {
 			ctx := context.WithValue(context.Background(), constants.CtxAccount, &entities.Account{ID: "owner"})
 			reg := rm.NewMockRegistry(t)
-			repo := im.NewMockProjectBrandingRepository(t)
+			repo := im.NewMockBrandingRepository(t)
 			projects := im.NewMockProjectRepository(t)
 			uploads := um.NewMockUploadService(t)
 			reg.EXPECT().ProjectRepository().Return(projects)
