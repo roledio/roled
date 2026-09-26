@@ -33,3 +33,7 @@ Sebelum setiap commit: test relevan; `golangci-lint run` dari `auth`; untuk cons
 ## Risiko
 
 Rata-rata perlu sekitar 450 statement auth tambahan per hari selama tujuh hari implementasi dan console perlu menambah sekitar 3.600 statement. Jika milestone tertinggal, sesi berikutnya langsung dialihkan ke file dengan gap terbesar dan hasil diukur ulang; jangan menunggu 4 Oktober. GitHub Actions baru dapat dipastikan setelah pengguna push, jadi sebelum itu laporkan hasil clean-checkout lokal sebagai verifikasi setara CI.
+
+## Catatan sinkronisasi automation
+
+Sebelum jadwal automation berikutnya dijalankan, prompt automation wajib memuat milestone terbaru, baseline 26 September, target minimal 80% untuk auth dan console, izin beberapa commit per hari, serta quality gate lint/test/clean-checkout yang tercantum di dokumen ini. Jika prompt belum tersinkron, lakukan sinkronisasi terlebih dahulu dan jangan memulai batch pekerjaan berdasarkan milestone lama.
