@@ -5,7 +5,7 @@ Targetnya adalah minimal 80% overall untuk `auth` dan `console` secara terpisah.
 ## Baseline 26 September
 
 - Auth: 4.034/8.974 statement = **44,95%** pada scope yang sama dengan CI (`make test` mengecualikan cmd, configs, constants, entities, errors, mocks, models, views, migrations, databases, types, dan testutil). Perlu sekitar 3.146 statement tambahan teruji untuk mencapai 80% pada denominator saat ini.
-- Console: 6.783/12.992 lines/statements = **52,20%**; branches 65,62% dan functions 40,52%. Baseline dijalankan dengan source `console/src`; laporan lama yang menghitung `dist` tidak dipakai. Ada satu test timeout pada percobaan paralel; percobaan ulang dengan dua worker menghasilkan report.
+- Console: laporan awal 6.783/12.992 lines/statements = **52,20%**; branches 65,62% dan functions 40,52%. Koreksi audit 27 September: konfigurasi tersebut ternyata masih memasukkan `dist`, laporan coverage, dan konfigurasi tooling, sehingga belum merupakan scope `src` saja. Scope dibakukan ke `src/**/*.{ts,tsx}`, termasuk file belum diuji, tanpa test/setup/deklarasi tipe. Perubahan denominator dilaporkan terpisah dari kenaikan karena test. Percobaan ulang baseline dengan dua worker lulus setelah percobaan pertama timeout.
 
 ## Milestone
 
@@ -37,3 +37,13 @@ Rata-rata perlu sekitar 450 statement auth tambahan per hari selama tujuh hari i
 ## Catatan sinkronisasi automation
 
 Sebelum jadwal automation berikutnya dijalankan, prompt automation wajib memuat milestone terbaru, baseline 26 September, target minimal 80% untuk auth dan console, izin beberapa commit per hari, serta quality gate lint/test/clean-checkout yang tercantum di dokumen ini. Jika prompt belum tersinkron, lakukan sinkronisasi terlebih dahulu dan jangan memulai batch pekerjaan berdasarkan milestone lama.
+
+## Eksekusi dan izin
+
+Automation sudah disinkronkan dan dijadwalkan pukul 09.00, 15.00, dan 20.00 WIB. Periksa git status dan izin setiap sesi; jika heartbeat hanya bisa menulis `/tmp`, siapkan patch dan verifikasi di sana lalu ajukan eskalasi resmi untuk penerapan/commit, bukan mengubah chmod/chown atau keamanan sistem. Hormati penolakan approval. Jangan menimpa perubahan pengguna, menghapus mock lokal, atau menggunakan database produksi; jangan menjalankan batch yang berbenturan dengan sesi lain.
+
+## Progres 27 September — sesi pagi
+
+- Handler client: 18 skenario, seluruh 46 statement teruji (100%). Auth keseluruhan pada scope CI: 4.080/8.974 = 45,46%, naik 46 statement dari baseline. Masih di bawah milestone 52% hari ini; sesi berikutnya harus mengejar gap services dan handlers lain.
+- Console client/role API: 90 skenario; clients.ts dan roles.ts masing-masing 100% lines/statements/functions/branches. Pada scope lama, console naik 6.783 menjadi 7.015 dari 12.992 statement (52,20% menjadi 53,99%); kenaikan nyata 232 statement. Setelah pembakuan scope dan seluruh 247 test dijalankan ulang, baseline source aplikasi terverifikasi: 7.015/12.179 = 57,59% lines/statements, functions 42,62%, branches 69,78%. Semua file report berada di src; gap ke milestone console 58% adalah 49 statement pada denominator ini.
+- Clean snapshot auth: mockery v3.8.0, golangci-lint 0 issue, suite coverage termasuk testcontainer MariaDB lulus. Console: 247 test lulus, lint 0 error (583 warning lama), typecheck dan build lulus.

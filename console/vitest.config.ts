@@ -10,9 +10,11 @@ export default defineConfig({
     setupFiles: ["./src/test/setup.ts"],
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
     coverage: {
+      all: true,
+      include: ["src/**/*.{ts,tsx}"],
       reporter: ["text", "json-summary", "lcov"],
       reportsDirectory: "./coverage",
-      exclude: ["node_modules/", "src/test/"],
+      exclude: ["src/test/**", "src/**/*.{test,spec}.{ts,tsx}", "src/**/*.d.ts"],
     },
   },
   resolve: {
