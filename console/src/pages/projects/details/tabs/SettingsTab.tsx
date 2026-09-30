@@ -131,8 +131,8 @@ export default function SettingsTab({ httpClient, project }: Props) {
             if (!project_id) throw new Error('Project not loaded');
             return deleteOAuthConnection(httpClient, AUTH_BASE_URL, project_id, provider);
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['project', project_id, 'oauth-connections'] });
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ['project', project_id, 'oauth-connections'] });
             toast({
                 title: 'Connection removed',
                 description: 'OAuth connection has been removed',

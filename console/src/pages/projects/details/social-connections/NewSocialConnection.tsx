@@ -47,8 +47,8 @@ export default function NewSocialConnection({ httpClient }: Props) {
         },
       );
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: ['project', project_id, 'oauth-connections'],
       });
       toast({

@@ -143,6 +143,22 @@ describe.each(['create', 'edit'] as const)('%s social connection', mode => {
     expect(await screen.findByTestId('destination')).toHaveTextContent('?tab=settings');
   });
 
+  it('waits for the connection list cache refresh before reporting success and navigating', async () => {
+    const { invalidate } = mount(mode);
+    let finishRefresh!: () => void;
+    invalidate.mockReturnValue(new Promise<void>(resolve => { finishRefresh = resolve; }));
+    await ready();
+    fireEvent.click(screen.getByRole('radio', { name: /Default/ }));
+    fireEvent.click(action());
+    await waitFor(() => expect(invalidate).toHaveBeenCalledWith({ queryKey: ['project', 'project-1', 'oauth-connections'] }));
+    expect(action()).toBeDisabled();
+    expect(toast).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('destination')).not.toBeInTheDocument();
+    finishRefresh();
+    expect(await screen.findByTestId('destination')).toHaveTextContent('?tab=settings');
+    expect(toast).toHaveBeenCalledWith(expect.objectContaining({ title: mode === 'create' ? 'Connection created' : 'Connection updated' }));
+  });
+
   it('disables controls while saving and displays the API error without navigation', async () => {
     let reject!: (error: Error) => void;
     vi.mocked(mutation()).mockReturnValue(new Promise((_, rejectPromise) => { reject = rejectPromise; }));

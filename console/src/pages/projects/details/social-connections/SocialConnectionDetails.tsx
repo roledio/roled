@@ -74,9 +74,9 @@ export default function SocialConnectionDetails({ httpClient }: Props) {
         enabled: enabled === 'true',
       });
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       // Refresh both the list and this single-connection cache entry
-      queryClient.invalidateQueries({ queryKey: ['project', project_id, 'oauth-connections'] });
+      await queryClient.invalidateQueries({ queryKey: ['project', project_id, 'oauth-connections'] });
       queryClient.setQueryData(
         ['project', project_id, 'oauth-connection', provider],
         data,
