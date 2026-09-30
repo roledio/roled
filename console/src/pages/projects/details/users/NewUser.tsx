@@ -102,13 +102,13 @@ export default function NewUser({ httpClient }: Props) {
     mutationFn: (payload: { display_name: string; email?: string; password?: string; external_user_id?: string; role_id?: string; avatar_url?: string | null }) => {
       return createProjectUser(httpClient, AUTH_BASE_URL, project!.id, payload);
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       telemetry.trackEvent('user_created', {
         project_id: project?.id,
         has_role: Boolean(roleId),
         has_external_user_id: Boolean(externalUserId),
       });
-      queryClient.invalidateQueries({ queryKey: ['project', project?.id, 'users'] });
+      await queryClient.invalidateQueries({ queryKey: ['project', project?.id, 'users'] });
       toast({ title: 'User created', description: 'New user has been added', variant: 'default' });
       navigate(`/projects/${project?.id}/details${paramsFrom}`, { state: { from: paramsFrom } });
     },

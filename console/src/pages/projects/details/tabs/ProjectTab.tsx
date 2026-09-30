@@ -154,9 +154,9 @@ export default function ProjectTab({ httpClient, project: projectProp }: Props) 
             if (!projectEffective) throw new Error('Project not loaded');
             return updateProject(httpClient, AUTH_BASE_URL, projectEffective.id, payload);
         },
-        onSuccess: (data) => {
+        onSuccess: async (data) => {
             queryClient.setQueryData(['project', projectEffective?.id], data);
-            queryClient.invalidateQueries({ queryKey: ['project'] });
+            await queryClient.invalidateQueries({ queryKey: ['project'] });
             toast({ title: 'Saved', description: 'Project updated', variant: 'default' });
         },
         onError: (err: any) => {
@@ -170,7 +170,7 @@ export default function ProjectTab({ httpClient, project: projectProp }: Props) 
         [name, description, redirectUris]
     );
 
-    const doSave = async () => {
+    const doSave = () => {
         if (!projectEffective || !validation.isValid) return;
         const payload: any = {
             name,
@@ -179,7 +179,7 @@ export default function ProjectTab({ httpClient, project: projectProp }: Props) 
             redirect_uris: validation.validRedirectUris,
             is_active: status === 'active',
         };
-        await updateMutation.mutateAsync(payload);
+        updateMutation.mutate(payload);
     };
 
     // Handle name change with validation
@@ -224,7 +224,7 @@ export default function ProjectTab({ httpClient, project: projectProp }: Props) 
         try {
             if (!projectEffective) throw new Error('Project not loaded');
             await deleteClient(httpClient, AUTH_BASE_URL, projectEffective.id, removeClient.id);
-            queryClient.invalidateQueries({ queryKey: ['project', projectEffective?.id, 'clients'] });
+            await queryClient.invalidateQueries({ queryKey: ['project', projectEffective?.id, 'clients'] });
             toast({ title: 'Client removed', description: `${removeClient.name} has been removed`, variant: 'default' });
             setRemoveClient(null);
         } catch (err) {

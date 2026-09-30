@@ -129,13 +129,13 @@ export default function ResourceDetails({ httpClient }: Props) {
 
     const updateMutation = useMutation({
         mutationFn: (payload: any) => updateProjectResource(httpClient, AUTH_BASE_URL, project_id!, resource_id!, payload),
-        onSuccess: (data) => {
+        onSuccess: async (data) => {
             telemetry.trackEvent('resource_updated', {
                 resource_id,
                 project_id,
                 permission_count: permissions.length,
             });
-            queryClient.invalidateQueries({ queryKey: ['project', project_id, 'resources'] });
+            await queryClient.invalidateQueries({ queryKey: ['project', project_id, 'resources'] });
             toast({ title: 'Saved', description: 'Resource updated', variant: 'default' });
             navigate(`/projects/${project_id}/details${paramsFrom}`);
         },
@@ -146,9 +146,9 @@ export default function ResourceDetails({ httpClient }: Props) {
 
     const deleteMutation = useMutation({
         mutationFn: () => deleteProjectResource(httpClient, AUTH_BASE_URL, project_id!, resource_id!),
-        onSuccess: () => {
+        onSuccess: async () => {
             telemetry.trackEvent('resource_deleted', { resource_id, project_id });
-            queryClient.invalidateQueries({ queryKey: ['project', project_id, 'resources'] });
+            await queryClient.invalidateQueries({ queryKey: ['project', project_id, 'resources'] });
             toast({ title: 'Resource removed', description: 'Resource has been removed', variant: 'default' });
             navigate(`/projects/${project_id}/details${paramsFrom}`);
         },

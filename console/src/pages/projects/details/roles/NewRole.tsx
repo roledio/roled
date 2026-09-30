@@ -107,12 +107,12 @@ export default function NewRole({ httpClient }: Props) {
 
     const createMutation = useMutation({
         mutationFn: (payload: { name: string; code?: string; description?: string; permission_ids: string[] }) => createProjectRole(httpClient, AUTH_BASE_URL, project!.id, payload),
-        onSuccess: () => {
+        onSuccess: async () => {
             telemetry.trackEvent('role_created', {
                 project_id: project?.id,
                 permission_count: selectedPermissionIds.length,
             });
-            queryClient.invalidateQueries({ queryKey: ['project', project?.id, 'roles'] });
+            await queryClient.invalidateQueries({ queryKey: ['project', project?.id, 'roles'] });
             toast({ title: 'Role created', description: 'New role has been added', variant: 'default' });
             navigate(`/projects/${project?.id}/details${paramsFrom}`, { state: { from: paramsFrom } });
         },

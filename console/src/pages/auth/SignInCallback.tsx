@@ -15,7 +15,7 @@ export default function SignInCallback({ auth, tokenService }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    (async () => {
+    void (async () => {
       try {
         // If token exists and is valid, go to projects instead of processing callback 
         const valid = tokenService.isAccessTokenValid();

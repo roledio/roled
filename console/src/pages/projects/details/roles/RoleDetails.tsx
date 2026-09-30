@@ -175,7 +175,7 @@ export default function RoleDetails({ httpClient }: Props) {
     try {
       await deleteProjectRole(httpClient, AUTH_BASE_URL, pid, roleId);
       telemetry.trackEvent('role_deleted', { role_id: roleId, project_id: pid });
-      queryClient.invalidateQueries({ queryKey: ['project', pid, 'roles'] });
+      await queryClient.invalidateQueries({ queryKey: ['project', pid, 'roles'] });
       toast({ title: 'Role removed', description: 'Role has been removed', variant: 'default' });
       navigate(`/projects/${pid}/details${getParamsFrom()}`);
     } catch (err: any) {

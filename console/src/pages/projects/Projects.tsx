@@ -113,9 +113,9 @@ export default function Projects({ httpClient }: ProjectsProps) {
     mutationFn: ({ projectId, name }: { projectId: string; name: string }) =>
       deleteProject(httpClient, AUTH_BASE_URL, projectId, { name }),
     onMutate: () => { },
-    onSuccess: (_data, vars) => {
+    onSuccess: async (_data, vars) => {
       // refresh projects list from server
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      await queryClient.invalidateQueries({ queryKey: ['projects'] });
       setRemoveTarget(null);
       setConfirmName('');
       toast({ title: 'Project removed', description: 'Project was successfully removed.' });

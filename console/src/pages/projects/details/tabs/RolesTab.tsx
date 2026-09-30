@@ -85,8 +85,8 @@ export default function RolesTab({ httpClient, project }: Props) {
 
     const deleteMutation = useMutation({
         mutationFn: (rid: string) => deleteProjectRole(httpClient, AUTH_BASE_URL, project!.id, rid),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['project', project?.id, 'roles'] });
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ['project', project?.id, 'roles'] });
             toast({ title: 'Role removed', description: 'Role has been removed', variant: 'default' });
             setRemoveTarget(null);
         },
@@ -97,8 +97,8 @@ export default function RolesTab({ httpClient, project }: Props) {
 
     const setSignupRoleMutation = useMutation({
         mutationFn: (rid: string) => setSignupRole(httpClient, AUTH_BASE_URL, project!.id, rid),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['project', project?.id, 'roles'] });
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ['project', project?.id, 'roles'] });
             toast({ title: 'Role updated', description: 'Successfully set as sign-up role', variant: 'default' });
         },
         onError: (err: any) => {

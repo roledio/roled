@@ -173,7 +173,7 @@ export default function ClientDetails({ httpClient }: Props) {
     try {
       await deleteClient(httpClient, AUTH_BASE_URL, pid, clientId);
       telemetry.trackEvent('client_deleted', { client_id: clientId, project_id: pid });
-      queryClient.invalidateQueries({ queryKey: ['project', pid, 'clients'] });
+      await queryClient.invalidateQueries({ queryKey: ['project', pid, 'clients'] });
       toast({ title: 'Client removed', description: 'Client has been removed', variant: 'default' });
       navigate(`/projects/${pid}/details${getParamsFrom()}`);
     } catch (err: any) {

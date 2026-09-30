@@ -186,7 +186,7 @@ export default function UserDetails({ httpClient }: Props) {
     try {
       await deleteProjectUser(httpClient, AUTH_BASE_URL, pid, userId);
       telemetry.trackEvent('user_deleted', { user_id: userId, project_id: pid });
-      queryClient.invalidateQueries({ queryKey: ['project', pid, 'users'] });
+      await queryClient.invalidateQueries({ queryKey: ['project', pid, 'users'] });
       toast({ title: 'User removed', description: 'User has been removed', variant: 'default' });
       navigate(`/projects/${pid}/details${getParamsFrom()}`);
     } catch (err: any) {

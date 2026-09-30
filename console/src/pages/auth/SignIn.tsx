@@ -11,7 +11,7 @@ export default function SignIn({ auth, tokenService, signup = false }: Props) {
   const location = useLocation();
 
   useEffect(() => {
-    (async () => {
+    void (async () => {
       try {
         const valid = tokenService.isAccessTokenValid();
         const refreshToken = tokenService.getRefreshToken();

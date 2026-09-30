@@ -60,8 +60,8 @@ export function useInviteMember({ httpClient, baseUrl, accountId }: { httpClient
       const redirect = buildSigninCallbackRedirect();
       return inviteMember(httpClient, baseUrl, email, redirect);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['account', accountId, 'members'] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['account', accountId, 'members'] });
     },
   });
 }
@@ -71,8 +71,8 @@ export function useDeleteMember({ httpClient, baseUrl, accountId }: { httpClient
 
   return useMutation({
     mutationFn: (memberId: string) => deleteMember(httpClient, baseUrl, memberId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['account', accountId, 'members'] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['account', accountId, 'members'] });
     },
   });
 }
@@ -83,8 +83,8 @@ export function useUpdateMember({ httpClient, baseUrl, accountId }: { httpClient
   return useMutation({
     mutationFn: ({ memberId, body }: { memberId: string; body: UpdateMemberBody }) =>
       updateMember(httpClient, baseUrl, memberId, body),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['account', accountId, 'members'] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['account', accountId, 'members'] });
     },
   });
 }

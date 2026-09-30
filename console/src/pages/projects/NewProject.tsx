@@ -73,9 +73,9 @@ export default function NewProject({ httpClient }: Props) {
     }) => {
       return createProject(httpClient, AUTH_BASE_URL, payload);
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       telemetry.trackEvent('project_created', { project_id: data.id });
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      await queryClient.invalidateQueries({ queryKey: ['projects'] });
       toast({ title: 'Project created', description: 'New project has been created', variant: 'default' });
       // Redirect to project details page
       navigate(`/projects/${data.id}/details?tab=project`, { state: { from: paramsFrom } });

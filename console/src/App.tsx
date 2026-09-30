@@ -43,7 +43,7 @@ export default function App() {
 
   React.useEffect(() => {
     // Preload console config on app start to ensure client_id is available for PKCE redirect
-    (async () => {
+    void (async () => {
       try {
         await configService.loadConfig();
       } catch (e) {

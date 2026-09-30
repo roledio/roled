@@ -91,8 +91,8 @@ export default function ResourcesTab({ httpClient, project }: Props) {
 
     const deleteMutation = useMutation({
         mutationFn: (rid: string) => deleteProjectResource(httpClient, AUTH_BASE_URL, project!.id, rid),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['project', project?.id, 'resources'] });
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ['project', project?.id, 'resources'] });
             toast({ title: 'Resource removed', description: 'Resource has been removed', variant: 'default' });
         },
         onError: (err: any) => {

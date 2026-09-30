@@ -100,13 +100,13 @@ export default function NewClient({ httpClient }: Props) {
 
     const createMutation = useMutation({
         mutationFn: (payload: { name: string; description?: string; permission_ids: string[] }) => createClient(httpClient, AUTH_BASE_URL, project!.id, payload),
-        onSuccess: (data: any) => {
+        onSuccess: async (data: any) => {
             telemetry.trackEvent('client_created', {
                 client_id: data?.id,
                 project_id: project?.id,
                 permission_count: selectedPermissionIds.length,
             });
-            queryClient.invalidateQueries({ queryKey: ['project', project?.id, 'clients'] });
+            await queryClient.invalidateQueries({ queryKey: ['project', project?.id, 'clients'] });
             toast({ title: 'Client created', description: 'New client has been added', variant: 'default' });
             navigate(`/projects/${project?.id}/clients/${data?.id}/details`, { state: { from: paramsFrom } });
         },

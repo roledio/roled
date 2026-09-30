@@ -95,9 +95,11 @@ export function useRevokeToken({ httpClient, authBaseUrl, onSuccess, onError }: 
 
   return useMutation({
     mutationFn: (payload: RevokeTokenPayload) => revokeCurrentToken(httpClient, authBaseUrl, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['currentTokenInfo'] });
-      queryClient.invalidateQueries({ queryKey: ['currentTokenAndMemberInfo'] });
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['currentTokenInfo'] }),
+        queryClient.invalidateQueries({ queryKey: ['currentTokenAndMemberInfo'] }),
+      ]);
       if (onSuccess) onSuccess();
     },
     onError: (error: Error) => {

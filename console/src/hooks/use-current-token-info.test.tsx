@@ -6,7 +6,7 @@ import type { Member } from '@/services/members';
 import * as authService from '@/services/core/authService';
 import * as memberService from '@/services/members';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useCurrentTokenInfo, useCurrentTokenAndMemberInfo, useRevokeToken } from './use-current-token-info';
@@ -124,6 +124,40 @@ describe('useCurrentTokenInfo & useRevokeToken hooks', () => {
       refresh_token: 'ref',
     }));
     expect(onSuccess).toHaveBeenCalled();
+  });
+
+  it('waits for both token caches to refresh before completing revocation', async () => {
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const onSuccess = vi.fn();
+    const httpClient = createMockHttpClient();
+    let finishToken!: () => void;
+    let finishMember!: () => void;
+    const invalidate = vi.spyOn(client, 'invalidateQueries')
+      .mockReturnValueOnce(new Promise<void>(resolve => { finishToken = resolve; }))
+      .mockReturnValueOnce(new Promise<void>(resolve => { finishMember = resolve; }));
+    vi.mocked(authService.revokeCurrentToken).mockResolvedValue(undefined);
+    function RevokeWithRefresh() {
+      const mutation = useRevokeToken({ httpClient, authBaseUrl: 'https://auth.example', onSuccess });
+      return <button disabled={mutation.isPending} onClick={() => mutation.mutate({ client_id: 'client', refresh_token: 'refresh' })}>revoke with refresh</button>;
+    }
+    const view = render(<QueryClientProvider client={client}><RevokeWithRefresh /></QueryClientProvider>);
+    try {
+      const button = screen.getByRole('button', { name: 'revoke with refresh' });
+      fireEvent.click(button);
+      await waitFor(() => expect(invalidate).toHaveBeenCalledTimes(2));
+      expect(invalidate).toHaveBeenNthCalledWith(1, { queryKey: ['currentTokenInfo'] });
+      expect(invalidate).toHaveBeenNthCalledWith(2, { queryKey: ['currentTokenAndMemberInfo'] });
+      expect(button).toBeDisabled();
+      await act(async () => { finishToken(); });
+      expect(onSuccess).not.toHaveBeenCalled();
+      expect(button).toBeDisabled();
+      await act(async () => { finishMember(); });
+      await waitFor(() => expect(button).not.toBeDisabled());
+      expect(onSuccess).toHaveBeenCalledTimes(1);
+    } finally {
+      view.unmount();
+      client.clear();
+    }
   });
 
   it('fetches and renders combined token and member info', async () => {

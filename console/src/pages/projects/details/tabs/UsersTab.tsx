@@ -128,8 +128,8 @@ export default function UsersTab({ httpClient, project }: Props) {
 
     const deleteMutation = useMutation({
         mutationFn: (uid: string) => deleteProjectUser(httpClient, AUTH_BASE_URL, project!.id, uid),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['project', project?.id, 'users'] });
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ['project', project?.id, 'users'] });
             toast({ title: 'User removed', description: 'User has been removed', variant: 'default' });
             setRemoveTarget(null);
         },
@@ -169,8 +169,8 @@ export default function UsersTab({ httpClient, project }: Props) {
                 ...(roleId && { role_id: roleId }),
                 ...(redirectUri && { redirect_uri: redirectUri }),
             }),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['project', project?.id, 'users'] });
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ['project', project?.id, 'users'] });
             toast({ title: 'Invitation sent', description: 'User invitation has been sent successfully.', variant: 'default' });
             setIsInviteDialogOpen(false);
         },
