@@ -3,7 +3,7 @@ package mail
 import (
 	"bytes"
 	"embed"
-	"text/template"
+	"html/template"
 )
 
 //go:embed templates
