@@ -2,7 +2,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import type { HttpClient } from '@/services/core/httpClient';
 import * as projectService from '@/services/projects';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within, cleanup } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import ResourceDetails from './ResourceDetails';
@@ -145,4 +145,67 @@ describe('ResourceDetails Page', () => {
         await waitFor(() => expect(updateMock).toHaveBeenCalled());
         await waitFor(() => expect(screen.getByText('PROJECT DETAILS')).toBeInTheDocument());
     });
+});
+
+describe('ResourceDetails permission editor', () => {
+ beforeEach(() => { vi.clearAllMocks(); vi.stubEnv('VITE_AUTH_BASE_URL', 'http://localhost:8082'); });
+ afterEach(() => { cleanup(); vi.unstubAllEnvs(); });
+ function mount() {
+  vi.mocked(projectService.fetchProjectById).mockResolvedValue({ id: 'p', name: 'Project', logo_url: 'https://example.com/logo.png' } as Awaited<ReturnType<typeof projectService.fetchProjectById>>);
+  vi.mocked(projectService.fetchProjectResourceById).mockResolvedValue({ id: 'r', name: 'Documents', code: 'documents', description: 'Files', is_default: false, permissions: [{id:'read',name:'Read',code:'read',description:'Read files'}, {id:'write',name:'Write',code:'write',description:'Write files'}] } as Awaited<ReturnType<typeof projectService.fetchProjectResourceById>>);
+  const client = createMockHttpClient();
+  render(<MemoryRouter initialEntries={['/projects/p/resources/r/details']}><Routes><Route path="/projects/:project_id/resources/:resource_id/details" element={<ResourceDetails httpClient={client} />} /><Route path="/projects/:project_id/details" element={<div>Returned to project</div>} /></Routes></MemoryRouter>, { wrapper: createWrapper() });
+  return client;
+ }
+ it('adds, validates, sorts and removes permissions before saving the edited payload', async () => {
+  const client = mount(); await screen.findByDisplayValue('Documents');
+  const table = screen.getByRole('table');
+  fireEvent.click(screen.getByRole('button', { name: 'Name (Action)' }));
+  expect(within(table).getAllByRole('row')[1]).toHaveTextContent('Write');
+  fireEvent.click(screen.getByRole('button', { name: 'Code', exact: true }));
+  expect(within(table).getAllByRole('row')[1]).toHaveTextContent('Read');
+  fireEvent.click(screen.getByRole('button', { name: 'Code', exact: true }));
+  expect(within(table).getAllByRole('row')[1]).toHaveTextContent('Write');
+  fireEvent.click(screen.getByRole('button', { name: 'Add Permission' }));
+  const dialog = screen.getByRole('dialog');
+  fireEvent.blur(within(dialog).getByLabelText('Name (Action)')); expect(within(dialog).getByLabelText('Name (Action)')).toHaveAttribute('aria-invalid', 'true');
+  fireEvent.change(within(dialog).getByLabelText('Name (Action)'), { target: { value: 'Read' } });
+  fireEvent.blur(within(dialog).getByLabelText('Code')); expect(within(dialog).getByLabelText('Code')).toHaveAttribute('aria-invalid', 'true');
+  fireEvent.change(within(dialog).getByLabelText('Name (Action)'), { target: { value: 'Archive' } });
+  fireEvent.change(within(dialog).getByLabelText('Code'), { target: { value: 'archive-record' } });
+  fireEvent.change(within(dialog).getByLabelText('Description'), { target: { value: 'Archive old files' } });
+  fireEvent.blur(within(dialog).getByLabelText('Description'));
+  fireEvent.click(within(dialog).getByRole('button', { name: 'Add', exact: true }));
+  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  expect(screen.getByText('documents:archive-record')).toBeInTheDocument();
+  const row = screen.getByText('Read files').closest('tr')!;
+  fireEvent.click(within(row).getByRole('button'));
+  expect(screen.queryByText('Read files')).not.toBeInTheDocument();
+  fireEvent.change(screen.getByLabelText('Description'), { target: { value: 'Updated files' } });
+  fireEvent.blur(screen.getByLabelText('Description'));
+  vi.mocked(projectService.updateProjectResource).mockResolvedValue({} as Awaited<ReturnType<typeof projectService.updateProjectResource>>);
+  fireEvent.click(screen.getByRole('button', {name:'Save'}));
+  await screen.findByText('Returned to project');
+  expect(projectService.updateProjectResource).toHaveBeenCalledWith(client,'http://localhost:8082','p','r',{name:'Documents',code:'documents',description:'Updated files',permissions:[{name:'Write',code:'write',description:'Write files'},{name:'Archive',code:'archive-record',description:'Archive old files'}]});
+ });
+ it('prevents invalid fields, cancels dialogs and returns using Back', async () => {
+  mount(); await screen.findByDisplayValue('Documents');
+  fireEvent.change(screen.getByLabelText('Name'), {target:{value:''}});fireEvent.blur(screen.getByLabelText('Name'));
+  expect(screen.getByLabelText('Name')).toHaveAttribute('aria-invalid','true'); expect(screen.getByRole('button',{name:'Save'})).toBeDisabled();
+  fireEvent.change(screen.getByLabelText('Name'), {target:{value:'Documents'}});
+  fireEvent.change(screen.getByLabelText('Code'), {target:{value:''}});fireEvent.blur(screen.getByLabelText('Code'));
+  expect(screen.getByLabelText('Code')).toHaveAttribute('aria-invalid','true');
+  fireEvent.click(screen.getByRole('button',{name:'Add Permission'}));fireEvent.click(within(screen.getByRole('dialog')).getByRole('button',{name:'Cancel'}));
+  fireEvent.click(screen.getByRole('button',{name:'Remove',exact:true}));fireEvent.click(within(screen.getByRole('alertdialog')).getByRole('button',{name:'Cancel'}));
+  expect(projectService.deleteProjectResource).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole('button',{name:'Back to Project'}));await screen.findByText('Returned to project');
+ });
+ it('keeps edits visible when saving fails',async()=>{
+  mount();await screen.findByDisplayValue('Documents');vi.mocked(projectService.updateProjectResource).mockRejectedValue(new Error('Offline'));
+  fireEvent.click(screen.getByRole('button',{name:'Save'}));await waitFor(()=>expect(projectService.updateProjectResource).toHaveBeenCalled());
+  await waitFor(()=>expect(screen.getByRole('button',{name:'Save'})).toBeEnabled());expect(screen.getByDisplayValue('Documents')).toBeInTheDocument();expect(screen.queryByText('Returned to project')).not.toBeInTheDocument();
+ });
+ it('renders a loading state until the project request settles',()=>{
+  mount();expect(screen.getByText('Loading…')).toBeInTheDocument();
+ });
 });

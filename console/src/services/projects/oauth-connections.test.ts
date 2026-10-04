@@ -4,6 +4,8 @@ import {
   createOAuthConnectionWithCredentials,
   deleteOAuthConnection,
   fetchOAuthConnections,
+  fetchOAuthConnectionByProvider,
+  updateOAuthConnection,
   type OAuthConnection,
 } from './oauth-connections';
 
@@ -234,4 +236,43 @@ describe('OAuthConnections Service', () => {
       );
     });
   });
+});
+
+ describe("OAuth endpoint contracts", () => {
+const payload = { credential_type: 'custom' as const, client_id: 'client', client_secret: 'secret', scopes: ['email'], enabled: false };
+const connection = { id: 'connection', provider: 'google', ...payload };
+const base = 'https://auth.example/';
+const root = 'https://auth.example/api/v1/projects/project/oauth-connections';
+const headers = { headers: { 'Content-Type': 'application/json' } };
+const endpoints = [
+ { name: 'list', method: 'get', url: root, call: (http: HttpClient) => fetchOAuthConnections(http, base, 'project'), invalid: 'Invalid oauth connections response', fallback: 'Failed to fetch oauth connections', data: [connection] },
+ { name: 'details', method: 'get', url: root + '/google', call: (http: HttpClient) => fetchOAuthConnectionByProvider(http, base, 'project', 'google'), invalid: 'Invalid oauth connection response', fallback: 'Failed to fetch oauth connection', data: connection },
+ { name: 'create', method: 'post', url: root + '/google', call: (http: HttpClient) => createOAuthConnectionWithCredentials(http, base, 'project', 'google', payload), invalid: 'Failed to create oauth connection with credentials', fallback: 'Failed to create oauth connection with credentials', data: connection },
+ { name: 'update', method: 'put', url: root + '/google', call: (http: HttpClient) => updateOAuthConnection(http, base, 'project', 'google', payload), invalid: 'Failed to update oauth connection', fallback: 'Failed to update oauth connection', data: connection },
+ { name: 'delete', method: 'delete', url: root + '/google', call: (http: HttpClient) => deleteOAuthConnection(http, base, 'project', 'google'), invalid: 'Failed to delete oauth connection', fallback: 'Failed to delete oauth connection', data: undefined },
+];
+for (const endpoint of endpoints) describe(endpoint.name, () => {
+ function setup() { const request = vi.fn(); return { request, http: { instanceRef: { [endpoint.method]: request } } as unknown as HttpClient }; }
+ it('uses the scoped endpoint and preserves data, pagination and credential payload', async () => {
+  const { request, http } = setup(); const pagination = { page_num: 1, page_size: 5, total_data: 1 }; request.mockResolvedValue({ data: { success: true, data: endpoint.data, pagination } });
+  expect(await endpoint.call(http)).toEqual(endpoint.name === 'list' ? { data: endpoint.data, pagination } : endpoint.data);
+  expect(request).toHaveBeenCalledExactlyOnceWith(...(['post', 'put'].includes(endpoint.method) ? [endpoint.url, payload, headers] : [endpoint.url, headers]));
+ });
+ it.each([undefined, {}, { success: false }, { success: false, error: { message: 'Denied' } }])('rejects malformed or failed API response %j', async data => {
+  const { request, http } = setup(); request.mockResolvedValue({ data }); await expect(endpoint.call(http)).rejects.toThrow(data?.error?.message ?? endpoint.invalid);
+ });
+ it.each([
+  [{ response: { data: { error: { message: 'nested' }, message: 'outer' } }, message: 'transport' }, 'nested'],
+  [{ response: { data: { message: 'outer' } }, message: 'transport' }, 'outer'],
+  [new Error('transport'), 'transport'],
+  [{}, null], [null, null],
+ ] as const)('propagates the highest priority error %j', async (failure, message) => {
+  const { request, http } = setup(); request.mockRejectedValue(failure); await expect(endpoint.call(http)).rejects.toThrow(message ?? endpoint.fallback);
+ });
+});
+it('normalizes a successful list with missing data to an empty list', async () => {
+ const get = vi.fn().mockResolvedValue({ data: { success: true } });
+ expect(await fetchOAuthConnections({ instanceRef: { get } } as unknown as HttpClient, base, 'project')).toEqual({ data: [], pagination: undefined });
+});
+
 });
