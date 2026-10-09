@@ -118,6 +118,7 @@ minify_css() {
     
     local css_files=(
         "${ASSETS_DIR}/roled.css"
+        "${ASSETS_DIR}/branding.css"
     )
     
     for css_file in "${css_files[@]}"; do
