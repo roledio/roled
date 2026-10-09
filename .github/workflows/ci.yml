@@ -20,7 +20,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v7
         with:
-          go-version: "1.27"
+          go-version: "1.27.1"
           cache: true
           cache-dependency-path: "auth/go.sum"
       - name: Install mockery
@@ -30,7 +30,7 @@ jobs:
         run: |
           go version
           go env GOVERSION GOTOOLCHAIN GOROOT
-          mockery --version
+          mockery version
           go version -m "$(which mockery)"
       - name: Generate mocks
         run: mockery
