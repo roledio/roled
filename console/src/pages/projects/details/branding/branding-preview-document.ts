@@ -14,7 +14,7 @@ export function buildBrandingPreview(settings: BrandingSettings, name: string, a
     <link rel="stylesheet" href="${base}/assets/static/roled.css">
     <link rel="stylesheet" href="${base}/assets/static/branding.css?v=1">
     <style>:root{--brand-primary:${color};--brand-radius:${radius};--brand-shadow:${shadow};--brand-border:${settings.enable_border ? '1px solid var(--roled-primary)' : '0'}}
-    .roled-auth-page{min-height:100vh;padding:2.5rem 1.25rem} .roled-auth-container{width:100%}</style>
+    .roled-auth-page{min-height:100vh;padding:2.5rem 1.25rem} .roled-auth-container{width:100%} a{pointer-events:none;cursor:default}</style>
     </head><body><main class="roled-auth-page"><div class="roled-auth-container"><div class="roled-auth-card">
     <header class="roled-auth-header">
     ${settings.logo_url ? `<img class="roled-auth-logo" src="${escapeHTML(settings.logo_url)}" alt="${escapeHTML(name)} logo">` : ''}
@@ -22,9 +22,9 @@ export function buildBrandingPreview(settings: BrandingSettings, name: string, a
     <div class="roled-auth-body"><form>
     <div class="roled-form-group"><label class="roled-label" for="preview-email">Email</label><input class="roled-input" id="preview-email" type="email" placeholder="Enter your email" autocomplete="off"></div>
     <div class="roled-form-group"><label class="roled-label" for="preview-password">Password</label><input class="roled-input" id="preview-password" type="password" placeholder="Enter your password" autocomplete="off"></div>
-    <div class="roled-form-group" style="text-align:right"><a href="#">Forgot password?</a></div>
+    <div class="roled-auth-forgot" style="text-align:right"><a href="#">Forgot password?</a></div>
     <div class="roled-form-group"><button type="button" class="roled-btn roled-btn-primary roled-btn-block">Sign in</button></div>
     </form></div><footer class="roled-auth-footer"><p class="roled-auth-toggle-text">Don't have an account? <a href="#">Sign up</a></p></footer>
-    </div><div class="roled-powered-by">Powered by <strong>Roled</strong></div></div></main></body></html>`;
+    </div><div class="roled-powered-by">Powered by <img src="${base}/assets/static/favicon.ico" alt="Roled Logo"> <strong>Roled</strong></div></div></main></body></html>`;
 }
 

@@ -11,7 +11,7 @@ func (h *handler) applyBranding(c fiber.Ctx, data *models.TemplateData, project 
 	if project == nil {
 		return errors.ErrSystemError.WithDebugMessage("Missing project for branding")
 	}
-	branding, err := h.brandingService.ResolveBranding(c.Context(), project.ID)
+	branding, err := h.brandingService.ResolveBranding(c.Context(), project)
 	if err != nil {
 		return err
 	}

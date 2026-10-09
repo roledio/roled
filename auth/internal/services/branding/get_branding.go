@@ -12,5 +12,5 @@ func (s *service) GetBranding(ctx context.Context, req *models.GetBrandingReques
 	if err != nil {
 		return nil, err
 	}
-	return s.ResolveBranding(ctx, project.ID)
+	return s.ResolveBranding(ctx, project)
 }

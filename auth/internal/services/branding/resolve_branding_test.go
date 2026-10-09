@@ -15,7 +15,7 @@ import (
 )
 
 func TestResolveBrandingFailures(t *testing.T) {
-	for _, stage := range []string{"project branding", "system lookup", "missing system", "system branding", "source project"} {
+	for _, stage := range []string{"project branding", "system lookup", "missing system", "system branding"} {
 		t.Run(stage, func(t *testing.T) {
 			ctx := context.Background()
 			reg := rm.NewMockRegistry(t)
@@ -26,11 +26,8 @@ func TestResolveBrandingFailures(t *testing.T) {
 			switch stage {
 			case "project branding":
 				repo.EXPECT().FindByProjectID(ctx, "tenant").Return(nil, failure)
-			case "source project":
-				repo.EXPECT().FindByProjectID(ctx, "tenant").Return(&entities.Branding{ProjectID: "tenant"}, nil)
-				reg.EXPECT().ProjectRepository().Return(projects)
-				projects.EXPECT().FindByID(ctx, "tenant").Return(nil, failure)
 			default:
+				// No custom branding for tenant → fall through to system lookup.
 				repo.EXPECT().FindByProjectID(ctx, "tenant").Return(nil, nil)
 				reg.EXPECT().ProjectRepository().Return(projects)
 				switch stage {
@@ -43,7 +40,7 @@ func TestResolveBrandingFailures(t *testing.T) {
 					repo.EXPECT().FindByProjectID(ctx, "system").Return(nil, failure)
 				}
 			}
-			got, err := NewService(&configs.DefaultConfig{}, reg, nil).ResolveBranding(ctx, "tenant")
+			got, err := NewService(&configs.DefaultConfig{}, reg, nil).ResolveBranding(ctx, &entities.Project{ID: "tenant"})
 			require.Nil(t, got)
 			require.ErrorIs(t, err, pkgerrors.ErrSystemError)
 		})
@@ -55,57 +52,91 @@ func TestResolveBrandingWithoutStoredSystemSettings(t *testing.T) {
 	reg := rm.NewMockRegistry(t)
 	repo := im.NewMockBrandingRepository(t)
 	projects := im.NewMockProjectRepository(t)
-	logo := "https://example.com/system.png"
+	tenantLogo := "https://example.com/tenant.png"
 	reg.EXPECT().BrandingRepository().Return(repo)
 	reg.EXPECT().ProjectRepository().Return(projects)
 	repo.EXPECT().FindByProjectID(ctx, "tenant").Return(nil, nil)
-	projects.EXPECT().FindSystem(ctx).Return(&entities.Project{ID: "system", LogoURL: &logo}, nil)
+	projects.EXPECT().FindSystem(ctx).Return(&entities.Project{ID: "system"}, nil)
 	repo.EXPECT().FindByProjectID(ctx, "system").Return(nil, nil)
-	got, err := NewService(&configs.DefaultConfig{}, reg, nil).ResolveBranding(ctx, "tenant")
+	// Logo comes from the project entity passed to ResolveBranding (not the system project).
+	got, err := NewService(&configs.DefaultConfig{}, reg, nil).ResolveBranding(ctx, &entities.Project{ID: "tenant", LogoURL: &tenantLogo})
 	require.NoError(t, err)
-	require.Equal(t, &models.BrandingDetails{ProjectID: "tenant", SourceProjectID: "system", IsDefault: true, LogoURL: &logo, PrimaryColor: "#ba8d1c", Rounding: "small", EnableShadow: true}, got)
+	require.Equal(t, &models.BrandingDetails{ProjectID: "tenant", SourceProjectID: "system", IsDefault: true, LogoURL: &tenantLogo, PrimaryColor: "#ba8d1c", Rounding: "small", EnableShadow: true}, got)
 }
 
-func TestResolveBrandingUsesOnlySourceProjectLogo(t *testing.T) {
+func TestResolveBrandingWithoutStoredSystemSettingsNoLogo(t *testing.T) {
+	ctx := context.Background()
+	reg := rm.NewMockRegistry(t)
+	repo := im.NewMockBrandingRepository(t)
+	projects := im.NewMockProjectRepository(t)
+	reg.EXPECT().BrandingRepository().Return(repo)
+	reg.EXPECT().ProjectRepository().Return(projects)
+	repo.EXPECT().FindByProjectID(ctx, "tenant").Return(nil, nil)
+	projects.EXPECT().FindSystem(ctx).Return(&entities.Project{ID: "system"}, nil)
+	repo.EXPECT().FindByProjectID(ctx, "system").Return(nil, nil)
+	// Project has no logo → LogoURL stays nil.
+	got, err := NewService(&configs.DefaultConfig{}, reg, nil).ResolveBranding(ctx, &entities.Project{ID: "tenant"})
+	require.NoError(t, err)
+	require.Equal(t, &models.BrandingDetails{ProjectID: "tenant", SourceProjectID: "system", IsDefault: true, PrimaryColor: "#ba8d1c", Rounding: "small", EnableShadow: true}, got)
+}
+
+func TestResolveBrandingUsesStoredSettings(t *testing.T) {
 	for _, fallback := range []bool{false, true} {
-		for _, missingSource := range []bool{false, true} {
-			name := "custom"
+		t.Run(map[bool]string{false: "custom branding", true: "system fallback"}[fallback], func(t *testing.T) {
+			ctx := context.Background()
+			reg := rm.NewMockRegistry(t)
+			repo := im.NewMockBrandingRepository(t)
+			projects := im.NewMockProjectRepository(t)
+			reg.EXPECT().BrandingRepository().Return(repo)
+			tenantLogo := "https://example.com/tenant.png"
+			sourceID := "tenant"
+			favicon := "https://example.com/icon.png"
+			stored := &entities.Branding{ProjectID: "tenant", FaviconURL: &favicon, PrimaryColor: "#112233", Rounding: "sharp", EnableBorder: true}
 			if fallback {
-				name = "system fallback"
-			}
-			if missingSource {
-				name += " missing source"
-			}
-			t.Run(name, func(t *testing.T) {
-				ctx := context.Background()
-				reg := rm.NewMockRegistry(t)
-				repo := im.NewMockBrandingRepository(t)
-				projects := im.NewMockProjectRepository(t)
-				reg.EXPECT().BrandingRepository().Return(repo)
+				sourceID = "system"
+				stored.ProjectID = sourceID
+				// No custom branding for tenant → fall through to system.
+				repo.EXPECT().FindByProjectID(ctx, "tenant").Return(nil, nil)
 				reg.EXPECT().ProjectRepository().Return(projects)
-				sourceID := "tenant"
-				if fallback {
-					sourceID = "system"
-				}
-				favicon := "https://example.com/icon.png"
-				stored := &entities.Branding{ProjectID: sourceID, FaviconURL: &favicon, PrimaryColor: "#112233", Rounding: "sharp", EnableBorder: true}
-				if fallback {
-					repo.EXPECT().FindByProjectID(ctx, "tenant").Return(nil, nil)
-					projects.EXPECT().FindSystem(ctx).Return(&entities.Project{ID: "system"}, nil)
-				}
-				repo.EXPECT().FindByProjectID(ctx, sourceID).Return(stored, nil)
-				logo := "https://example.com/" + sourceID + ".png"
-				var source *entities.Project
-				var expectedLogo *string
-				if !missingSource {
-					source = &entities.Project{ID: sourceID, LogoURL: &logo}
-					expectedLogo = &logo
-				}
-				projects.EXPECT().FindByID(ctx, sourceID).Return(source, nil)
-				got, err := NewService(&configs.DefaultConfig{}, reg, nil).ResolveBranding(ctx, "tenant")
-				require.NoError(t, err)
-				require.Equal(t, &models.BrandingDetails{ProjectID: "tenant", SourceProjectID: sourceID, IsDefault: fallback, LogoURL: expectedLogo, FaviconURL: &favicon, PrimaryColor: "#112233", Rounding: "sharp", EnableBorder: true}, got)
-			})
-		}
+				projects.EXPECT().FindSystem(ctx).Return(&entities.Project{ID: "system"}, nil)
+			}
+			repo.EXPECT().FindByProjectID(ctx, sourceID).Return(stored, nil)
+			// Logo always comes from the project entity passed to ResolveBranding.
+			got, err := NewService(&configs.DefaultConfig{}, reg, nil).ResolveBranding(ctx, &entities.Project{ID: "tenant", LogoURL: &tenantLogo})
+			require.NoError(t, err)
+			require.Equal(t, &models.BrandingDetails{
+				ProjectID:       "tenant",
+				SourceProjectID: sourceID,
+				IsDefault:       fallback,
+				LogoURL:         &tenantLogo,
+				FaviconURL:      &favicon,
+				PrimaryColor:    "#112233",
+				Rounding:        "sharp",
+				EnableBorder:    true,
+			}, got)
+		})
 	}
+}
+
+func TestResolveBrandingStoredLogoFallsBackToBrandingRecord(t *testing.T) {
+	// When the project has no logo but the stored branding record has one, use the branding logo.
+	ctx := context.Background()
+	reg := rm.NewMockRegistry(t)
+	repo := im.NewMockBrandingRepository(t)
+	reg.EXPECT().BrandingRepository().Return(repo)
+	brandingLogo := "https://example.com/branding-logo.png"
+	favicon := "https://example.com/icon.png"
+	stored := &entities.Branding{ProjectID: "tenant", LogoURL: &brandingLogo, FaviconURL: &favicon, PrimaryColor: "#112233", Rounding: "sharp"}
+	repo.EXPECT().FindByProjectID(ctx, "tenant").Return(stored, nil)
+	// Project has no logo → result.LogoURL comes from stored branding record.
+	got, err := NewService(&configs.DefaultConfig{}, reg, nil).ResolveBranding(ctx, &entities.Project{ID: "tenant"})
+	require.NoError(t, err)
+	require.Equal(t, &models.BrandingDetails{
+		ProjectID:       "tenant",
+		SourceProjectID: "tenant",
+		LogoURL:         &brandingLogo,
+		FaviconURL:      &favicon,
+		PrimaryColor:    "#112233",
+		Rounding:        "sharp",
+	}, got)
 }

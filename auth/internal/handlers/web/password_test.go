@@ -2,6 +2,10 @@ package web
 
 import (
 	"encoding/json"
+	"net/http/httptest"
+	"strings"
+	"testing"
+
 	"github.com/gofiber/fiber/v3"
 	"github.com/roledio/roled/auth/internal/configs"
 	"github.com/roledio/roled/auth/internal/entities"
@@ -11,9 +15,6 @@ import (
 	pkgerrors "github.com/roledio/roled/auth/pkg/errors"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	"net/http/httptest"
-	"strings"
-	"testing"
 )
 
 func TestRenderForgotPasswordTemplateAndFailures(t *testing.T) {
@@ -34,7 +35,7 @@ func TestRenderForgotPasswordTemplateAndFailures(t *testing.T) {
 					if stage == "branding error" {
 						be = pkgerrors.ErrSystemError
 					}
-					branding.On("ResolveBranding", mock.Anything, "project").Return(&models.BrandingDetails{}, be).Once()
+					branding.On("ResolveBranding", mock.Anything, mock.Anything).Return(&models.BrandingDetails{}, be).Once()
 				}
 			}
 			route, url, body := "/forgot", "/forgot?client_id=client", ""
@@ -82,7 +83,7 @@ func TestRenderResetPasswordTemplateAndFailures(t *testing.T) {
 					if stage == "branding error" {
 						be = pkgerrors.ErrSystemError
 					}
-					branding.On("ResolveBranding", mock.Anything, "project").Return(&models.BrandingDetails{}, be).Once()
+					branding.On("ResolveBranding", mock.Anything, mock.Anything).Return(&models.BrandingDetails{}, be).Once()
 				}
 			}
 			route, url, body := "/reset/:token", "/reset/token", ""
@@ -130,7 +131,7 @@ func TestSubmitResetPasswordTemplateAndFailures(t *testing.T) {
 					if stage == "branding error" {
 						be = pkgerrors.ErrSystemError
 					}
-					branding.On("ResolveBranding", mock.Anything, "project").Return(&models.BrandingDetails{}, be).Once()
+					branding.On("ResolveBranding", mock.Anything, mock.Anything).Return(&models.BrandingDetails{}, be).Once()
 				}
 			}
 			route, url, body := "/reset/:token", "/reset/token", "password=passphrase&password_confirmation=passphrase"

@@ -5,6 +5,7 @@ import (
 
 	"github.com/roledio/roled/auth/internal/configs"
 	"github.com/roledio/roled/auth/internal/constants"
+	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/models"
 	"github.com/roledio/roled/auth/internal/repositories"
 	"github.com/roledio/roled/auth/internal/services/upload"
@@ -13,7 +14,7 @@ import (
 type Service interface {
 	GetBranding(context.Context, *models.GetBrandingRequest) (*models.BrandingDetails, error)
 	UpdateBranding(context.Context, *models.UpdateBrandingRequest) (*models.BrandingDetails, error)
-	ResolveBranding(context.Context, string) (*models.BrandingDetails, error)
+	ResolveBranding(context.Context, *entities.Project) (*models.BrandingDetails, error)
 }
 
 type service struct {

@@ -38,7 +38,7 @@ func TestBrandingFallbackAndCustom(t *testing.T) {
 				repo.EXPECT().FindByProjectID(ctx, "system").Return(stored, nil)
 			}
 			service := NewService(&configs.DefaultConfig{}, reg, nil)
-			got, err := service.ResolveBranding(ctx, "project")
+			got, err := service.ResolveBranding(ctx, &entities.Project{ID: "project"})
 			require.NoError(t, err)
 			require.Equal(t, !custom, got.IsDefault)
 			require.Equal(t, stored.ProjectID, got.SourceProjectID)

@@ -18,6 +18,10 @@ func (s *service) UpdateBranding(ctx context.Context, req *models.UpdateBranding
 	if err != nil {
 		return nil, err
 	}
+	if project.IsSystem {
+		log.WithContext(ctx).Errorw("Update branding for system project is not allowed", "project_id", req.ProjectID)
+		return nil, errors.ErrOperationNotAvailable.WithDebugMessage("Unable to update branding for system project")
+	}
 	// Defense in depth for non-HTTP callers, too.
 	if !brandingRequestValid(req) {
 		return nil, errors.ErrInvalidParams
