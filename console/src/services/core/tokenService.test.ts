@@ -13,7 +13,7 @@ describe('TokenService', () => {
     storageMock = mock<IStorage>();
     configServiceMock = mock<ConfigService>();
     configServiceMock.getAuthBaseUrl.mockReturnValue('http://auth.local');
-    configServiceMock.getCachedConfig.mockReturnValue({ client_id: 'cid' });
+    configServiceMock.getCachedConfig.mockReturnValue({ client_id: 'cid', project_id: 'system-project' });
     svc = new TokenService(storageMock, configServiceMock);
   });
 

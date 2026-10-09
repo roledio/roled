@@ -53,4 +53,8 @@ export class HttpClient {
   get tokenServiceRef() {
     return this.tokenService;
   }
+
+  get configServiceRef() {
+    return this.configService;
+  }
 }

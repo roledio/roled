@@ -52,6 +52,7 @@ func TestProjectService_GetConsoleConfig_Success(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, result)
 	assert.Equal(t, "console-client-id", result.ClientID)
+	assert.Equal(t, "console-project-id", result.ProjectID)
 }
 
 func TestProjectService_GetConsoleConfig_ProjectNotFound(t *testing.T) {

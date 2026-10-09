@@ -2,10 +2,11 @@ import type { IStorage } from '@/storage/storageService';
 
 export type ConsoleConfig = {
   client_id: string;
+  project_id: string;
   [key: string]: unknown;
 };
 
-const CONFIG_KEY = 'console_config_v1';
+const CONFIG_KEY = 'console_config_v2';
 
 export class ConfigService {
   private storage: IStorage;
@@ -37,8 +38,8 @@ export class ConfigService {
         json = payload.data as ConsoleConfig;
       }
     }
-    if (!json || !json.client_id) {
-      throw new Error('console config missing client_id');
+    if (!json || !json.client_id || !json.project_id) {
+      throw new Error('console config missing client_id or project_id');
     }
     this.cache = json;
     this.storage.set(CONFIG_KEY, json);

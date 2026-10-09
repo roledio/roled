@@ -226,7 +226,8 @@ func TestGetConsoleConfig_Success(t *testing.T) {
 	app := fiber.New()
 	projectMock := projectmocks.NewMockProjectService(t)
 	expectedResponse := &models.GetConsoleConfigResponse{
-		ClientID: "console-client-id",
+		ClientID:  "console-client-id",
+		ProjectID: "console-project-id",
 	}
 	projectMock.EXPECT().GetConsoleConfig(context.Background()).Return(expectedResponse, nil)
 	deps := &Dependencies{
@@ -243,6 +244,7 @@ func TestGetConsoleConfig_Success(t *testing.T) {
 	parsed := gjson.Parse(body)
 	assert.True(t, parsed.Get("success").Bool())
 	assert.Equal(t, "console-client-id", parsed.Get("data.client_id").String())
+	assert.Equal(t, "console-project-id", parsed.Get("data.project_id").String())
 }
 
 func TestGetConsoleConfig_Error(t *testing.T) {

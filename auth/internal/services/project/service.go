@@ -88,7 +88,8 @@ func (s *projectService) GetConsoleConfig(ctx context.Context) (*models.GetConso
 			fmt.Errorf("default client for system project is not active"))
 	}
 	res := models.GetConsoleConfigResponse{
-		ClientID: client.ID,
+		ClientID:  client.ID,
+		ProjectID: project.ID,
 	}
 	return &res, nil
 }

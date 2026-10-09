@@ -14,5 +14,6 @@ type SystemStatus struct {
 }
 
 type GetConsoleConfigResponse struct {
-	ClientID string `json:"client_id"`
+	ClientID  string `json:"client_id"`
+	ProjectID string `json:"project_id"`
 }

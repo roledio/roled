@@ -14,7 +14,7 @@ describe('ConfigService', () => {
   });
 
   it('loadConfig accepts wrapped payloads and caches result', async () => {
-    const response = { data: { client_id: 'abc123' } };
+    const response = { data: { client_id: 'abc123', project_id: 'system-project' } };
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => response }));
 
     // Mock storage set/get
@@ -25,8 +25,9 @@ describe('ConfigService', () => {
     const cfg = new ConfigService(storageMock, 'http://localhost:8082');
     const loaded = await cfg.loadConfig();
     expect(loaded.client_id).toBe('abc123');
+    expect(loaded.project_id).toBe('system-project');
     expect(cfg.getCachedConfig()?.client_id).toBe('abc123');
-    expect(storageMock.set).toHaveBeenCalledWith('console_config_v1', response.data);
-    expect(storageMock.get).toHaveBeenCalledWith('console_config_v1');
+    expect(storageMock.set).toHaveBeenCalledWith('console_config_v2', response.data);
+    expect(storageMock.get).toHaveBeenCalledWith('console_config_v2');
   });
 });
