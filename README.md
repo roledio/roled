@@ -134,9 +134,9 @@ Here are some screenshots of the Roled Console for you to take a look at so you 
       Configure authentication flows, default sign-up roles, and security policies.
     </td>
     <td align="left" valign="top" width="50%">
-      <img src="docs/images/signin.png" alt="Sign In Page" height="200" /><br/>
-      <strong>Sign In Page</strong><br/>
-      Clean sign-in and authentication screen for your project users.
+      <img src="docs/images/project-branding.png" alt="Project Branding" height="200" /><br/>
+      <strong>Project Branding</strong><br/>
+      Customize your project's authentication pages with your own brand.
     </td>
   </tr>
 </table>
@@ -160,11 +160,11 @@ Roled is open source and contributions are welcome! The project is under active 
 
 ### Upcoming Features
 
-- **Official SDKs**: Faster integration with Roled for various programming languages.
-- **More social logins**: ~~Google~~, Microsoft, GitHub, Facebook, and more.
-- **Audit logs**: Track and monitor all your projects' user activities.
-- **Login layouts**: Ready-to-use login page templates for quick project integration.
-- **User groups**: Define reusable sets of default users for quick assignment to new projects.
-- **Users view**: Inverse management view, assign a user to multiple projects from a central user list without navigating project-by-project.
-- And many more!
-
+- [ ] **Official SDKs**: Faster integration with Roled for various programming languages.
+- [x] **Google social login**: Seamless authentication using Google accounts.
+- [ ] **More social logins**: Microsoft, GitHub, Facebook, and more.
+- [ ] **Audit logs**: Track and monitor all your projects' user activities.
+- [x] **Customizable login page**: Customize project's login page appearance and theme.
+- [ ] **User groups**: Define reusable sets of default users for quick assignment to new projects.
+- [ ] **Users view**: Inverse management view, assign a user to multiple projects from a central user list without navigating project-by-project.
+- [ ] And many more!
