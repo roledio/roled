@@ -52,5 +52,17 @@ func (b *BrandingDetails) CSS() template.CSS {
 	if b.EnableBorder {
 		border = "1px solid var(--roled-primary)"
 	}
-	return template.CSS(fmt.Sprintf(":root{--brand-primary:%s;--brand-radius:%s;--brand-shadow:%s;--brand-border:%s}", color, radius, shadow, border))
+	return template.CSS(fmt.Sprintf(`:root{--brand-primary:%s;--brand-radius:%s;--brand-shadow:%s;--brand-border:%s}`,
+		color, radius, shadow, border))
+}
+
+// StyleTag generates a <style> block containing the branding CSS.
+// We use template.HTML to ensure the <style> tag is not escaped, while
+// the CSS() method above uses template.CSS to ensure the CSS content is safe.
+//
+// Note: writing {{.CSS}} inside a <style> tag in a template will be treated as
+// invalid syntax in the IDE and the minifier will remove it.
+// Instead, we generate the <style> tag here.
+func (b *BrandingDetails) StyleTag() template.HTML {
+	return template.HTML("<style>" + string(b.CSS()) + "</style>")
 }
