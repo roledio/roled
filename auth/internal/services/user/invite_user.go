@@ -16,6 +16,7 @@ import (
 	"github.com/roledio/roled/auth/internal/queues"
 	"github.com/roledio/roled/auth/internal/queues/payloads"
 	"github.com/roledio/roled/auth/internal/repositories"
+	"github.com/roledio/roled/auth/internal/services/shared"
 	"github.com/roledio/roled/auth/internal/utils/contextutil"
 	pkgerrors "github.com/roledio/roled/auth/pkg/errors"
 	"github.com/roledio/roled/auth/pkg/utils/idutil"
@@ -26,28 +27,15 @@ import (
 // InviteUser invites a user to a project. Creates a new user record with is_active=false
 // and sends an email invitation with activation token.
 func (s *userService) InviteUser(ctx context.Context, req *models.InviteUserRequest) (*models.UserDetails, error) {
-
-	// Get current access token and project from context
-	accessToken := contextutil.GetAccessToken(ctx)
-	if accessToken == nil {
-		log.WithContext(ctx).Errorw("Access token not found in context")
-		return nil, errors.ErrCtxAccessTokenNotFound
-	}
-
-	projectRepo := s.registry.ProjectRepository()
-	project, err := projectRepo.FindByID(ctx, req.ProjectID)
+	account, project, err := shared.ValidateProject(ctx, s.registry, req.ProjectID)
 	if err != nil {
-		log.WithContext(ctx).Errorw("Failed to find project", "error", err, "project_id", req.ProjectID)
-		return nil, pkgerrors.ErrSystemError.WithError(err)
-	}
-	if project == nil {
-		log.WithContext(ctx).Errorw("Project not found", "project_id", req.ProjectID)
-		return nil, errors.ErrProjectNotFound
+		return nil, err
 	}
 
-	if !project.IsActive {
-		log.WithContext(ctx).Errorw("Project not active", "project_id", req.ProjectID)
-		return nil, errors.ErrProjectNotActive
+	if project.IsSystem {
+		// Invite user for system project is not supported, should be done from invite member instead
+		log.WithContext(ctx).Warn("Inviting system project users is not supported, should be done from invite member instead.")
+		return nil, pkgerrors.ErrOperationNotAvailable.WithDebugMessage("invite user to system project is not supported, use invite member instead")
 	}
 
 	email := strings.ToLower(req.Email)
@@ -94,13 +82,6 @@ func (s *userService) InviteUser(ctx context.Context, req *models.InviteUserRequ
 			return nil, errors.ErrRedirectURINotFound
 		}
 		loginURL = redirectURI.LoginURL
-	}
-
-	// Get current account from context
-	account := contextutil.GetAccount(ctx)
-	if account == nil {
-		log.WithContext(ctx).Errorw("Account not found in context")
-		return nil, errors.ErrCtxAccountNotFound
 	}
 
 	// Create user and user role in transaction
