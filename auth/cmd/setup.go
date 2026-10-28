@@ -21,6 +21,7 @@ import (
 	"github.com/roledio/roled/auth/internal/services/client"
 	"github.com/roledio/roled/auth/internal/services/member"
 	"github.com/roledio/roled/auth/internal/services/oauthconnection"
+	"github.com/roledio/roled/auth/internal/services/openrouter"
 	"github.com/roledio/roled/auth/internal/services/permission"
 	"github.com/roledio/roled/auth/internal/services/project"
 	"github.com/roledio/roled/auth/internal/services/resource"
@@ -59,6 +60,7 @@ type Services struct {
 	RoleService            role.RoleService
 	PermissionService      permission.PermissionService
 	BrandingService        branding.Service
+	OpenRouterService      openrouter.Service
 }
 
 func setupServices(config *configs.DefaultConfig, registry repositories.Registry, publishers QueuePublishers, redis redis.Service) *Services {
@@ -77,6 +79,7 @@ func setupServices(config *configs.DefaultConfig, registry repositories.Registry
 		RoleService:            role.NewRoleService(registry, redis),
 		PermissionService:      permission.NewPermissionService(config, registry),
 		BrandingService:        branding.NewService(config, registry, uploadService),
+		OpenRouterService:      openrouter.NewService(config),
 	}
 }
 

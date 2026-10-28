@@ -77,6 +77,11 @@ type DefaultConfig struct {
 			Endpoint  string `mapstructure:"endpoint"`
 		} `mapstructure:"s3"`
 	} `mapstructure:"upload"`
+	OpenRouter struct {
+		BaseURL string `mapstructure:"base_url"`
+		APIKey  string `mapstructure:"api_key"`
+		Model   string `mapstructure:"model"`
+	} `mapstructure:"openrouter"`
 }
 
 func (d *DefaultConfig) IsEnvProd() bool {
@@ -148,5 +153,13 @@ func LoadDefaultConfig(path string) (*DefaultConfig, error) {
 		// Default to 5 minutes if parsing fails
 		c.CacheDefaultTTLDuration = 5 * time.Minute
 	}
+
+	if c.OpenRouter.BaseURL == "" {
+		c.OpenRouter.BaseURL = "https://openrouter.ai/api/v1"
+	}
+	if c.OpenRouter.Model == "" {
+		c.OpenRouter.Model = "google/gemini-2.0-flash-001"
+	}
+
 	return &c, nil
 }

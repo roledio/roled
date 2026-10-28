@@ -70,3 +70,9 @@ google_oauth:
   client_id: your-google-client-id
   client_secret: your-google-client-secret
   redirect_uri: http://localhost:8080/oauth/google/callback
+
+openrouter:
+  base_url: https://openrouter.ai/api/v1
+  api_key: your-openrouter-api-key
+  model: 
+

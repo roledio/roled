@@ -12,6 +12,7 @@ import (
 	"github.com/roledio/roled/auth/internal/services/client"
 	"github.com/roledio/roled/auth/internal/services/member"
 	"github.com/roledio/roled/auth/internal/services/oauthconnection"
+	"github.com/roledio/roled/auth/internal/services/openrouter"
 	"github.com/roledio/roled/auth/internal/services/permission"
 	"github.com/roledio/roled/auth/internal/services/project"
 	"github.com/roledio/roled/auth/internal/services/resource"
@@ -36,6 +37,7 @@ type Dependencies struct {
 	UserService            user.UserService
 	PermissionService      permission.PermissionService
 	BrandingService        branding.Service
+	OpenRouterService      openrouter.Service
 }
 
 type handler struct {
@@ -55,9 +57,15 @@ type handler struct {
 	userService            user.UserService
 	permissionService      permission.PermissionService
 	brandingService        branding.Service
+	openRouterService      openrouter.Service
 }
 
 func NewHandler(app *fiber.App, defaultConfig *configs.DefaultConfig, deps *Dependencies) *handler {
+	openRouterService := deps.OpenRouterService
+	if openRouterService == nil {
+		openRouterService = openrouter.NewService(defaultConfig)
+	}
+
 	return &handler{
 		app:                    app,
 		defaultConfig:          defaultConfig,
@@ -75,6 +83,7 @@ func NewHandler(app *fiber.App, defaultConfig *configs.DefaultConfig, deps *Depe
 		userService:            deps.UserService,
 		permissionService:      deps.PermissionService,
 		brandingService:        deps.BrandingService,
+		openRouterService:      openRouterService,
 	}
 }
 
@@ -83,6 +92,8 @@ func (h *handler) SetupRoutes() {
 	h.app.Get("/system/health", h.getSystemHealth)
 	h.app.Get("/system/info", h.getSystemInfo)
 	h.app.Get("/system/console/config", h.getConsoleConfig)
+
+	h.app.Post("/api/openrouter/extract-image", h.extractImage)
 
 	h.app.Post("/api/v1/tokens", h.exchangeToken)
 	h.app.Post("/api/v1/tokens/current/revoke", h.revokeCurrentToken)

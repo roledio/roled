@@ -23,6 +23,7 @@ func newApiHandlerDeps(registry repositories.Registry, redis redis.Service, serv
 		UserService:            services.UserService,
 		PermissionService:      services.PermissionService,
 		BrandingService:        services.BrandingService,
+		OpenRouterService:      services.OpenRouterService,
 	}
 }
 
