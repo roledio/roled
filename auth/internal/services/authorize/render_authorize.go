@@ -32,7 +32,7 @@ func (s *authorizeService) RenderAuthorize(ctx context.Context, req *models.Rend
 		return &res, nil
 	}
 	// Build oauth connection URLs when enabled
-	s.buildOAuthConnections(conns, req, &res)
+	s.buildOAuthConnections(ctx, conns, req, &res)
 	return &res, nil
 }
 
@@ -99,12 +99,43 @@ func (s *authorizeService) validateAuthorizeRequest(ctx context.Context, req *mo
 }
 
 func (s *authorizeService) buildOAuthConnections(
+	ctx context.Context,
 	conns []entities.OAuthConnection,
 	req *models.RenderAuthorizeRequest,
 	res *models.RenderAuthorizeResult) {
+	// systemProject is fetched lazily on first need and reused for all
+	// subsequent default-credential connections in the same render call.
+	var systemProject *entities.Project
+	systemProjectFetched := false
 	for _, conn := range conns {
 		if !conn.Enabled {
 			continue
+		}
+		// For connections that delegate to system-project credentials we must
+		// verify the system project actually has an enabled connection for the
+		// same provider — otherwise there is nothing to authenticate with.
+		if conn.CredentialType == constants.OAuthCredentialTypeDefault {
+			if !systemProjectFetched {
+				var err error
+				systemProject, err = s.registry.ProjectRepository().FindSystem(ctx)
+				systemProjectFetched = true
+				if err != nil {
+					log.WithContext(ctx).Warnw("Skipping default OAuth connection: could not find system project",
+						"provider", conn.Provider, "error", err)
+					continue
+				}
+			}
+			if systemProject == nil {
+				log.WithContext(ctx).Warnw("Skipping default OAuth connection: system project not found",
+					"provider", conn.Provider)
+				continue
+			}
+			systemConn, err := s.registry.OAuthConnectionRepository().FindByProjectIDAndProvider(ctx, systemProject.ID, conn.Provider)
+			if err != nil || systemConn == nil || !systemConn.Enabled {
+				log.WithContext(ctx).Warnw("Skipping default OAuth connection: system project connection missing or disabled",
+					"provider", conn.Provider, "error", err)
+				continue
+			}
 		}
 		soc := models.OAuthConnection{
 			Provider: conn.Provider,

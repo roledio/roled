@@ -14,9 +14,14 @@ import (
 )
 
 func (s *oAuthConnectionService) UpdateOAuthConnection(ctx context.Context, req *models.UpdateOAuthConnectionRequest) (*models.OAuthConnectionDetails, error) {
-	_, _, err := shared.ValidateProject(ctx, s.registry, req.ProjectID)
+	_, project, err := shared.ValidateProject(ctx, s.registry, req.ProjectID)
 	if err != nil {
 		return nil, err
+	}
+
+	if project.IsSystem && req.CredentialType == constants.OAuthCredentialTypeDefault {
+		log.WithContext(ctx).Warnw("Cannot update OAuth connection to default credentials for system project", "project_id", req.ProjectID, "provider", req.Provider)
+		return nil, errors.ErrDefaultCredentialsNotSupported
 	}
 
 	// Find existing connection
@@ -29,6 +34,31 @@ func (s *oAuthConnectionService) UpdateOAuthConnection(ctx context.Context, req 
 	if existing == nil {
 		log.WithContext(ctx).Warnw("OAuth connection not found", "project_id", req.ProjectID, "provider", req.Provider)
 		return nil, errors.ErrOAuthConnectionNotFound
+	}
+
+	// Make sure the system project already has an OAuth connection configured before
+	// switching a non-system project's credential type to default.
+	// (Whether the system connection is enabled can change at any time; we only
+	// require it to be configured so the provider is known.)
+	if !project.IsSystem && req.CredentialType == constants.OAuthCredentialTypeDefault {
+		systemProject, err := s.registry.ProjectRepository().FindSystem(ctx)
+		if err != nil {
+			log.WithContext(ctx).Errorw("Failed to find system project", "error", err)
+			return nil, pkgerrors.ErrSystemError.WithError(err)
+		}
+		if systemProject == nil {
+			log.WithContext(ctx).Warnw("System project does not exist", "project_id", req.ProjectID, "provider", req.Provider)
+			return nil, pkgerrors.ErrSystemError.WithDebugMessage("System project does not exist")
+		}
+		systemOAuthConnection, err := oauthConnectionRepo.FindByProjectIDAndProvider(ctx, systemProject.ID, req.Provider)
+		if err != nil {
+			log.WithContext(ctx).Errorw("Failed to check system OAuth connection", "error", err, "project_id", req.ProjectID, "provider", req.Provider)
+			return nil, pkgerrors.ErrSystemError.WithError(err)
+		}
+		if systemOAuthConnection == nil {
+			log.WithContext(ctx).Warnw("System project does not have OAuth connection configured for this provider", "project_id", req.ProjectID, "provider", req.Provider)
+			return nil, errors.ErrDefaultCredentialsNotConfigured
+		}
 	}
 
 	existing.Enabled = req.Enabled != nil && *req.Enabled

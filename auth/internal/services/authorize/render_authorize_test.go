@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/roledio/roled/auth/internal/configs"
+	"github.com/roledio/roled/auth/internal/constants"
 	"github.com/roledio/roled/auth/internal/entities"
 	"github.com/roledio/roled/auth/internal/errors"
 	"github.com/roledio/roled/auth/internal/models"
@@ -1069,4 +1070,99 @@ func TestAuthorizeService_RenderAuthorize_RedirectURIRepositoryError(t *testing.
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "An unexpected error occurred")
 	assert.Nil(t, result)
+}
+
+func TestAuthorizeService_RenderAuthorize_DefaultCredentials(t *testing.T) {
+	ctx := context.Background()
+	sysConn := func(enabled bool) *entities.OAuthConnection {
+		return &entities.OAuthConnection{
+			ID:        "system-conn",
+			ProjectID: "system-project",
+			Provider:  constants.OAuthProviderGoogle,
+			Enabled:   enabled,
+		}
+	}
+	cases := []struct {
+		name        string
+		provider    string
+		credType    string
+		connEnabled bool
+		systemConn  *entities.OAuthConnection // nil = system project has no such connection
+		wantListed  bool
+	}{
+		{"Default/SystemEnabled", constants.OAuthProviderGoogle, constants.OAuthCredentialTypeDefault, true, sysConn(true), true},
+		{"Default/SystemDisabled", constants.OAuthProviderGoogle, constants.OAuthCredentialTypeDefault, true, sysConn(false), false},
+		{"Default/SystemMissing", constants.OAuthProviderGoogle, constants.OAuthCredentialTypeDefault, true, nil, false},
+		{"Default/OwnConnectionDisabled", constants.OAuthProviderGoogle, constants.OAuthCredentialTypeDefault, false, sysConn(true), false},
+		{"Custom/IsListed", constants.OAuthProviderGoogle, constants.OAuthCredentialTypeCustom, true, nil, true},
+		{"Custom/SystemDisabledIsStillListed", constants.OAuthProviderGoogle, constants.OAuthCredentialTypeCustom, true, sysConn(false), true},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			mockRegistry := repositorymocks.NewMockRegistry(t)
+			mockClientRepo := interfacemocks.NewMockClientRepository(t)
+			mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+			mockProjectSettingRepo := interfacemocks.NewMockProjectSettingRepository(t)
+			mockAccountRepo := interfacemocks.NewMockAccountRepository(t)
+			mockRedirectURIRepo := interfacemocks.NewMockRedirectURIRepository(t)
+			mockOAuthConnectionRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
+
+			mockRegistry.EXPECT().ClientRepository().Return(mockClientRepo)
+			mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
+			mockRegistry.EXPECT().ProjectSettingRepository().Return(mockProjectSettingRepo)
+			mockRegistry.EXPECT().AccountRepository().Return(mockAccountRepo)
+			mockRegistry.EXPECT().RedirectURIRepository().Return(mockRedirectURIRepo)
+			mockRegistry.EXPECT().OAuthConnectionRepository().Return(mockOAuthConnectionRepo)
+
+			client := &entities.Client{ID: "test-client", ProjectID: "test-project", AccountID: "test-account", IsActive: true}
+			mockClientRepo.EXPECT().FindByID(ctx, "test-client").Return(client, nil)
+			project := &entities.Project{ID: "test-project", IsActive: true}
+			mockProjectRepo.EXPECT().FindByID(ctx, "test-project").Return(project, nil)
+			redirectURI := &entities.RedirectURI{ProjectID: "test-project", RedirectURI: "http://example.com/callback"}
+			mockRedirectURIRepo.EXPECT().FindByProjectIDAndRedirectURI(ctx, "test-project", "http://example.com/callback").Return(redirectURI, nil)
+			projectSetting := &entities.ProjectSetting{ProjectID: "test-project"}
+			mockProjectSettingRepo.EXPECT().FindByProjectID(ctx, "test-project").Return(projectSetting, nil)
+			account := &entities.Account{ID: "test-account", IsActive: true}
+			mockAccountRepo.EXPECT().FindByID(ctx, "test-account").Return(account, nil)
+
+			conns := []entities.OAuthConnection{
+				{
+					ID:             "test-conn",
+					ProjectID:      "test-project",
+					Provider:       tc.provider,
+					CredentialType: tc.credType,
+					Enabled:        tc.connEnabled,
+				},
+			}
+			mockOAuthConnectionRepo.EXPECT().FindByProjectID(ctx, "test-project").Return(conns, nil)
+
+			if tc.connEnabled && tc.credType == constants.OAuthCredentialTypeDefault {
+				systemProject := &entities.Project{ID: "system-project", IsSystem: true}
+				mockProjectRepo.EXPECT().FindSystem(ctx).Return(systemProject, nil)
+				mockOAuthConnectionRepo.EXPECT().FindByProjectIDAndProvider(ctx, "system-project", tc.provider).Return(tc.systemConn, nil)
+			}
+
+			defaultConfig := configs.DefaultConfig{}
+			defaultConfig.JWT.AuthCodeExpiryDuration = "1m"
+			service := NewAuthorizeService(&defaultConfig, mockRegistry, nil, nil)
+
+			req := &models.RenderAuthorizeRequest{
+				ClientID:     "test-client",
+				RedirectURI:  "http://example.com/callback",
+				ResponseType: "code",
+			}
+
+			result, err := service.RenderAuthorize(ctx, req)
+
+			assert.NoError(t, err)
+			assert.NotNil(t, result)
+			if tc.wantListed {
+				assert.Len(t, result.OAuthConnections, 1)
+				assert.Equal(t, tc.provider, result.OAuthConnections[0].Provider)
+			} else {
+				assert.Empty(t, result.OAuthConnections)
+			}
+		})
+	}
 }

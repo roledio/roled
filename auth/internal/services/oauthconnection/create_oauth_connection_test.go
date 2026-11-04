@@ -320,3 +320,232 @@ func TestCreateOAuthConnection_DBError(t *testing.T) {
 func boolPtr(b bool) *bool {
 	return &b
 }
+
+func TestCreateOAuthConnection_SystemProject_CustomCredentials_Success(t *testing.T) {
+	ctx := context.Background()
+
+	account := &entities.Account{
+		ID:       "acc-123",
+		IsSystem: true,
+		IsActive: true,
+	}
+	ctx = context.WithValue(ctx, constants.CtxAccount, account)
+
+	mockRegistry := repositorymocks.NewMockRegistry(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockOAuthConnectionRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
+	mockRedisService := redismocks.NewMockService(t)
+
+	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
+	mockRegistry.EXPECT().OAuthConnectionRepository().Return(mockOAuthConnectionRepo)
+
+	project := &entities.Project{
+		ID:       "proj-system",
+		IsSystem: true,
+		IsActive: true,
+	}
+	mockProjectRepo.EXPECT().FindByID(ctx, "proj-system").Return(project, nil)
+
+	// Check existing connection
+	mockOAuthConnectionRepo.EXPECT().
+		FindByProjectIDAndProvider(ctx, "proj-system", "google").
+		Return(nil, nil)
+
+	// Create connection
+	mockOAuthConnectionRepo.EXPECT().Create(ctx, mock.AnythingOfType("*entities.OAuthConnection")).Return(nil)
+
+	mockRedisService.EXPECT().
+		DeleteManyWithContext(ctx, []string{
+			"oauth_connection:project:proj-system",
+			"oauth_connection:project:proj-system:provider:google",
+		}).
+		Return(nil)
+
+	service := NewOAuthConnectionService(&configs.DefaultConfig{EncryptionMasterKey: "test-key"}, mockRegistry, mockRedisService)
+
+	req := &models.CreateOAuthConnectionRequest{
+		ProjectID:      "proj-system",
+		Provider:       "google",
+		CredentialType: constants.OAuthCredentialTypeCustom,
+		ClientID:       "client-1",
+		ClientSecret:   "secret-1",
+		Scopes:         []string{"openid", "profile", "email"},
+		Enabled:        boolPtr(true),
+	}
+
+	result, err := service.CreateOAuthConnection(ctx, req)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+	assert.Equal(t, "proj-system", result.ProjectID)
+	assert.Equal(t, "google", result.Provider)
+	assert.Equal(t, constants.OAuthCredentialTypeCustom, result.CredentialType)
+	assert.True(t, result.Enabled)
+}
+
+func TestCreateOAuthConnection_SystemProject_DefaultCredentials_Rejected(t *testing.T) {
+	ctx := context.Background()
+
+	account := &entities.Account{
+		ID:       "acc-123",
+		IsSystem: true,
+		IsActive: true,
+	}
+	ctx = context.WithValue(ctx, constants.CtxAccount, account)
+
+	mockRegistry := repositorymocks.NewMockRegistry(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockRedisService := redismocks.NewMockService(t)
+
+	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
+
+	project := &entities.Project{
+		ID:       "proj-system",
+		IsSystem: true,
+		IsActive: true,
+	}
+	mockProjectRepo.EXPECT().FindByID(ctx, "proj-system").Return(project, nil)
+
+	service := NewOAuthConnectionService(&configs.DefaultConfig{EncryptionMasterKey: "test-key"}, mockRegistry, mockRedisService)
+
+	req := &models.CreateOAuthConnectionRequest{
+		ProjectID:      "proj-system",
+		Provider:       "google",
+		CredentialType: constants.OAuthCredentialTypeDefault,
+		Enabled:        boolPtr(true),
+	}
+
+	result, err := service.CreateOAuthConnection(ctx, req)
+
+	assert.Error(t, err)
+	assert.Equal(t, errors.ErrDefaultCredentialsNotSupported.Msg, err.Error())
+	assert.Nil(t, result)
+}
+
+func TestCreateOAuthConnection_DefaultCredentials_SystemConnectionNotFound(t *testing.T) {
+	ctx := context.Background()
+
+	account := &entities.Account{
+		ID:       "acc-123",
+		IsSystem: true,
+		IsActive: true,
+	}
+	ctx = context.WithValue(ctx, constants.CtxAccount, account)
+
+	mockRegistry := repositorymocks.NewMockRegistry(t)
+	mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+	mockOAuthConnectionRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
+	mockRedisService := redismocks.NewMockService(t)
+
+	mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
+	mockRegistry.EXPECT().OAuthConnectionRepository().Return(mockOAuthConnectionRepo)
+
+	project := &entities.Project{
+		ID:       "proj-123",
+		IsSystem: false,
+		IsActive: true,
+	}
+	mockProjectRepo.EXPECT().FindByID(ctx, "proj-123").Return(project, nil)
+
+	// No existing connection for this project
+	mockOAuthConnectionRepo.EXPECT().FindByProjectIDAndProvider(ctx, "proj-123", "google").Return(nil, nil)
+
+	systemProject := &entities.Project{ID: "proj-system", IsSystem: true}
+	mockProjectRepo.EXPECT().FindSystem(ctx).Return(systemProject, nil)
+
+	// System project has no connection for this provider
+	mockOAuthConnectionRepo.EXPECT().FindByProjectIDAndProvider(ctx, "proj-system", "google").Return(nil, nil)
+
+	service := NewOAuthConnectionService(&configs.DefaultConfig{EncryptionMasterKey: "test-key"}, mockRegistry, mockRedisService)
+
+	req := &models.CreateOAuthConnectionRequest{
+		ProjectID:      "proj-123",
+		Provider:       "google",
+		CredentialType: constants.OAuthCredentialTypeDefault,
+		Enabled:        boolPtr(true),
+	}
+
+	result, err := service.CreateOAuthConnection(ctx, req)
+
+	assert.Error(t, err)
+	assert.Equal(t, errors.ErrDefaultCredentialsNotConfigured.Msg, err.Error())
+	assert.Nil(t, result)
+}
+
+func TestCreateOAuthConnection_DefaultCredentials_SystemConnectionEnabledStates_StillAllowed(t *testing.T) {
+	testCases := []struct {
+		name    string
+		enabled bool
+	}{
+		{name: "Enabled", enabled: true},
+		{name: "Disabled", enabled: false},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			ctx := context.Background()
+
+			account := &entities.Account{
+				ID:       "acc-123",
+				IsSystem: true,
+				IsActive: true,
+			}
+			ctx = context.WithValue(ctx, constants.CtxAccount, account)
+
+			mockRegistry := repositorymocks.NewMockRegistry(t)
+			mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+			mockOAuthConnectionRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
+			mockRedisService := redismocks.NewMockService(t)
+
+			mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
+			mockRegistry.EXPECT().OAuthConnectionRepository().Return(mockOAuthConnectionRepo)
+
+			project := &entities.Project{
+				ID:       "proj-123",
+				IsSystem: false,
+				IsActive: true,
+			}
+			mockProjectRepo.EXPECT().FindByID(ctx, "proj-123").Return(project, nil)
+
+			mockOAuthConnectionRepo.EXPECT().FindByProjectIDAndProvider(ctx, "proj-123", "google").Return(nil, nil)
+
+			systemProject := &entities.Project{ID: "proj-system", IsSystem: true}
+			mockProjectRepo.EXPECT().FindSystem(ctx).Return(systemProject, nil)
+
+			systemConn := &entities.OAuthConnection{
+				ID:             "sys-conn-1",
+				ProjectID:      "proj-system",
+				Provider:       "google",
+				CredentialType: constants.OAuthCredentialTypeCustom,
+				Enabled:        testCase.enabled,
+			}
+			mockOAuthConnectionRepo.EXPECT().FindByProjectIDAndProvider(ctx, "proj-system", "google").Return(systemConn, nil)
+
+			mockOAuthConnectionRepo.EXPECT().Create(ctx, mock.AnythingOfType("*entities.OAuthConnection")).Return(nil)
+
+			mockRedisService.EXPECT().
+				DeleteManyWithContext(ctx, []string{
+					"oauth_connection:project:proj-123",
+					"oauth_connection:project:proj-123:provider:google",
+				}).
+				Return(nil)
+
+			service := NewOAuthConnectionService(&configs.DefaultConfig{EncryptionMasterKey: "test-key"}, mockRegistry, mockRedisService)
+
+			req := &models.CreateOAuthConnectionRequest{
+				ProjectID:      "proj-123",
+				Provider:       "google",
+				CredentialType: constants.OAuthCredentialTypeDefault,
+				Enabled:        boolPtr(true),
+			}
+
+			result, err := service.CreateOAuthConnection(ctx, req)
+
+			assert.NoError(t, err)
+			assert.NotNil(t, result)
+			assert.Equal(t, "proj-123", result.ProjectID)
+			assert.Equal(t, constants.OAuthCredentialTypeDefault, result.CredentialType)
+			assert.True(t, result.Enabled)
+		})
+	}
+}

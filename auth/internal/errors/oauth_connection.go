@@ -32,4 +32,14 @@ var (
 			HttpCode: http.StatusBadRequest,
 		}
 	}
+	ErrDefaultCredentialsNotSupported = errors.CustomError{
+		Code:     "default_credentials_not_supported",
+		Msg:      "Default OAuth credentials are not supported for system project.",
+		HttpCode: http.StatusBadRequest,
+	}
+	ErrDefaultCredentialsNotConfigured = errors.CustomError{
+		Code:     "default_credentials_not_configured",
+		Msg:      "Default OAuth credentials are not configured for this provider.",
+		HttpCode: http.StatusBadRequest,
+	}
 )
