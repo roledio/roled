@@ -79,13 +79,13 @@ func NewHandler(app *fiber.App, defaultConfig *configs.DefaultConfig, deps *Depe
 }
 
 func (h *handler) SetupRoutes() {
-	h.app.Get("/system/ping", h.ping)
-	h.app.Get("/system/health", h.getSystemHealth)
-	h.app.Get("/system/info", h.getSystemInfo)
-	h.app.Get("/system/console/config", h.getConsoleConfig)
+	h.publicGet("/system/ping", h.ping)
+	h.publicGet("/system/health", h.getSystemHealth)
+	h.publicGet("/system/info", h.getSystemInfo)
+	h.publicGet("/system/console/config", h.getConsoleConfig)
 
-	h.app.Post("/api/v1/tokens", h.exchangeToken)
-	h.app.Post("/api/v1/tokens/current/revoke", h.revokeCurrentToken)
+	h.publicPost("/api/v1/tokens", h.exchangeToken)
+	h.publicPost("/api/v1/tokens/current/revoke", h.revokeCurrentToken)
 	h.protectedGet("/api/v1/tokens/current", constants.RouteGetCurrentTokenDetails, h.getCurrentAccessToken)
 
 	h.protectedGet("/api/v1/accounts/current", constants.RouteGetCurrentAccountDetails, h.getCurrentAccountDetails)
@@ -156,9 +156,24 @@ func (h *handler) SetupRoutes() {
 	h.protectedPost("/api/v1/projects/:project_id/users/invitation", constants.RouteInviteProjectUser, h.inviteProjectUser)
 }
 
+// publicGet registers an unauthenticated GET route with New Relic instrumentation.
+func (h *handler) publicGet(path string, pathHandler fiber.Handler) {
+	h.app.Get(path,
+		middlewares.NewRelicRequestAttributes,
+		pathHandler)
+}
+
+// publicPost registers an unauthenticated POST route with New Relic instrumentation.
+func (h *handler) publicPost(path string, pathHandler fiber.Handler) {
+	h.app.Post(path,
+		middlewares.NewRelicRequestAttributes,
+		pathHandler)
+}
+
 // protectedGet registers a protected GET route with JWT and Permission middlewares
 func (h *handler) protectedGet(path string, name string, pathHandler fiber.Handler) {
 	h.app.Get(path,
+		middlewares.NewRelicRequestAttributes,
 		middlewares.JWT(h.defaultConfig, h.repo),
 		middlewares.Permission(h.repo),
 		pathHandler).
@@ -168,6 +183,7 @@ func (h *handler) protectedGet(path string, name string, pathHandler fiber.Handl
 // protectedPost registers a protected POST route with JWT and Permission middlewares
 func (h *handler) protectedPost(path string, name string, pathHandler fiber.Handler) {
 	h.app.Post(path,
+		middlewares.NewRelicRequestAttributes,
 		middlewares.JWT(h.defaultConfig, h.repo),
 		middlewares.Permission(h.repo),
 		pathHandler).
@@ -177,6 +193,7 @@ func (h *handler) protectedPost(path string, name string, pathHandler fiber.Hand
 // protectedPut registers a protected PUT route with JWT and Permission middlewares
 func (h *handler) protectedPut(path string, name string, pathHandler fiber.Handler) {
 	h.app.Put(path,
+		middlewares.NewRelicRequestAttributes,
 		middlewares.JWT(h.defaultConfig, h.repo),
 		middlewares.Permission(h.repo),
 		pathHandler).
@@ -186,6 +203,7 @@ func (h *handler) protectedPut(path string, name string, pathHandler fiber.Handl
 // protectedDelete registers a protected DELETE route with JWT and Permission middlewares
 func (h *handler) protectedDelete(path string, name string, pathHandler fiber.Handler) {
 	h.app.Delete(path,
+		middlewares.NewRelicRequestAttributes,
 		middlewares.JWT(h.defaultConfig, h.repo),
 		middlewares.Permission(h.repo),
 		pathHandler).
@@ -195,6 +213,7 @@ func (h *handler) protectedDelete(path string, name string, pathHandler fiber.Ha
 // protectedPatch registers a protected PATCH route with JWT and Permission middlewares
 func (h *handler) protectedPatch(path string, name string, pathHandler fiber.Handler) {
 	h.app.Patch(path,
+		middlewares.NewRelicRequestAttributes,
 		middlewares.JWT(h.defaultConfig, h.repo),
 		middlewares.Permission(h.repo),
 		pathHandler).
