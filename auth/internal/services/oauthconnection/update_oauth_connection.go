@@ -2,7 +2,6 @@ package oauthconnection
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v3/log"
@@ -36,28 +35,9 @@ func (s *oAuthConnectionService) UpdateOAuthConnection(ctx context.Context, req 
 		return nil, errors.ErrOAuthConnectionNotFound
 	}
 
-	// Make sure the system project already has an OAuth connection configured before
-	// switching a non-system project's credential type to default.
-	// (Whether the system connection is enabled can change at any time; we only
-	// require it to be configured so the provider is known.)
 	if !project.IsSystem && req.CredentialType == constants.OAuthCredentialTypeDefault {
-		systemProject, err := s.registry.ProjectRepository().FindSystem(ctx)
-		if err != nil {
-			log.WithContext(ctx).Errorw("Failed to find system project", "error", err)
-			return nil, pkgerrors.ErrSystemError.WithError(err)
-		}
-		if systemProject == nil {
-			log.WithContext(ctx).Warnw("System project does not exist", "project_id", req.ProjectID, "provider", req.Provider)
-			return nil, pkgerrors.ErrSystemError.WithDebugMessage("System project does not exist")
-		}
-		systemOAuthConnection, err := oauthConnectionRepo.FindByProjectIDAndProvider(ctx, systemProject.ID, req.Provider)
-		if err != nil {
-			log.WithContext(ctx).Errorw("Failed to check system OAuth connection", "error", err, "project_id", req.ProjectID, "provider", req.Provider)
-			return nil, pkgerrors.ErrSystemError.WithError(err)
-		}
-		if systemOAuthConnection == nil {
-			log.WithContext(ctx).Warnw("System project does not have OAuth connection configured for this provider", "project_id", req.ProjectID, "provider", req.Provider)
-			return nil, errors.ErrDefaultCredentialsNotConfigured
+		if err := s.validateSystemOAuthConnectionConfigured(ctx, req.ProjectID, req.Provider); err != nil {
+			return nil, err
 		}
 	}
 
@@ -69,20 +49,9 @@ func (s *oAuthConnectionService) UpdateOAuthConnection(ctx context.Context, req 
 		existing.ClientSecretEncrypted = nil
 		existing.Scopes = nil
 	} else {
-
-		// Convert scopes to space-separated string
-		scopesStr := strings.Join(req.Scopes, " ")
-
-		// Encrypt client secret
-		secretEncrypted, err := s.encryptOAuthClientSecret(ctx, req.ClientSecret)
-		if err != nil {
+		if err := s.setCustomOAuthCredentials(ctx, existing, req.ClientID, req.ClientSecret, req.Scopes); err != nil {
 			return nil, err
 		}
-
-		// Set client ID, encrypted secret, and scopes
-		existing.ClientSecretEncrypted = &secretEncrypted
-		existing.ClientID = &req.ClientID
-		existing.Scopes = &scopesStr
 	}
 
 	affected, err := s.registry.OAuthConnectionRepository().Update(ctx, existing)

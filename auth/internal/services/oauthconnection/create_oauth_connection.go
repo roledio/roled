@@ -2,7 +2,6 @@ package oauthconnection
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v3/log"
@@ -46,45 +45,16 @@ func (s *oAuthConnectionService) CreateOAuthConnection(ctx context.Context, req 
 		Enabled:        req.Enabled != nil && *req.Enabled,
 	}
 
-	// Make sure the system project already has OAuth connection configured before creating
-	// a default OAuth connection for a non-system project
 	if !project.IsSystem && req.CredentialType == constants.OAuthCredentialTypeDefault {
-		// Find system project
-		systemProject, err := s.registry.ProjectRepository().FindSystem(ctx)
-		if err != nil {
-			log.WithContext(ctx).Errorw("Failed to find system project", "error", err)
-			return nil, pkgerrors.ErrSystemError.WithError(err)
-		}
-		if systemProject == nil {
-			log.WithContext(ctx).Warnw("System project does not exist", "project_id", req.ProjectID, "provider", req.Provider)
-			return nil, pkgerrors.ErrSystemError.WithDebugMessage("System project does not exist")
-		}
-		// Find OAuth connection for system project
-		systemOAuthConnection, err := oauthConnectionRepo.FindByProjectIDAndProvider(ctx, systemProject.ID, req.Provider)
-		if err != nil {
-			log.WithContext(ctx).Errorw("Failed to check existing OAuth connection", "error", err, "project_id", req.ProjectID, "provider", req.Provider)
-			return nil, pkgerrors.ErrSystemError.WithError(err)
-		}
-		if systemOAuthConnection == nil {
-			log.WithContext(ctx).Warnw("System project does not have OAuth connection configured for this provider", "project_id", req.ProjectID, "provider", req.Provider)
-			return nil, errors.ErrDefaultCredentialsNotConfigured
+		if err := s.validateSystemOAuthConnectionConfigured(ctx, req.ProjectID, req.Provider); err != nil {
+			return nil, err
 		}
 	}
 
 	if req.CredentialType == constants.OAuthCredentialTypeCustom {
-		// Convert scopes to space-separated string
-		scopesStr := strings.Join(req.Scopes, " ")
-
-		// Encrypt client secret
-		secretEncrypted, err := s.encryptOAuthClientSecret(ctx, req.ClientSecret)
-		if err != nil {
+		if err := s.setCustomOAuthCredentials(ctx, newConnection, req.ClientID, req.ClientSecret, req.Scopes); err != nil {
 			return nil, err
 		}
-
-		// Set client ID, encrypted secret, and scopes
-		newConnection.ClientID = &req.ClientID
-		newConnection.ClientSecretEncrypted = &secretEncrypted
-		newConnection.Scopes = &scopesStr
 	}
 
 	err = oauthConnectionRepo.Create(ctx, newConnection)
