@@ -549,3 +549,45 @@ func TestCreateOAuthConnection_DefaultCredentials_SystemConnectionEnabledStates_
 		})
 	}
 }
+
+func TestValidateSystemOAuthConnectionConfigured_Errors(t *testing.T) {
+	testCases := []struct {
+		name              string
+		systemProject     *entities.Project
+		findSystemErr     error
+		findConnectionErr error
+	}{
+		{
+			name:          "system project lookup error",
+			findSystemErr: context.DeadlineExceeded,
+		},
+		{
+			name: "system project missing",
+		},
+		{
+			name:              "system connection lookup error",
+			systemProject:     &entities.Project{ID: "system-project"},
+			findConnectionErr: context.DeadlineExceeded,
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			ctx := context.Background()
+			mockRegistry := repositorymocks.NewMockRegistry(t)
+			mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+			mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
+			mockProjectRepo.EXPECT().FindSystem(ctx).Return(testCase.systemProject, testCase.findSystemErr)
+
+			if testCase.systemProject != nil {
+				mockOAuthConnectionRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
+				mockRegistry.EXPECT().OAuthConnectionRepository().Return(mockOAuthConnectionRepo)
+				mockOAuthConnectionRepo.EXPECT().FindByProjectIDAndProvider(ctx, testCase.systemProject.ID, "google").Return(nil, testCase.findConnectionErr)
+			}
+
+			service := &oAuthConnectionService{registry: mockRegistry}
+			err := service.validateSystemOAuthConnectionConfigured(ctx, "project", "google")
+			assert.Error(t, err)
+		})
+	}
+}
