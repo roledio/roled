@@ -1,6 +1,12 @@
+<div align="center" width="100%">
+
 [![GitHub Release](https://img.shields.io/badge/dynamic/json?url=https://api.github.com/repos/roledio/roled/releases/latest&query=$.name&label=release)](https://github.com/roledio/roled/releases)
 [![CI](https://github.com/roledio/roled/actions/workflows/ci.yml/badge.svg)](https://github.com/roledio/roled/actions/workflows/ci.yml)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=roledio_roled&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=roledio_roled) 
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=roledio_roled&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=roledio_roled) 
 [![License](https://img.shields.io/github/license/roledio/roled)](https://github.com/roledio/roled/blob/main/LICENSE)
+
+</div>
 
 <p align="center">
   <img src="console/public/roled-logo-text-dark.png" alt="Roled Logo" style="height: 48px;" />
@@ -34,8 +40,8 @@ As an open-source platform, Roled gives you complete control over your data and 
 
 | Layer | Technologies | Badges |
 |---|---|---|
-| **Backend** ([auth](./auth/)) | [Go](https://go.dev/), [Fiber](https://gofiber.io/), [MariaDB](https://mariadb.org/), [Redis](https://redis.io/) | [![Auth Coverage](https://codecov.io/gh/roledio/roled/graph/badge.svg?component=auth&token=ukGZpGAbMX)](https://codecov.io/gh/roledio/roled) [![Auth Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=roledio_roled_auth&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=roledio_roled_auth) [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=roledio_roled_auth&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=roledio_roled_auth) |
-| **Frontend** ([console](./console/)) | [React](https://react.dev/), [Vite](https://vite.dev/), [TailwindCSS](https://tailwindcss.com/) | [![Console Coverage](https://codecov.io/gh/roledio/roled/graph/badge.svg?component=console&token=ukGZpGAbMX)](https://codecov.io/gh/roledio/roled) [![Console Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=roledio_roled_console&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=roledio_roled_console) [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=roledio_roled_console&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=roledio_roled_console) |
+| **Backend** ([auth](./auth/)) | [Go](https://go.dev/), [Fiber](https://gofiber.io/), [MariaDB](https://mariadb.org/), [Redis](https://redis.io/) | [![Auth Coverage](https://codecov.io/gh/roledio/roled/graph/badge.svg?component=auth&token=ukGZpGAbMX)](https://app.codecov.io/gh/roledio/roled/components) |
+| **Frontend** ([console](./console/)) | [React](https://react.dev/), [Vite](https://vite.dev/), [TailwindCSS](https://tailwindcss.com/) | [![Console Coverage](https://codecov.io/gh/roledio/roled/graph/badge.svg?component=console&token=ukGZpGAbMX)](https://app.codecov.io/gh/roledio/roled/components) |
 
 
 ## Quick Start
