@@ -14,6 +14,7 @@ import (
 	"github.com/roledio/roled/auth/internal/models"
 	interfacemocks "github.com/roledio/roled/auth/internal/repositories/interfaces/mocks"
 	repositorymocks "github.com/roledio/roled/auth/internal/repositories/mocks"
+	pkgerrors "github.com/roledio/roled/auth/pkg/errors"
 	redismocks "github.com/roledio/roled/auth/pkg/redis/mocks"
 )
 
@@ -546,6 +547,59 @@ func TestCreateOAuthConnection_DefaultCredentials_SystemConnectionEnabledStates_
 			assert.Equal(t, "proj-123", result.ProjectID)
 			assert.Equal(t, constants.OAuthCredentialTypeDefault, result.CredentialType)
 			assert.True(t, result.Enabled)
+		})
+	}
+}
+
+func TestValidateSystemOAuthConnectionConfigured_Errors(t *testing.T) {
+	testCases := []struct {
+		name              string
+		systemProject     *entities.Project
+		findSystemErr     error
+		findConnectionErr error
+		debugMessage      string
+	}{
+		{
+			name:          "system project lookup error",
+			findSystemErr: context.DeadlineExceeded,
+		},
+		{
+			name:         "system project missing",
+			debugMessage: "System project does not exist",
+		},
+		{
+			name:          "system connection missing",
+			systemProject: &entities.Project{ID: "system-project"},
+			debugMessage:  "System OAuth connection is not configured for provider google",
+		},
+		{
+			name:              "system connection lookup error",
+			systemProject:     &entities.Project{ID: "system-project"},
+			findConnectionErr: context.DeadlineExceeded,
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			ctx := context.Background()
+			mockRegistry := repositorymocks.NewMockRegistry(t)
+			mockProjectRepo := interfacemocks.NewMockProjectRepository(t)
+			mockRegistry.EXPECT().ProjectRepository().Return(mockProjectRepo)
+			mockProjectRepo.EXPECT().FindSystem(ctx).Return(testCase.systemProject, testCase.findSystemErr)
+
+			if testCase.systemProject != nil {
+				mockOAuthConnectionRepo := interfacemocks.NewMockOAuthConnectionRepository(t)
+				mockRegistry.EXPECT().OAuthConnectionRepository().Return(mockOAuthConnectionRepo)
+				mockOAuthConnectionRepo.EXPECT().FindByProjectIDAndProvider(ctx, testCase.systemProject.ID, "google").Return(nil, testCase.findConnectionErr)
+			}
+
+			service := &oAuthConnectionService{registry: mockRegistry}
+			err := service.validateSystemOAuthConnectionConfigured(ctx, "project", "google")
+			assert.Error(t, err)
+			var customErr pkgerrors.CustomError
+			if assert.ErrorAs(t, err, &customErr) {
+				assert.Equal(t, testCase.debugMessage, customErr.DebugMessage)
+			}
 		})
 	}
 }
