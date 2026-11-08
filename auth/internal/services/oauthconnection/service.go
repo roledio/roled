@@ -72,7 +72,7 @@ func (s *oAuthConnectionService) validateSystemOAuthConnectionConfigured(ctx con
 	}
 	if systemConnection == nil {
 		log.WithContext(ctx).Warnw("System project does not have OAuth connection configured for this provider", "project_id", projectID, "provider", provider)
-		return errors.ErrDefaultCredentialsNotConfigured
+		return errors.ErrDefaultCredentialsNotConfigured.WithDebugMessage("System OAuth connection is not configured for provider " + provider)
 	}
 	return nil
 }
