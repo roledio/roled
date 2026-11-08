@@ -1,0 +1,19 @@
+comment:
+  layout: "header, diff, components"
+
+component_management:
+  default_rules:
+    statuses:
+      - type: project
+        target: auto
+
+  individual_components:
+    - component_id: auth
+      name: Auth
+      paths:
+        - auth/**
+
+    - component_id: console
+      name: Console
+      paths:
+        - console/src/**
