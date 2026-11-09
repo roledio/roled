@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func TestHashPassword(t *testing.T) {
@@ -11,6 +12,9 @@ func TestHashPassword(t *testing.T) {
 	hash, err := HashPassword(password)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, hash)
+	cost, err := bcrypt.Cost([]byte(hash))
+	assert.NoError(t, err)
+	assert.GreaterOrEqual(t, cost, 10)
 
 	// The primary validation is whether IsValidPassword can verify the generated hash.
 	assert.True(t, IsValidPassword(password, hash))

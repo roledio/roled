@@ -14,7 +14,7 @@ import (
 // It returns the generated bcrypt hash as a string and an error if one occurred.
 func HashPassword(password string) (string, error) {
 	sha := hashutil.HashSum(hashutil.AlgoSHA256, password) // 32 bytes
-	bytes, err := bcrypt.GenerateFromPassword(sha, 8)      // Using the cost of 8 to support low spec hardwares
+	bytes, err := bcrypt.GenerateFromPassword(sha, bcrypt.DefaultCost)
 	return string(bytes), err
 }
 
