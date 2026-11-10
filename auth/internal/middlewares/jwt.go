@@ -32,6 +32,10 @@ func JWT(defaultConfig *configs.DefaultConfig, registry repositories.Registry) f
 			ctx := c.Context()
 			token := jwtware.FromContext(c)
 			claims := token.Claims.(*models.JWTClaims)
+			if len(claims.Audience) == 0 {
+				log.WithContext(ctx).Warnw("Access token audience is missing", "id", claims.ID)
+				return responseutil.SendError(c, errors.ErrInvalidAuthorizationToken)
+			}
 			accessTokenRepo := registry.AccessTokenRepository()
 			accessToken, err := accessTokenRepo.FindByID(ctx, claims.ID)
 			if err != nil {
