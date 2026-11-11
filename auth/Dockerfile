@@ -24,7 +24,11 @@ FROM alpine:latest
 
 WORKDIR /app
 
-RUN apk add --no-cache ca-certificates wget
+RUN apk add --no-cache ca-certificates wget \
+  && addgroup -S roled \
+  && adduser -S -G roled roled \
+  && mkdir -p /app/uploads \
+  && chown roled:roled /app/uploads
 
 # The binary is built into tmp dir in the builder stage
 COPY --from=builder /app/tmp/app .
@@ -33,6 +37,8 @@ COPY --from=builder /app/tmp/app .
 # so we need to copy them separately
 COPY --from=builder /app/configs ./configs
 COPY --from=builder /app/migrations ./migrations
+
+USER roled:roled
 
 EXPOSE 8080
 

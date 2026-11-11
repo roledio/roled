@@ -86,7 +86,7 @@ services:
         - VITE_DOCS_BASE_URL
         - VITE_PORT=${CONSOLE_PORT}
     ports:
-      - "${CONSOLE_PORT}:80"
+      - "${CONSOLE_PORT}:8080"
     depends_on:
       auth:
         condition: service_healthy
